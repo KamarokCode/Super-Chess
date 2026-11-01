@@ -177,6 +177,11 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--gold);
   box-shadow: inset 0 0 0 4px #e8b64c, 0 0 18px rgba(232, 182, 76, .9); animation-duration: .9s; }
 @keyframes pwPulse { 0%, 100% { opacity: .65; transform: scale(.94); } 50% { opacity: 1; transform: scale(1); } }
 @media (prefers-reduced-motion: reduce) { .pwring { animation: none; } }
+.review { position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%); z-index: 25; display: flex; align-items: center; gap: 4px;
+  padding: 5px; border-radius: 14px; background: color-mix(in srgb, var(--panel) 92%, transparent); border: 1px solid var(--gold); box-shadow: 0 12px 30px -10px rgba(0,0,0,.8); max-width: calc(100% - 16px); }
+.review .btn { padding: 7px 9px; } .review .btn svg { width: 16px; height: 16px; }
+.rv-label { font: 700 12.5px var(--f-mono); padding: 0 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.mv[data-i] { cursor: pointer; } .mv[data-i]:hover { background: var(--panel-2); }
 .hint.pow::before { width: 30%; height: 30%; border-radius: 3px; transform: rotate(45deg); background: var(--gold); box-shadow: 0 0 12px rgba(232, 182, 76, .9); }
 .hint.pow.cap::before { width: 84%; height: 84%; border-radius: 50%; transform: none; background: none; border: 5px solid var(--gold); box-shadow: 0 0 14px rgba(232, 182, 76, .8), inset 0 0 14px rgba(232, 182, 76, .6); }
 .sq.can .pc svg { filter: drop-shadow(0 0 5px rgba(232, 182, 76, 1)) drop-shadow(0 0 2px rgba(232, 182, 76, 1)); }
@@ -318,7 +323,30 @@ body[data-sc-theme="pirate"] .home-head h1 { font-weight: 400; letter-spacing: .
 .hbtn:active { transform: scale(.985); }
 .hbtn.resume { background: var(--gold); color: var(--gold-ink); border-color: var(--gold); }
 .hbtn.resume svg, .hbtn.resume small { color: var(--gold-ink); }
-.home-foot { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.home-foot { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+@media (max-width: 480px) { .home-foot { grid-template-columns: 1fr 1fr; } .home-foot .hbtn:last-child { grid-column: 1 / -1; } }
+.stats-grid { display: grid; gap: 8px; }
+.modal.tuto { width: min(400px, 100%); text-align: center; gap: 10px; }
+.tuto-ico { width: 76px; height: 76px; margin: 0 auto; border-radius: 20px; display: grid; place-items: center; background: var(--panel-2); border: 1px solid var(--line); position: relative; }
+.tuto-ico svg { width: 52px; height: 52px; }
+.tuto-ico .pwring { inset: 10%; }
+.tuto-step { margin: 0; font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); }
+.tuto-text { margin: 0; color: var(--muted); line-height: 1.55; font-size: 15px; text-wrap: pretty; }
+.tuto-dots { display: flex; justify-content: center; gap: 6px; }
+.tuto-dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--line); }
+.tuto-dots i.on { background: var(--gold); width: 20px; border-radius: 4px; }
+.st-row { display: grid; grid-template-columns: minmax(0, 1fr) repeat(3, 52px); gap: 6px; align-items: center; padding: 8px 10px; border-radius: 10px; background: var(--panel-2); font-size: 14px; }
+.st-row.head { background: none; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding-block: 0; }
+.st-row b { font-family: var(--f-mono); text-align: center; font-variant-numeric: tabular-nums; }
+.st-row .w { color: #7fd6a0; } .st-row .l { color: #ff9c94; }
+.st-row.head span:not(:first-child) { text-align: center; }
+.st-tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.st-tile { padding: 10px; border-radius: 12px; background: var(--panel-2); text-align: center; }
+.st-tile b { display: block; font: 700 22px var(--f-mono); color: var(--gold); }
+.st-tile span { font-size: 12px; color: var(--muted); }
+.st-fav { display: flex; flex-wrap: wrap; gap: 6px; }
+.st-fav span { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px 3px 3px; border-radius: 999px; background: var(--panel-2); font-size: 12px; font-weight: 700; }
+.st-fav svg { width: 22px; height: 22px; }
 .hbtn.small { padding: 11px 12px; font-size: 14px; gap: 10px; } .hbtn.small svg { width: 22px; height: 22px; } .hbtn.small small { font-size: 12px; }
 /* ---------- Paramètres ---------- */
 .home.settings { z-index: 47; place-items: start center; }
@@ -465,6 +493,14 @@ body:not(.moves-open) #moves { display: none; }
       <div class="clock" id="clockTop">5:00</div>
     </div>
     <div class="board-wrap" id="wrap">
+      <div class="review" id="reviewBar" hidden>
+        <button class="btn" data-rv="first" title="Début de la partie"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 5v14M18 6l-8 6 8 6z"/></svg></button>
+        <button class="btn" data-rv="prev" title="Coup précédent"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <span class="rv-label" id="reviewLabel"></span>
+        <button class="btn" data-rv="next" title="Coup suivant"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
+        <button class="btn" data-rv="last" title="Dernier coup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 5v14M6 6l8 6-8 6z"/></svg></button>
+        <button class="btn primary" data-rv="exit" title="Revenir à la partie">Partie</button>
+      </div>
       <div id="view3d" hidden></div>
       <div id="board" role="grid" aria-label="Échiquier"></div>
     </div>
@@ -514,6 +550,7 @@ body:not(.moves-open) #moves { display: none; }
     </div>
     <div class="home-foot">
       <button class="hbtn small" data-home="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg><span>Paramètres<small>Son, vue, coups, règles</small></span></button>
+      <button class="hbtn small" data-home="stats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Statistiques<small id="homeStatsSub">Votre palmarès</small></span></button>
       <button class="hbtn small" data-home="rules"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 012-2h13v16H6a2 2 0 00-2 2z"/><path d="M4 19V5M9 7h6M9 11h6"/></svg><span>Règles du jeu<small>Pouvoirs et événements</small></span></button>
     </div>
   </div>
@@ -562,7 +599,7 @@ body:not(.moves-open) #moves { display: none; }
     <div class="rules" id="rulesList"></div>
     <div class="rules" id="eventsList"></div>
     <p class="golden"><b>Comment jouer un pouvoir :</b> les pièces dont le pouvoir est prêt ont un cercle doré au sol. Touchez une fois la pièce pour ses coups normaux, une deuxième fois pour son coup spécial (cases marquées d'un losange doré), une troisième fois pour revenir aux coups normaux. Un pouvoir remplace votre coup, puis se recharge pendant le nombre de tours indiqué. <b>Échec par pouvoir :</b> une Catapulte, un Spectre, un Double bond ou une Percée prêts peuvent mettre le roi en échec, et même le mater : il faut parer la menace. Le roi n'est jamais capturé, la Supernova l'épargne et aucun événement ne le touche. <b>Événements :</b> en variante Super, un événement tiré au sort frappe l'échiquier au début des tours 5, 9, 13, 17… Le même ne tombe jamais deux fois de suite, et aucun ne peut donner mat.</p>
-    <div class="actions"><button class="btn primary" id="rulesClose">Compris</button></div>
+    <div class="actions"><button class="btn" id="rulesTuto">Revoir les premiers pas</button><button class="btn primary" id="rulesClose">Compris</button></div>
   </div>
 </div>
 
@@ -591,12 +628,31 @@ body:not(.moves-open) #moves { display: none; }
   </div>
 </div>
 
+<div class="modal-bg" id="tutoModal" hidden>
+  <div class="modal tuto" role="dialog" aria-modal="true" aria-labelledby="tutoTitle">
+    <div class="tuto-ico" id="tutoIco"></div>
+    <p class="tuto-step" id="tutoStep"></p>
+    <h3 id="tutoTitle"></h3>
+    <p class="tuto-text" id="tutoText"></p>
+    <div class="tuto-dots" id="tutoDots"></div>
+    <div class="actions"><button class="btn" id="tutoSkip">Passer</button><button class="btn primary" id="tutoNext">Suivant</button></div>
+  </div>
+</div>
+
+<div class="modal-bg" id="statsModal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="statsTitle">
+    <h3 id="statsTitle">Statistiques</h3>
+    <div id="statsBody" class="stats-grid"></div>
+    <div class="actions"><button class="btn" id="statsReset">Remettre à zéro</button><button class="btn primary" id="statsClose">Fermer</button></div>
+  </div>
+</div>
+
 <div class="modal-bg" id="endModal" hidden>
   <div class="modal result" role="dialog" aria-modal="true" aria-labelledby="endTitle">
     <div class="result-ico" id="endIco"></div>
     <h3 id="endTitle">Échec et mat</h3>
     <p id="endSub"></p>
-    <div class="actions" style="justify-content:center"><button class="btn" id="endMenu">Menu principal</button><button class="btn" id="endClose">Voir l'échiquier</button><button class="btn primary" id="endAgain">Revanche</button></div>
+    <div class="actions" style="justify-content:center"><button class="btn" id="endMenu">Menu principal</button><button class="btn" id="endClose">Voir l'échiquier</button><button class="btn" id="endReview">Revoir la partie</button><button class="btn primary" id="endAgain">Revanche</button></div>
   </div>
 </div>
 
@@ -2457,9 +2513,13 @@ const powersOn = () => !!cur().powers;
 const powerSide = () => (G.settings.mode === 'local' ? cur().turn : G.human);
 const cur = () => G.states[G.states.length - 1];
 const lastMove = () => (G.hist.length ? G.hist[G.hist.length - 1].m : null);
-const humanTurn = () => !G.over && !G.thinking && (G.settings.mode === 'local' || cur().turn === G.human);
+const humanTurn = () => G.review == null && !G.over && !G.thinking && (G.settings.mode === 'local' || cur().turn === G.human);
+// relecture : la position affichée peut être une position passée (G.review = indice dans G.states)
+const viewSt = () => (G.review != null ? G.states[G.review] : cur());
+const viewLast = () => (G.review != null ? (G.review > 0 ? G.hist[G.review - 1].m : null) : lastMove());
 
 function newGame(settings) {
+  G.review = null; G.gid = 'g' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
   G.settings = Object.assign({}, G.settings, settings);
   const s = G.settings;
   G.human = s.mode === 'local' ? 'w' : s.color === 'r' ? (Math.random() < .5 ? 'w' : 'b') : s.color;
@@ -2482,7 +2542,8 @@ for (let d = 0; d < 64; d++) { const e = document.createElement('div'); e.classN
 const disp = s => (G.flipped ? 63 - s : s);
 
 function renderBoard(animFrom) {
-  const st = cur(), lm = lastMove();
+  const st = viewSt(), lm = viewLast();
+  renderReviewBar();
   const checkSq = !G.over || G.over.type === 'mate' ? (inCheck(st) ? findKing(st, st.turn) : -1) : -1;
   const tgt = new Map(G.targets.map(m => [m.to, m]));
   // pièces capables d'utiliser le pouvoir armé + zones d'explosion de la Supernova
@@ -2604,7 +2665,8 @@ function renderMoves() {
   let html = '';
   for (let i = 0; i < G.hist.length; i += 2) {
     const a = G.hist[i], b = G.hist[i + 1], last = G.hist.length - 1;
-    const cell = (h, k) => h ? `<span class="mv${k === last ? ' cur' : ''}${h.m.power ? ' pw' : ''}"${h.m.power ? ` title="${POWERS[h.m.piece].name}"` : ''}>${h.san}</span>` : '<span></span>';
+    const at = G.review != null ? G.review - 1 : last;
+    const cell = (h, k) => h ? `<span class="mv${k === at ? ' cur' : ''}${h.m.power ? ' pw' : ''}" data-i="${k + 1}" role="button" tabindex="0"${h.m.power ? ` title="${POWERS[h.m.piece].name}"` : ''}>${h.san}</span>` : '<span></span>';
     html += `<div class="mrow"><span class="n">${i / 2 + 1}.</span>${cell(a, i)}${cell(b, i + 1)}</div>`;
     for (const h of [a, b]) if (h && h.ev) html += `<div class="evrow">✷ ${EVENTS[h.ev.id].name}</div>`;
   }
@@ -2613,6 +2675,14 @@ function renderMoves() {
 }
 const WHO = c => (c === 'w' ? 'Blancs' : 'Noirs');
 function renderStatus() {
+  if (G.review != null) {
+    const eb0 = document.getElementById('statusEyebrow'), h20 = document.getElementById('statusText'), sub0 = document.getElementById('statusSub');
+    eb0.textContent = 'Relecture'; h20.className = '';
+    h20.textContent = G.review === 0 ? 'Position de départ' : `Après ${Math.ceil(G.review / 2)}.${G.review % 2 ? '' : '..'} ${G.hist[G.review - 1].san}`;
+    const ev = G.review > 0 && G.hist[G.review - 1].ev;
+    sub0.textContent = ev ? `${EVENTS[ev.id].name} : ${EVENTS[ev.id].desc}` : 'Utilisez ‹ › pour avancer ou reculer, « Partie » pour revenir au jeu.';
+    return;
+  }
   const st = cur(), h2 = document.getElementById('statusText'), eb = document.getElementById('statusEyebrow'), sub = document.getElementById('statusSub');
   h2.className = '';
   if (G.over) {
@@ -2634,8 +2704,12 @@ function renderStatus() {
     return;
   }
   const selP = G.sel != null ? st.board[G.sel] : null;
-  if (selP && !G.arm && humanTurn() && legalFrom(st, G.sel).some(m => m.power)) {
-    sub.textContent = `Touchez encore votre ${NAMES[selP.t]} pour son pouvoir : ${POWERS[selP.t].name}.`;
+  if (selP && !G.arm && humanTurn() && st.powers) {
+    const t = selP.t, nm = POWERS[t].name, cd = st.cd && st.cd[selP.c][t];
+    sub.textContent = st.rules && st.rules.off.includes(t) ? `${nm} est désactivé dans les paramètres de cette partie.`
+      : cd > 0 ? `${nm} : prêt dans ${cd} tour${cd > 1 ? 's' : ''}.`
+      : legalFrom(st, G.sel).some(m => m.power) ? `Touchez encore votre ${NAMES[t]} pour son pouvoir : ${nm}.`
+      : `${nm} est prêt, mais n'a aucune cible depuis cette case.`;
     return;
   }
   sub.textContent = G.notice || (st.half >= 80 ? `Règle des 50 coups : ${Math.ceil((100 - st.half) / 2)} coups avant nulle` : '');
@@ -2705,7 +2779,7 @@ function renderControls() {
     : !G.hist.length || (G.settings.mode === 'ai' && !G.hist.some(h => h.m.color === G.human));
   document.getElementById('btnHint').disabled = online || !humanTurn();
 }
-function renderAll(anim) { renderBoard(anim); renderPlayers(); renderMoves(); renderStatus(); renderChips(); renderControls(); renderPowers(); snapshot(); }
+function renderAll(anim) { recordEnd(); renderBoard(anim); renderPlayers(); renderMoves(); renderStatus(); renderChips(); renderControls(); renderPowers(); snapshot(); }
 function flash(squares, kind) {
   if (view3d && G.view === '3d') { view3d.flash(squares, kind); return; }
   for (const s of squares) {
@@ -2732,7 +2806,7 @@ function commit(m, animate = true) {
   checkEnd();
   if (G.over) SND.end();
   else if (m.power) SND.power(m);
-  else if (s.endsWith('+')) SND.check();
+  else if (s.endsWith('+')) { SND.check(); try { navigator.vibrate && navigator.vibrate([30, 40, 30]); } catch (e) {} }
   else if (m.castle) SND.castle();
   else if (m.captured) SND.capture();
   else SND.move();
@@ -2915,8 +2989,12 @@ function endDrag(e, cancel) {
 boardEl.addEventListener('pointerup', e => endDrag(e, false));
 boardEl.addEventListener('pointercancel', e => endDrag(e, true));
 document.addEventListener('keydown', e => {
+  if (G.review != null && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+    reviewBar.querySelector(`[data-rv="${e.key === 'ArrowLeft' ? 'prev' : 'next'}"]`).click(); return;
+  }
   if (e.key !== 'Escape') return;
-  const open = ['newModal', 'rulesModal', 'netModal'].find(id => !document.getElementById(id).hidden);
+  if (G.review != null && document.querySelectorAll('.modal-bg:not([hidden])').length === 0 && homeEl.hidden) { exitReview(); return; }
+  const open = ['newModal', 'rulesModal', 'netModal', 'statsModal', 'tutoModal'].find(id => !document.getElementById(id).hidden);
   if (!open && !setEl.hidden) { closeSettings(); return; }
   if (!open && !homeEl.hidden) { if (G.hist.length && !G.over) hideHome(); return; }
   if (open) hideModal(open);
@@ -2947,6 +3025,7 @@ document.getElementById('btnUndo').onclick = () => {
     return;
   }
   if (!G.hist.length) return;
+  G.review = null;
   aiReq++; G.thinking = false; G.over = null;
   const pop = () => { G.states.pop(); G.hist.pop(); G.keys.pop(); };
   pop();
@@ -2969,6 +3048,7 @@ const openRules = () => { renderRules(); showModal('rulesModal'); document.getEl
 document.getElementById('btnRules').onclick = openRules;
 document.getElementById('pwHelp').onclick = openRules;
 document.getElementById('rulesClose').onclick = () => hideModal('rulesModal');
+document.getElementById('rulesTuto').onclick = () => { hideModal('rulesModal'); showTuto(0); };
 document.getElementById('rulesModal').addEventListener('click', e => { if (e.target.id === 'rulesModal') hideModal('rulesModal'); });
 document.getElementById('btnFlip').onclick = () => { G.flipped = !G.flipped; if (view3d) view3d.resetView(); renderAll(); };
 function applyTheme() {
@@ -3013,7 +3093,7 @@ document.getElementById('btnNew').onclick = () => { newFromHome = false; openNew
 document.getElementById('btnNewTop').onclick = () => { newFromHome = false; openNew(); };
 document.getElementById('newCancel').onclick = () => { hideModal('newModal'); if (newFromHome) showHome(); };
 document.getElementById('newModal').addEventListener('click', e => { if (e.target.id === 'newModal') hideModal('newModal'); });
-document.getElementById('newGo').onclick = () => { hideModal('newModal'); newFromHome = false; newGame(Object.assign({}, draft)); };
+document.getElementById('newGo').onclick = () => { hideModal('newModal'); newFromHome = false; newGame(Object.assign({}, draft)); if (!PREFS.tuto) setTimeout(() => showTuto(0), 400); };
 
 function showEnd() {
   if (!G.over) return;
@@ -3029,6 +3109,41 @@ function showEnd() {
   showModal('endModal');
 }
 document.getElementById('endClose').onclick = () => hideModal('endModal');
+document.getElementById('endReview').onclick = () => { hideModal('endModal'); startReview(0); };
+
+/* ---------- Revoir la partie ---------- */
+const reviewBar = document.getElementById('reviewBar');
+function startReview(i) {
+  G.review = Math.max(0, Math.min(G.states.length - 1, i));
+  if (G.review === G.states.length - 1 && !G.over) G.review = null; // la position actuelle, c'est la partie elle-même
+  G.sel = null; G.targets = []; G.arm = null;
+  renderBoard(); renderMoves(); renderStatus();
+}
+function exitReview() { G.review = null; renderAll(); maybeAI(); }
+function renderReviewBar() {
+  const on = G.review != null;
+  reviewBar.hidden = !on;
+  if (!on) return;
+  const i = G.review, h = G.hist[i - 1];
+  document.getElementById('reviewLabel').textContent = i === 0 ? 'Position de départ'
+    : `${Math.ceil(i / 2)}.${i % 2 ? '' : '..'} ${h.san}${h.ev ? ' ✷' : ''}  ·  ${i}/${G.hist.length}`;
+  reviewBar.querySelector('[data-rv="exit"]').textContent = G.over ? 'Terminer' : 'Partie';
+}
+reviewBar.addEventListener('click', e => {
+  const b = e.target.closest('[data-rv]'); if (!b) return;
+  const a = b.dataset.rv, i = G.review ?? G.states.length - 1;
+  if (a === 'exit') { exitReview(); return; }
+  const to = a === 'first' ? 0 : a === 'prev' ? i - 1 : a === 'next' ? i + 1 : G.states.length - 1;
+  G.review = Math.max(0, Math.min(G.states.length - 1, to));
+  if (G.review === G.states.length - 1 && !G.over) { exitReview(); return; }
+  renderBoard(); renderMoves(); renderStatus();
+});
+movesEl.addEventListener('click', e => {
+  const m = e.target.closest('.mv[data-i]'); if (!m) return;
+  const i = +m.dataset.i;
+  if (i === G.states.length - 1 && G.review == null) return;
+  startReview(i);
+});
 document.getElementById('endMenu').onclick = () => { hideModal('endModal'); showHome(); };
 
 /* ---------- Menu principal ---------- */
@@ -3056,6 +3171,7 @@ homeEl.addEventListener('click', e => {
   else if (a === 'online') { hideHome(); openNet(); }
   else if (a === 'rules') { openRules(); }
   else if (a === 'settings') openSettings(true);
+  else if (a === 'stats') openStats();
 });
 document.getElementById('btnMenu').onclick = showHome;
 /* Panneau d'informations (téléphone à l'horizontale) : repliable vers la droite */
@@ -3073,7 +3189,8 @@ document.getElementById('homeBack').onclick = () => { hideHome(); maybeAI(); };
 /* Bouton Retour du téléphone (application Android) : ferme d'abord ce qui est ouvert.
    Renvoie true si quelque chose a été fermé, false s'il ne reste plus qu'à quitter. */
 window.scBack = () => {
-  const modal = ['rulesModal', 'newModal', 'netModal', 'endModal', 'authModal'].find(id => { const el = document.getElementById(id); return el && !el.hidden; });
+  if (G.review != null && homeEl.hidden && document.querySelectorAll('.modal-bg:not([hidden])').length === 0) { exitReview(); return true; }
+  const modal = ['tutoModal', 'statsModal', 'rulesModal', 'newModal', 'netModal', 'endModal', 'authModal'].find(id => { const el = document.getElementById(id); return el && !el.hidden; });
   if (modal) { if (modal === 'newModal' && newFromHome) { hideModal(modal); showHome(); } else hideModal(modal); return true; }
   if (!setEl.hidden) { closeSettings(); return true; }
   if (!homeEl.hidden) { hideHome(); maybeAI(); return true; }
@@ -3422,6 +3539,7 @@ function onGames() {
   renderNet();
 }
 function enterOnline(g) {
+  G.review = null;
   const color = g.white === NET.me ? 'w' : 'b';
   G.settings = Object.assign({}, G.settings, { mode: 'online', variant: g.variant || 'super', time: 0 });
   G.online = { id: g.id, opp: oppOf(g) };
@@ -3608,17 +3726,86 @@ netInit();
 
 
 /* ---------- Conservation de la partie lors des mises à jour ---------- */
+/* ---------- Statistiques (sur cet appareil) ---------- */
+const STATS0 = () => ({ ai: { 1: [0, 0, 0], 2: [0, 0, 0], 3: [0, 0, 0], 4: [0, 0, 0] }, online: [0, 0, 0], local: 0, streak: 0, best: 0, powers: {}, events: 0, seen: [] });
+let STATS = STATS0();
+try { STATS = Object.assign(STATS0(), JSON.parse(localStorage.getItem('superchess.stats') || '{}')); } catch (e) {}
+const saveStats = () => { try { localStorage.setItem('superchess.stats', JSON.stringify(STATS)); } catch (e) {} };
+function recordEnd() { // appelée à chaque rendu : n'enregistre qu'une fois chaque partie terminée
+  if (!G.over || G.review != null) return;
+  const id = G.settings.mode === 'online' && G.online ? 'o:' + G.online.id : G.gid;
+  if (!id || STATS.seen.includes(id)) return;
+  STATS.seen = STATS.seen.concat(id).slice(-300);
+  const res = !G.over.winner ? 1 : G.over.winner === G.human ? 0 : 2; // 0 victoire, 1 nulle, 2 défaite
+  if (G.settings.mode === 'ai') STATS.ai[G.settings.level][res]++;
+  else if (G.settings.mode === 'online') STATS.online[res]++;
+  else STATS.local++;
+  if (G.settings.mode !== 'local') {
+    STATS.streak = res === 0 ? STATS.streak + 1 : 0; STATS.best = Math.max(STATS.best, STATS.streak);
+    try { navigator.vibrate && navigator.vibrate(res === 0 ? [60, 60, 120] : 200); } catch (e) {}
+  }
+  for (const h of G.hist) {
+    if (h.m.power && (G.settings.mode === 'local' || h.m.color === G.human)) STATS.powers[h.m.piece] = (STATS.powers[h.m.piece] || 0) + 1;
+    if (h.ev) STATS.events++;
+  }
+  saveStats();
+}
+function openStats() {
+  const tot = a => a[0] + a[1] + a[2], all = [1, 2, 3, 4].reduce((n, l) => n + tot(STATS.ai[l]), 0) + tot(STATS.online) + STATS.local;
+  const wins = [1, 2, 3, 4].reduce((n, l) => n + STATS.ai[l][0], 0) + STATS.online[0];
+  const row = (label, a) => `<div class="st-row"><span>${label}</span><b class="w">${a[0]}</b><b>${a[1]}</b><b class="l">${a[2]}</b></div>`;
+  const fav = Object.entries(STATS.powers).sort((a, b) => b[1] - a[1]);
+  document.getElementById('statsBody').innerHTML =
+    `<div class="st-tiles"><div class="st-tile"><b>${all}</b><span>parties terminées</span></div><div class="st-tile"><b>${wins}</b><span>victoires</span></div><div class="st-tile"><b>${STATS.best}</b><span>meilleure série</span></div></div>` +
+    `<div class="st-row head"><span>Adversaire</span><span>Vict.</span><span>Nulles</span><span>Déf.</span></div>` +
+    [1, 2, 3, 4].map(l => row('Ordinateur · ' + LEVELS[l].name, STATS.ai[l])).join('') + row('En ligne', STATS.online) +
+    `<p class="net-empty">À deux sur cet appareil : ${STATS.local} partie${STATS.local > 1 ? 's' : ''} · Événements vécus : ${STATS.events}</p>` +
+    (fav.length ? `<div><p class="net-empty" style="margin-bottom:6px">Vos pouvoirs favoris</p><div class="st-fav">${fav.map(([t, n]) => `<span>${pieceSVG(t, 'w')}${POWERS[t].name} · ${n}</span>`).join('')}</div></div>` : '');
+  document.getElementById('statsReset').textContent = 'Remettre à zéro';
+  showModal('statsModal');
+}
+document.getElementById('statsClose').onclick = () => hideModal('statsModal');
+document.getElementById('statsModal').addEventListener('click', e => { if (e.target.id === 'statsModal') hideModal('statsModal'); });
+document.getElementById('statsReset').onclick = e => { // confirmation en deux temps, dans la page
+  if (e.currentTarget.textContent !== 'Confirmer la remise à zéro') { e.currentTarget.textContent = 'Confirmer la remise à zéro'; return; }
+  STATS = STATS0(); saveStats(); openStats();
+};
+
+/* ---------- Premiers pas (au premier lancement, puis depuis les Règles) ---------- */
+const TUTO = [
+  { ico: () => pieceSVG('p', 'w'), title: 'Jouer un coup', text: 'Touchez une de vos pièces : les cases où elle peut aller s\'affichent. Touchez ensuite la case d\'arrivée. En 2D, vous pouvez aussi la faire glisser.' },
+  { ico: () => '<div class="pwring armed"></div>' + pieceSVG('n', 'w'), title: 'Les pouvoirs', text: 'Un cercle doré au sol signale une pièce dont le pouvoir est prêt. Touchez-la deux fois pour son coup spécial, une troisième fois pour revenir aux coups normaux.' },
+  { ico: () => `<span style="color:var(--gold)">${evIcon('gust')}</span>`, title: 'Les événements', text: 'Tous les 4 tours, un événement secoue la partie : rafale de vent, météores, coffre au trésor… Le compteur du panneau vous prévient à l\'avance.' },
+  { ico: () => pieceSVG('k', 'w'), title: 'Échec par pouvoir', text: 'Une Catapulte, un Spectre, un Double bond ou une Percée prêts menacent aussi le roi : surveillez les cercles dorés de l\'adversaire !' },
+  { ico: () => '<svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>', title: 'Menu et panneau', text: 'Le panneau de droite se replie pour agrandir l\'échiquier. Le menu donne accès aux parties, aux paramètres (son, 3D, règles des pouvoirs) et à vos statistiques. Touchez un coup de la liste pour revoir la partie.' }
+];
+let tutoI = 0;
+function showTuto(i) {
+  tutoI = i; const t = TUTO[i];
+  document.getElementById('tutoIco').innerHTML = t.ico();
+  document.getElementById('tutoStep').textContent = `Premiers pas · ${i + 1}/${TUTO.length}`;
+  document.getElementById('tutoTitle').textContent = t.title;
+  document.getElementById('tutoText').textContent = t.text;
+  document.getElementById('tutoDots').innerHTML = TUTO.map((_, k) => `<i class="${k === i ? 'on' : ''}"></i>`).join('');
+  document.getElementById('tutoNext').textContent = i === TUTO.length - 1 ? 'À l\'abordage !' : 'Suivant';
+  document.getElementById('tutoSkip').hidden = i === TUTO.length - 1;
+  showModal('tutoModal'); document.getElementById('tutoNext').focus();
+}
+function endTuto() { hideModal('tutoModal'); PREFS.tuto = 1; savePrefs(); }
+document.getElementById('tutoNext').onclick = () => (tutoI < TUTO.length - 1 ? showTuto(tutoI + 1) : endTuto());
+document.getElementById('tutoSkip').onclick = endTuto;
+
 function saveLocal() {
   try {
     if (G.settings.mode === 'online' || !G.hist.length) return;
-    localStorage.setItem('superchess.game', JSON.stringify({ settings: G.settings, human: G.human, states: G.states, hist: G.hist, keys: G.keys, over: G.over, clocks: G.clocks, flipped: G.flipped }));
+    localStorage.setItem('superchess.game', JSON.stringify({ gid: G.gid, settings: G.settings, human: G.human, states: G.states, hist: G.hist, keys: G.keys, over: G.over, clocks: G.clocks, flipped: G.flipped }));
   } catch (e) {}
 }
 function loadLocal() {
   try {
     const g = JSON.parse(localStorage.getItem('superchess.game') || 'null');
     if (!g || !Array.isArray(g.states) || !g.states.length || g.over || !g.hist || !g.hist.length || g.settings.mode === 'online') return false;
-    Object.assign(G, g, { sel: null, targets: [], hintMove: null, thinking: false, arm: null, online: null, notice: '' });
+    Object.assign(G, g, { sel: null, targets: [], hintMove: null, thinking: false, arm: null, online: null, notice: '', review: null });
     return true;
   } catch (e) { return false; }
 }
