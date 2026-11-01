@@ -206,6 +206,9 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--gold);
 .rv-label { font: 700 12.5px var(--f-mono); padding: 0 8px; white-space: nowrap; overflow: hidden; min-width: 0; flex: 1; display: grid; line-height: 1.25; }
 .rv-label > span { overflow: hidden; text-overflow: ellipsis; }
 #reviewBar { width: min(460px, calc(100% - 16px)); }
+#wrap.with-bar:not(.is3d) { overflow: visible; margin-bottom: 58px; }
+#wrap.with-bar:not(.is3d) .review { bottom: -54px; width: min(460px, calc(100vw - 24px)); max-width: none; }
+#wrap.with-bar:not(.is3d) .over-bar { width: auto; }
 .rv-an { font: 700 11.5px var(--f-body); display: flex; align-items: center; gap: 5px; }
 @media (max-width: 700px), (max-height: 560px) { .review [data-rv="menu"] { font-size: 0; gap: 0; } .review [data-rv="first"], .review [data-rv="last"] { display: none; } }
 .rv-an i { font-style: normal; color: #10151c; border-radius: 6px; padding: 0 4px; font-size: 10.5px; }
@@ -506,6 +509,7 @@ body:not(.moves-open) #moves { display: none; }
   .clock { font-size: 13px; min-width: 52px; padding: 3px 6px; }
   #wrap { grid-area: board; align-self: center; justify-self: center; height: 100%; width: auto; max-width: 100%; aspect-ratio: 1; min-height: 0; }
   #wrap.is3d { width: 100%; aspect-ratio: auto; }
+  #wrap.with-bar:not(.is3d) { height: calc(100% - 58px); align-self: start; margin-bottom: 0; }
   .status { grid-area: status; padding: 8px 10px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); overflow-y: auto; min-height: 0; }
   .status .eyebrow { font-size: 9px; } .status h2 { font-size: 14px; } .opening { font-size: 11px; min-height: 0; line-height: 1.35; }
   .chips { margin-top: 6px; gap: 4px; } .chip { font-size: 10px; padding: 2px 7px; }
@@ -1156,104 +1160,88 @@ function createPirateWorld(T, canvasTex) {
   });
 
   /* ---------- Pièces pirates ----------
-     Pion : matelot au bandana · Tour : tonneau-vigie à fanion · Cavalier : hippocampe
-     Fou : perroquet sur son perchoir · Dame : la corsaire au chapeau à plume · Roi : le capitaine au tricorne
+     Pion : matelot au bandana · Tour : fortin-tonneau à créneaux et pavillon · Cavalier : cheval au bandana et cache-œil
+     Fou : mitre et perroquet · Dame : reine corsaire à couronne et plume · Roi : capitaine au tricorne et à la croix
      Ivoire et or (la Marine) contre ébène et pourpre (les pirates). */
   const V2 = a => a.map(([x, y]) => new T.Vector2(x, y));
   const lathe = (pts, seg = 32) => new T.LatheGeometry(V2(pts), seg);
   const BASE = [[0, 0], [.35, 0], [.36, .04], [.34, .08], [.3, .1], [.28, .12]];
   const P = (geo, mat, x = 0, y = 0, z = 0, o = {}) => Object.assign({ geo, mat, x, y, z }, o);
   const sph = (r, ws = 20, hs = 14, ...rest) => new T.SphereGeometry(r, ws, hs, ...rest);
+  /* Silhouettes classiques (Staunton) pour qu'on reconnaisse chaque pièce au premier coup d'œil,
+     habillées en pirates : bandana, tonneau cerclé et pavillon, cheval à cache-œil, perroquet, couronne à plume, tricorne. */
   const pieces = {};
+  const band = (r, y, t = .022) => P(new T.TorusGeometry(r, t, 6, 28), 'accent', 0, y, 0, { rx: Math.PI / 2 });
+  // Pion : le matelot
   pieces.p = [
-    P(lathe(BASE.concat([[.2, .13], [.21, .2], [.19, .3], [.15, .36], [.11, .39], [0, .39]])), 'body'),
-    P(new T.TorusGeometry(.2, .022, 6, 24), 'accent', 0, .23, 0, { rx: Math.PI / 2 }),
-    P(new T.TorusGeometry(.18, .022, 6, 24), 'accent', 0, .31, 0, { rx: Math.PI / 2 }),
-    P(sph(.12), 'body', 0, .5),
-    P(sph(.128, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2), 'accent', 0, .515, 0, { sy: .85 }),
-    P(sph(.04, 8, 6), 'accent', -.12, .52, 0),
-    P(sph(.018, 6, 4), 'detail', .11, .52, .045), P(sph(.018, 6, 4), 'detail', .11, .52, -.045)
+    P(lathe(BASE.concat([[.21, .14], [.14, .2], [.11, .34], [.17, .37], [.17, .4], [.09, .42], [0, .42]])), 'body'),
+    band(.165, .385, .025),
+    P(sph(.135, 24, 18), 'body', 0, .53),
+    P(sph(.142, 24, 12, 0, Math.PI * 2, 0, Math.PI * .45), 'accent', 0, .545, 0),           // bandana
+    P(sph(.045, 10, 8), 'accent', -.14, .56, 0),                                                // nœud
+    P(new T.BoxGeometry(.03, .11, .05), 'accent', -.17, .5, .03, { rz: -.4 }), P(new T.BoxGeometry(.03, .1, .05), 'accent', -.17, .5, -.03, { rz: -.6 })
   ];
+  // Tour : le fortin-tonneau, créneaux et pavillon noir
   pieces.r = [
-    P(lathe(BASE), 'body'),
-    P(lathe([[0, .12], [.24, .12], [.27, .22], [.29, .36], [.27, .5], [.24, .6], [0, .6]], 24), 'detail'),
-    P(new T.TorusGeometry(.262, .022, 6, 24), 'accent', 0, .19, 0, { rx: Math.PI / 2 }),
-    P(new T.TorusGeometry(.288, .022, 6, 24), 'accent', 0, .36, 0, { rx: Math.PI / 2 }),
-    P(new T.TorusGeometry(.262, .022, 6, 24), 'accent', 0, .53, 0, { rx: Math.PI / 2 }),
-    P(new T.CylinderGeometry(.3, .29, .05, 24), 'body', 0, .63),
-    // créneaux : la silhouette de la tour classique, reconnaissable sous tous les angles
-    ...[0, 1, 2, 3, 4, 5].map(k => P(new T.BoxGeometry(.1, .12, .09), 'accent', Math.cos(k * Math.PI / 3) * .25, .71, Math.sin(k * Math.PI / 3) * .25, { ry: -k * Math.PI / 3 })),
-    P(new T.CylinderGeometry(.018, .018, .45, 6), 'body', 0, .87),
-    P(new T.PlaneGeometry(.24, .15), 'accent', .12, 1.0, 0, { side: true })
+    P(lathe(BASE.concat([[.26, .14], [.24, .2], [.24, .56], [.29, .6], [.29, .68], [.19, .68], [.19, .63], [0, .63]]), 28), 'body'),
+    band(.25, .24), band(.25, .4), band(.25, .54),
+    ...[0, 1, 2, 3, 4, 5].map(k => P(new T.BoxGeometry(.11, .11, .09), 'body', Math.cos(k * Math.PI / 3) * .24, .73, Math.sin(k * Math.PI / 3) * .24, { ry: -k * Math.PI / 3 })),
+    P(new T.CylinderGeometry(.015, .015, .32, 6), 'detail', 0, .84),
+    P(new T.PlaneGeometry(.2, .12), 'accent', .1, .93, 0, { side: true })
   ];
-  const horse = new T.Shape();
-  horse.moveTo(0, .16); horse.quadraticCurveTo(.17, .15, .15, .27); horse.lineTo(.08, .31);
-  horse.quadraticCurveTo(.21, .39, .19, .52); horse.quadraticCurveTo(.17, .6, .1, .64);
-  horse.lineTo(.17, .68); horse.lineTo(.34, .7); horse.lineTo(.355, .75); horse.lineTo(.17, .79);
-  horse.quadraticCurveTo(.13, .9, .03, .89); horse.lineTo(-.01, .95); horse.lineTo(-.05, .87);
-  horse.quadraticCurveTo(-.15, .73, -.11, .58); horse.quadraticCurveTo(-.08, .45, -.13, .35);
-  horse.quadraticCurveTo(-.17, .22, -.06, .19); horse.lineTo(0, .16);
-  const horseGeo = new T.ExtrudeGeometry(horse, { depth: .11, bevelEnabled: true, bevelThickness: .035, bevelSize: .025, bevelSegments: 3, curveSegments: 8 });
-  horseGeo.translate(0, 0, -.055);
+  // Cavalier : le cheval de bataille au bandana et au cache-œil
+  const horse = new T.Shape(V2([[-.16, .19], [.12, .19], [.08, .3], [.05, .4], [.12, .43], [.22, .45], [.29, .49], [.31, .55],
+    [.27, .6], [.16, .66], [.1, .72], [.06, .8], [.02, .89], [-.02, .8], [-.08, .79], [-.15, .72], [-.2, .6], [-.22, .45], [-.2, .3]]));
+  const horseGeo = new T.ExtrudeGeometry(horse, { depth: .14, bevelEnabled: true, bevelThickness: .05, bevelSize: .035, bevelSegments: 4, curveSegments: 6 });
+  horseGeo.translate(0, 0, -.07);
   pieces.n = [
-    P(lathe(BASE.concat([[.22, .14], [.22, .17], [0, .17]])), 'body'),
+    P(lathe(BASE.concat([[.25, .14], [.25, .22], [0, .22]])), 'body'),
     P(horseGeo, 'body'),
-    P(new T.ConeGeometry(.05, .16, 4), 'accent', -.12, .68, 0, { rz: .9 }),
-    P(new T.ConeGeometry(.05, .14, 4), 'accent', -.13, .5, 0, { rz: 1.2 }),
-    P(sph(.022, 8, 6), 'detail', .13, .8, .085), P(sph(.022, 8, 6), 'detail', .13, .8, -.085)
+    P(new T.BoxGeometry(.2, .06, .27), 'accent', .02, .69, 0, { rz: -.55 }),                   // bandana
+    P(new T.CylinderGeometry(.05, .05, .02, 12), 'detail', .13, .6, .13, { rx: Math.PI / 2 }),  // cache-œil
+    P(new T.CylinderGeometry(.05, .05, .02, 12), 'detail', .13, .6, -.13, { rx: Math.PI / 2 }),
+    P(new T.TorusGeometry(.03, .008, 6, 12), 'accent', -.06, .7, .12),                          // boucle d'oreille
+    ...[0, 1, 2, 3].map(k => P(new T.BoxGeometry(.05, .06, .09), 'accent', -.17 - k * .015, .78 - k * .1, 0, { rz: .3 }))  // crinière
   ];
+  // Fou : la mitre, avec son perroquet sur l'épaule
   pieces.b = [
-    P(lathe(BASE), 'body'),
-    P(new T.CylinderGeometry(.035, .045, .34, 8), 'detail', 0, .29),
-    P(new T.CylinderGeometry(.028, .028, .4, 8), 'detail', 0, .46, 0, { rx: Math.PI / 2 }),
-    P(sph(.14), 'body', -.01, .62, 0, { sx: .95, sy: 1.35, sz: .9, rz: .25 }),
-    P(sph(.12, 14, 10), 'accent', -.03, .62, .1, { sx: .5, sy: 1.25, sz: .5, rz: .3 }),
-    P(sph(.12, 14, 10), 'accent', -.03, .62, -.1, { sx: .5, sy: 1.25, sz: .5, rz: .3 }),
-    P(new T.BoxGeometry(.06, .26, .1), 'accent', -.11, .41, 0, { rz: .45 }),
-    P(sph(.1), 'body', .05, .85),
-    P(new T.ConeGeometry(.045, .11, 10), 'detail', .16, .83, 0, { rz: -Math.PI / 2 - .35 }),
-    P(new T.ConeGeometry(.035, .12, 6), 'accent', .0, .97, 0, { rz: .5 }),
-    // mitre du fou (pointe et fente), posée sur la tête du perroquet
-    P(sph(.075, 14, 12), 'accent', .03, 1.02, 0, { sx: .8, sy: 1.6, sz: .8 }),
-    P(new T.BoxGeometry(.02, .1, .12), 'detail', .055, 1.05, 0, { rz: -.4 }),
-    P(sph(.018, 6, 4), 'detail', .1, .88, .065), P(sph(.018, 6, 4), 'detail', .1, .88, -.065)
+    P(lathe(BASE.concat([[.21, .14], [.12, .24], [.09, .5], [.16, .52], [.16, .55], [.08, .57], [0, .57]])), 'body'),
+    band(.15, .535, .022),
+    P(lathe([[0, .55], [.14, .61], [.17, .7], [.14, .8], [.07, .88], [0, .9]]), 'body'),
+    P(new T.BoxGeometry(.03, .16, .32), 'detail', .03, .76, 0, { rz: -.6 }),                    // fente de la mitre
+    P(sph(.05, 14, 10), 'accent', 0, .94),
+    // perroquet perché sur le col
+    P(sph(.06, 12, 10), 'accent', 0, .62, .2, { sy: 1.4 }),
+    P(sph(.045, 10, 8), 'accent', .01, .71, .2),
+    P(new T.ConeGeometry(.02, .05, 6), 'detail', .055, .71, .2, { rz: -Math.PI / 2 - .4 }),
+    P(new T.BoxGeometry(.03, .1, .025), 'detail', -.05, .56, .2, { rz: .5 })
   ];
+  // Dame : la reine corsaire, couronne à pointes et plume
   pieces.q = [
-    P(lathe(BASE.concat([[.27, .13], [.24, .2], [.17, .4], [.12, .56], [.14, .6], [.1, .65], [0, .65]])), 'body'),
-    P(new T.TorusGeometry(.135, .025, 6, 24), 'accent', 0, .54, 0, { rx: Math.PI / 2 }),
-    P(sph(.11), 'body', 0, .75),
-    P(new T.CylinderGeometry(.25, .25, .025, 28), 'detail', 0, .83, 0, { rz: .1 }),
-    P(new T.CylinderGeometry(.1, .125, .12, 20), 'detail', 0, .9),
-    P(sph(.06, 10, 8), 'accent', -.06, .99, .02, { sx: .8, sy: .8, sz: 4.2, rx: -.6, ry: .9 }),
-    P(new T.TorusGeometry(.06, .012, 6, 16), 'accent', 0, .64, 0, { rx: Math.PI / 2 }),
-    // couronne à pointes et perles : le signe de la dame
-    P(new T.CylinderGeometry(.13, .11, .07, 20, 1, true), 'accent', 0, 1.0),
-    ...[0, 1, 2, 3, 4, 5, 6, 7].map(k => P(new T.ConeGeometry(.032, .12, 6), 'accent', Math.cos(k * Math.PI / 4) * .125, 1.09, Math.sin(k * Math.PI / 4) * .125)),
-    ...[0, 1, 2, 3, 4, 5, 6, 7].map(k => P(sph(.022, 8, 6), 'accent', Math.cos(k * Math.PI / 4) * .125, 1.155, Math.sin(k * Math.PI / 4) * .125)),
-    P(sph(.045, 10, 8), 'accent', 0, 1.1)
+    P(lathe(BASE.concat([[.22, .14], [.13, .26], [.1, .6], [.18, .64], [.18, .67], [.11, .69], [.14, .76], [.21, .86], [.17, .88], [0, .83]])), 'body'),
+    band(.17, .655, .024),
+    ...[0, 1, 2, 3, 4, 5, 6, 7, 8].map(k => P(new T.ConeGeometry(.035, .11, 6), 'accent', Math.cos(k * 2 * Math.PI / 9) * .19, .92, Math.sin(k * 2 * Math.PI / 9) * .19)),
+    ...[0, 1, 2, 3, 4, 5, 6, 7, 8].map(k => P(sph(.026, 8, 6), 'accent', Math.cos(k * 2 * Math.PI / 9) * .19, .985, Math.sin(k * 2 * Math.PI / 9) * .19)),
+    P(sph(.075, 16, 12), 'accent', 0, .93),
+    P(sph(.05, 10, 8), 'detail', -.08, 1.02, .05, { sx: .7, sy: 3, sz: .7, rz: .5, rx: .3 })    // plume
   ];
+  // Roi : le capitaine, tricorne et grande croix
   const tri = new T.Shape();
   for (let k = 0; k <= 3; k++) {
-    const a = Math.PI / 2 + k * 2 * Math.PI / 3, b = a - Math.PI / 3;
-    const px = Math.cos(a) * .3, py = Math.sin(a) * .3;
-    if (!k) tri.moveTo(px, py); else tri.quadraticCurveTo(Math.cos(b) * .1, Math.sin(b) * .1, px, py);
+    const a2 = Math.PI / 2 + k * 2 * Math.PI / 3, b2 = a2 - Math.PI / 3;
+    const px = Math.cos(a2) * .27, py = Math.sin(a2) * .27;
+    if (!k) tri.moveTo(px, py); else tri.quadraticCurveTo(Math.cos(b2) * .09, Math.sin(b2) * .09, px, py);
   }
-  const tricorn = new T.ExtrudeGeometry(tri, { depth: .08, bevelEnabled: true, bevelThickness: .02, bevelSize: .02, bevelSegments: 2, curveSegments: 8 });
+  const tricorn = new T.ExtrudeGeometry(tri, { depth: .07, bevelEnabled: true, bevelThickness: .02, bevelSize: .02, bevelSegments: 2, curveSegments: 8 });
   tricorn.rotateX(-Math.PI / 2); tricorn.rotateY(Math.PI / 2);
   pieces.k = [
-    P(lathe(BASE.concat([[.28, .13], [.26, .2], [.18, .42], [.14, .63], [.17, .67], [.1, .71], [0, .71]])), 'body'),
-    P(new T.TorusGeometry(.2, .03, 6, 24), 'accent', 0, .37, 0, { rx: Math.PI / 2, sx: 1.08, sy: 1.08 }),
-    P(new T.BoxGeometry(.06, .07, .09), 'accent', .21, .37, 0),
-    P(sph(.065, 12, 8), 'accent', 0, .65, .15, { sy: .45 }), P(sph(.065, 12, 8), 'accent', 0, .65, -.15, { sy: .45 }),
-    P(sph(.115), 'body', 0, .81),
-    P(tricorn, 'detail', 0, .89),
-    P(sph(.125, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2), 'detail', 0, .96),
-    P(sph(.035, 10, 8), 'accent', .25, 1.01, 0),
-    P(new T.CylinderGeometry(.012, .012, .16, 6), 'accent', .25, 1.01, 0, { rx: Math.PI / 2, rz: .5 }),
-    // croix du roi : le repère le plus haut de l'échiquier
-    P(new T.CylinderGeometry(.03, .03, .08, 10), 'accent', 0, 1.1),
-    P(new T.BoxGeometry(.07, .3, .07), 'accent', 0, 1.27),
-    P(new T.BoxGeometry(.07, .07, .22), 'accent', 0, 1.31)
+    P(lathe(BASE.concat([[.22, .14], [.13, .26], [.1, .66], [.18, .7], [.18, .73], [.11, .75], [.15, .86], [.17, .9], [0, .91]])), 'body'),
+    band(.17, .715, .026),
+    P(tricorn, 'detail', 0, .9),
+    P(sph(.11, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2), 'detail', 0, .95),
+    P(new T.TorusGeometry(.27, .012, 4, 3), 'accent', 0, .98, 0, { rx: Math.PI / 2, rz: Math.PI / 2 }),
+    P(new T.BoxGeometry(.075, .3, .075), 'accent', 0, 1.18),
+    P(new T.BoxGeometry(.075, .075, .22), 'accent', 0, 1.22)
   ];
   const mk = (c, r, m, extra) => new T.MeshStandardMaterial(Object.assign({ color: c, roughness: r, metalness: m }, extra || {}));
   const materials = {
@@ -2310,7 +2298,7 @@ function san(st, m) {
 const EVENT_FIRST = 5, EVENT_EVERY = 4;
 const EVENTS = {
   meteor:    { name: 'Pluie de météores', w: 3, desc: 'Deux météores frappent le centre. Ils détruisent la pièce touchée (sauf un roi) et laissent un cratère infranchissable pendant 4 tours.' },
-  ice:       { name: 'Mur de glace',      w: 3, desc: 'Un mur de glace coupe le milieu de l\'échiquier pendant 3 tours. Seuls les cavaliers sautent par-dessus.' },
+  ice:       { name: 'Mur de glace',      w: 3, desc: 'Un mur de glace barre toute la largeur de l\'échiquier, au milieu, pendant 3 tours. Seuls les cavaliers sautent par-dessus.' },
   storm:     { name: 'Orage d\'énergie',  w: 3, desc: 'La foudre recharge tous les pouvoirs des deux camps : ils sont prêts immédiatement.' },
   silence:   { name: 'Silence',           w: 2, desc: 'Les pouvoirs s\'éteignent. Aucun ne sera prêt avant au moins 3 tours.' },
   march:     { name: 'Marche forcée',     w: 2, desc: 'Tous les pions qui ont la voie libre avancent d\'une case. Aucun ne peut être promu ainsi.' },
@@ -2365,9 +2353,10 @@ const EVENT_FN = {
     return { st: n, squares: hits, victims };
   },
   ice(st) {
-    const n = cloneSt(st), r = pickOne([3, 4]), f0 = rnd(5), sq = [];
-    for (let f = f0; f < f0 + 4; f++) { const s = r * 8 + f; if (!n.board[s]) { n.board[s] = wall('ice', 6); sq.push(s); } }
-    return sq.length >= 2 ? { st: n, squares: sq } : null;
+    // le mur traverse toute la largeur de l'échiquier (sur les cases libres de la rangée)
+    const n = cloneSt(st), r = pickOne([3, 4]), sq = [];
+    for (let f = 0; f < 8; f++) { const s = r * 8 + f; if (!n.board[s]) { n.board[s] = wall('ice', 6); sq.push(s); } }
+    return sq.length >= 3 ? { st: n, squares: sq } : null;
   },
   storm(st) {
     const n = cloneSt(st);
@@ -3693,6 +3682,8 @@ function renderReviewBar() {
   const on = G.review != null;
   reviewBar.hidden = !on;
   overBar.hidden = on || !G.over;
+  // en 2D, la barre passe sous l'échiquier (qui rétrécit un peu) au lieu de recouvrir les pièces
+  wrap.classList.toggle('with-bar', on || !!G.over);
   renderAnCard();
   if (!on) return;
   const i = G.review, h = G.hist[i - 1];
