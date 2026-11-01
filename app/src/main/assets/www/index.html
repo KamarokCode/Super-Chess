@@ -345,6 +345,10 @@ body[data-sc-theme="pirate"] .set-head h2 { font-weight: 400; font-size: 32px; }
 .pw-tog[aria-pressed="false"] svg { filter: grayscale(1); }
 .set-note { margin: 10px 0 0; font-size: 12.5px; color: var(--muted); }
 body:not(.moves-open) #moves { display: none; }
+#powerWrap, #btnNet { display: none !important; } /* pouvoirs : depuis les pièces ; en ligne : depuis le menu */
+#btnPanel { display: none; }
+#btnMenu { position: relative; }
+#btnMenu .badge { position: absolute; top: -6px; right: -6px; }
 .linkbtn { border: 0; background: none; color: var(--gold); font: 700 13px var(--f-body); padding: 2px; cursor: pointer; }
 
 /* Écran de compte (application) */
@@ -386,9 +390,15 @@ body:not(.moves-open) #moves { display: none; }
 @media (orientation: landscape) and (max-height: 560px) {
   body { height: 100dvh; box-sizing: border-box; overflow: hidden; padding-block: 6px;
     display: grid; column-gap: 10px; row-gap: 5px;
-    grid-template-columns: minmax(170px, 204px) minmax(0, 1fr);
-    grid-template-rows: auto auto minmax(0, 1fr) auto auto auto;
-    grid-template-areas: "head board" "ptop board" "status board" "ctrl board" "pbot board" "pbot powers"; }
+    grid-template-columns: minmax(0, 1fr) minmax(170px, 204px);
+    grid-template-rows: auto auto minmax(0, 1fr) auto auto;
+    grid-template-areas: "board head" "board ptop" "board status" "board ctrl" "board pbot"; }
+  /* panneau replié : une fine bande avec « déplier » et « menu » */
+  body.panel-closed { grid-template-columns: minmax(0, 1fr) 46px; }
+  body.panel-closed :is(#pTop, #pBot, .status, .controls, #moves, .logo) { display: none !important; }
+  body.panel-closed .top { grid-row: 1 / -1; }
+  body.panel-closed .top-actions { flex-direction: column; }
+  #btnPanel { display: inline-flex; }
   main.game, .board-col, .side { display: contents; }
   .top { grid-area: head; margin: 0; flex-direction: column; align-items: stretch; gap: 5px; }
   .logo { font-size: 15px; gap: 6px; } .logo svg { width: 22px; height: 22px; }
@@ -404,17 +414,11 @@ body:not(.moves-open) #moves { display: none; }
   .clock { font-size: 13px; min-width: 52px; padding: 3px 6px; }
   #wrap { grid-area: board; align-self: center; justify-self: center; height: 100%; width: auto; max-width: 100%; aspect-ratio: 1; min-height: 0; }
   #wrap.is3d { width: 100%; aspect-ratio: auto; }
-  #powerWrap { grid-area: powers; }
-  #powerWrap .pw-head { display: none; }
-  .powerbar { margin-top: 0 !important; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; }
-  .pw-card { grid-template-columns: 15px minmax(0, 1fr); grid-template-rows: auto auto; justify-items: start; text-align: left; column-gap: 3px; row-gap: 0; padding: 4px 4px; border-radius: 8px; }
-  .pw-card svg { grid-row: 1 / 3; width: 15px; height: 15px; align-self: center; }
-  .pw-card .nm { font-size: 9px; letter-spacing: -.02em; padding: 0; } .pw-card .st { font-size: 8.5px; }
   .status { grid-area: status; padding: 8px 10px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); overflow-y: auto; min-height: 0; }
   .status .eyebrow { font-size: 9px; } .status h2 { font-size: 14px; } .opening { font-size: 11px; min-height: 0; line-height: 1.35; }
   .chips { margin-top: 6px; gap: 4px; } .chip { font-size: 10px; padding: 2px 7px; }
-  /* coups : panneau compact qui recouvre statut et commandes quand on l'ouvre (bouton « Coups ») */
-  #moves { grid-column: 1; grid-row: 3 / 5; z-index: 3; max-height: none; min-height: 0; border: 1px solid var(--gold); border-radius: 12px;
+  /* coups : panneau compact qui recouvre statut et commandes (Paramètres › Liste des coups) */
+  #moves { grid-column: 2; grid-row: 3 / 5; z-index: 3; max-height: none; min-height: 0; border: 1px solid var(--gold); border-radius: 12px;
     background: var(--panel); font-size: 11px; line-height: 1.75; padding: 6px 8px; box-shadow: 0 10px 30px -10px rgba(0,0,0,.7); }
   #moves .mrow { display: inline; padding: 0; background: none; }
   #moves .mrow .n { font-size: 10px; color: var(--muted); margin-left: 4px; }
@@ -446,7 +450,8 @@ body:not(.moves-open) #moves { display: none; }
     <span>Super <b>Chess</b></span>
   </div>
   <div class="top-actions">
-    <button class="btn" id="btnMenu" title="Menu principal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span class="lbl">Menu</span></button>
+    <button class="btn" id="btnPanel" title="Replier le panneau" aria-expanded="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path id="panelChevron" d="M10 6l6 6-6 6"/></svg></button>
+    <button class="btn" id="btnMenu" title="Menu principal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span class="lbl">Menu</span><span class="badge" id="menuBadge" hidden>0</span></button>
     <button class="btn" id="btnNet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 010 6.8M18 14.8c1.9.8 3.1 2.6 3.5 5.2"/></svg><span class="lbl">En ligne</span><span class="badge" id="netBadge" hidden>0</span></button>
     <button class="btn primary" id="btnNewTop">Nouvelle partie</button>
   </div>
@@ -3053,6 +3058,16 @@ homeEl.addEventListener('click', e => {
   else if (a === 'settings') openSettings(true);
 });
 document.getElementById('btnMenu').onclick = showHome;
+/* Panneau d'informations (téléphone à l'horizontale) : repliable vers la droite */
+function applyPanel() {
+  const closed = PREFS.panel === 'closed';
+  document.body.classList.toggle('panel-closed', closed);
+  const b = document.getElementById('btnPanel');
+  b.setAttribute('aria-expanded', String(!closed)); b.title = closed ? 'Déplier le panneau' : 'Replier le panneau';
+  document.getElementById('panelChevron').setAttribute('d', closed ? 'M14 6l-6 6 6 6' : 'M10 6l6 6-6 6');
+}
+document.getElementById('btnPanel').onclick = () => { PREFS.panel = PREFS.panel === 'closed' ? 'open' : 'closed'; savePrefs(); applyPanel(); };
+applyPanel();
 document.getElementById('homeBack').onclick = () => { hideHome(); maybeAI(); };
 
 /* Bouton Retour du téléphone (application Android) : ferme d'abord ce qui est ouvert.
@@ -3488,6 +3503,7 @@ function renderNet() {
     ? NET.reqIn.length + NET.games.filter(g => (g.status === 'pending' && g.to === NET.me) || (myTurnIn(g) && !(G.online && G.online.id === g.id && G.settings.mode === 'online'))).length
     : 0;
   badge.hidden = !count; badge.textContent = count;
+  const mb = document.getElementById('menuBadge'); if (mb) { mb.hidden = !count; mb.textContent = count; }
   const body = document.getElementById('netBody'), meEl = document.getElementById('netMe');
   if (G.settings.mode === 'online') renderPlayers();
   if (NET.state !== 'ready') {
