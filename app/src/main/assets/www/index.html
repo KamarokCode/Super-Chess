@@ -102,6 +102,12 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--gold);
 .coord.rk { top: 3px; left: 4px; } .coord.fl { bottom: 2px; right: 4px; }
 .sq.l .coord { color: var(--coord-on-light); } .sq.d .coord { color: var(--coord-on-dark); }
 .pc { position: absolute; inset: 0; z-index: 2; cursor: grab; }
+/* pièce qui met le roi en échec : anneau rouge pulsant sous elle */
+.threat { position: absolute; inset: 7%; z-index: 1; border-radius: 50%; pointer-events: none;
+  border: 3px solid rgba(229, 60, 52, .95); background: radial-gradient(circle, rgba(229, 60, 52, .35), transparent 70%);
+  box-shadow: 0 0 10px rgba(229, 60, 52, .85), inset 0 0 8px rgba(229, 60, 52, .6); animation: threatPulse 1s ease-in-out infinite; }
+@keyframes threatPulse { 50% { transform: scale(.9); opacity: .7; } }
+@media (prefers-reduced-motion: reduce) { .threat { animation: none; } }
 .pc svg { width: 100%; height: 100%; display: block; filter: drop-shadow(0 2px 1.5px rgba(0,0,0,.28)); }
 .pc.lifted { opacity: .3; }
 .pc.anim { transition: transform .16s ease-out; }
@@ -1459,6 +1465,8 @@ function createBoard3D(container, opts) {
   // cercle doré au sol sous les pièces dont le pouvoir peut servir
   const pwRingGeo = new T.RingGeometry(.4, .49, 44), pwDiscGeo = new T.CircleGeometry(.49, 44);
   const pwRingMat = () => new T.MeshBasicMaterial({ color: 0xffc95a, transparent: true, opacity: .85, depthWrite: false, blending: T.AdditiveBlending });
+  const thRingMat = () => new T.MeshBasicMaterial({ color: 0xff3a30, transparent: true, opacity: .9, depthWrite: false });
+  const thDiscMat = () => new T.MeshBasicMaterial({ color: 0xe5342c, transparent: true, opacity: .3, depthWrite: false });
   const pwDiscMat = () => new T.MeshBasicMaterial({ color: 0xe8b64c, transparent: true, opacity: .22, depthWrite: false, blending: T.AdditiveBlending });
 
   /* ---------- Animations ---------- */
@@ -1481,6 +1489,11 @@ function createBoard3D(container, opts) {
       ov.visible = col !== null;
       if (col !== null) { ov.material.color.setHex(col); ov.material.opacity = op; }
       if (q.check) { checkMesh.visible = true; checkMesh.position.copy(pos).setY(.008); }
+      if (q.threat) { // pièce qui donne l'échec : anneau rouge pulsant
+        const ring = new T.Mesh(pwRingGeo, thRingMat()), disc = new T.Mesh(pwDiscGeo, thDiscMat());
+        for (const m of [ring, disc]) { m.rotation.x = -Math.PI / 2; m.position.copy(pos).setY(.014); m.userData.s = s; hints.add(m); }
+        pulsers.push({ ring, disc, armed: true, ph: s * .7, red: true });
+      }
       if (q.pwr) {
         const ring = new T.Mesh(pwRingGeo, pwRingMat()), disc = new T.Mesh(pwDiscGeo, pwDiscMat());
         for (const m of [ring, disc]) { m.rotation.x = -Math.PI / 2; m.position.copy(pos).setY(.012); m.userData.s = s; hints.add(m); }
@@ -1628,7 +1641,8 @@ function createBoard3D(container, opts) {
     camera.position.set(R * Math.sin(pol) * Math.sin(az), R * Math.cos(pol), R * Math.sin(pol) * Math.cos(az));
     if (P && !calm) camera.position.y += Math.sin(t * .55) * .14; // la houle soulève doucement le navire
     // le point visé tourne avec la caméra (au lieu de sauter d'un côté à l'autre du plateau)
-    const k = P ? -1.1 : .35;
+    // vue plongeante : le point visé revient au centre du plateau pour qu'on le voie en entier
+    const k = (P ? -1.1 : .35) * Math.min(1, Math.max(0, (pol - .15) / (.78 - .15)));
     camera.lookAt(k * Math.sin(az), -.2, k * Math.cos(az));
     if (P && !calm) camera.rotateZ(Math.sin(t * .42) * .013 + Math.sin(t * .97) * .004); // et le fait rouler
     if (P) PW.tick(calm ? 0 : t, camera.position);
@@ -1651,7 +1665,7 @@ function createBoard3D(container, opts) {
     for (const p of pulsers) {
       const k = .5 + .5 * Math.sin(now / (p.armed ? 140 : 270) + p.ph), sc = p.armed ? 1.05 + k * .08 : .92 + k * .08;
       p.ring.scale.setScalar(sc); p.disc.scale.setScalar(sc);
-      p.ring.material.opacity = (p.armed ? .75 : .45) + k * .4; p.disc.material.opacity = (p.armed ? .35 : .12) + k * .15;
+      p.ring.material.opacity = p.red ? .6 + k * .4 : (p.armed ? .75 : .45) + k * .4; p.disc.material.opacity = p.red ? .2 + k * .25 : (p.armed ? .35 : .12) + k * .15;
     }
     const busy = tweens.length || spinners.length || pulsers.length || now < idleUntil;
     // en mer, la scène vit en permanence ; au repos on se contente de 30 images par seconde
@@ -1993,6 +2007,18 @@ function makeMove(st, m) {
   return n;
 }
 
+/* Pièces adverses qui mettent en échec le roi du camp au trait (y compris par un pouvoir prêt).
+   Chaque pièce est testée seule : les autres pièces ennemies deviennent de simples obstacles neutres. */
+function checkers(st) {
+  const k = findKing(st, st.turn); if (k < 0) return [];
+  const by = st.turn === 'w' ? 'b' : 'w', out = [];
+  st.board.forEach((p, s) => {
+    if (!p || p.c !== by) return;
+    const board = st.board.map((q, i) => (q && q.c === by && i !== s ? { t: 'x', c: 'n' } : q));
+    if (attacked(Object.assign({}, st, { board }), k, by)) out.push(s);
+  });
+  return out;
+}
 function findKing(st, c) {
   for (let s = 0; s < 64; s++) { const p = st.board[s]; if (p && p.t === 'k' && p.c === c) return s; }
   return -1;
@@ -2613,7 +2639,9 @@ const humanTurn = () => G.review == null && !G.over && !G.thinking && (G.setting
 const viewSt = () => (G.review != null ? G.states[G.review] : cur());
 const viewLast = () => (G.review != null ? (G.review > 0 ? G.hist[G.review - 1].m : null) : lastMove());
 
+let gameShown = false; // une partie a-t-elle été affichée depuis le lancement ?
 function newGame(settings) {
+  gameShown = true;
   G.review = null; G.gid = 'g' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
   G.settings = Object.assign({}, G.settings, settings);
   const s = G.settings;
@@ -2640,6 +2668,7 @@ function renderBoard(animFrom) {
   const st = viewSt(), lm = viewLast();
   renderReviewBar();
   const checkSq = !G.over || G.over.type === 'mate' ? (inCheck(st) ? findKing(st, st.turn) : -1) : -1;
+  const threats = new Set(checkSq >= 0 ? checkers(st) : []); // pièces qui donnent l'échec, soulignées en rouge
   const tgt = new Map(G.targets.map(m => [m.to, m]));
   // pièces capables d'utiliser le pouvoir armé + zones d'explosion de la Supernova
   const can = new Set(), blastZone = new Set(), pwr = new Set();
@@ -2663,7 +2692,7 @@ function renderBoard(animFrom) {
     {
       const p0 = st.board[s], tm = tgt.get(s);
       model.squares[s] = {
-        p: fog ? null : p0, fog: !!fog, sel: G.sel === s, check: s === checkSq,
+        p: fog ? null : p0, fog: !!fog, sel: G.sel === s, check: s === checkSq, threat: threats.has(s) && !fog,
         last: !!((lm && (lm.from === s || lm.to === s)) || (G.hintMove && (G.hintMove.from === s || G.hintMove.to === s))),
         can: can.has(s) && G.sel !== s, blast: blastZone.has(s),
         pwr: pwr.has(s) && !fog, armed: G.sel === s && !!G.arm,
@@ -2684,6 +2713,7 @@ function renderBoard(animFrom) {
     if (d % 8 === 0) html += `<span class="coord rk">${8 - r}</span>`;
     if (d >= 56) html += `<span class="coord fl">${FILES[f]}</span>`;
     const p = st.board[s];
+    if (threats.has(s) && !fog) html += '<div class="threat"></div>';
     if (pwr.has(s) && !fog) html += `<div class="pwring${G.sel === s && G.arm ? ' armed' : ''}"></div>`;
     if (p && !fog) html += p.t === 'x'
       ? `<div class="wall ${p.kind}">${wallSVG(p.kind)}<span class="ttl" title="Tours restants">${Math.ceil(p.ttl / 2)}</span></div>`
@@ -3263,7 +3293,8 @@ function showHome() {
   const on = document.getElementById('homeOnline');
   on.textContent = NET.state === 'ready' ? `Connecté : ${NET.myName || NET.names[NET.me] || 'vous'}` : 'Défiez vos amis sur leur propre appareil';
   // « Retour » ramène à l'échiquier à tout moment, sauf quand la partie est terminée : on reste alors sur le menu
-  document.getElementById('homeBack').hidden = !!G.over;
+  // au lancement de l'application, aucune partie n'a encore été affichée : pas de retour possible non plus
+  document.getElementById('homeBack').hidden = !!G.over || !gameShown;
   homeEl.hidden = false;
   if (view3d) view3d.setActive(false); // la partie est masquée : inutile de la dessiner
   (r.hidden ? homeEl.querySelector('[data-home="ai"]') : r).focus();
@@ -3272,7 +3303,7 @@ function hideHome() { homeEl.hidden = true; if (view3d) view3d.setActive(G.view 
 homeEl.addEventListener('click', e => {
   const b = e.target.closest('[data-home]'); if (!b) return;
   const a = b.dataset.home;
-  if (a === 'resume') { hideHome(); maybeAI(); }
+  if (a === 'resume') { gameShown = true; hideHome(); maybeAI(); }
   else if (a === 'ai' || a === 'local') { hideHome(); newFromHome = true; openNew(a); }
   else if (a === 'online') { hideHome(); openNet(); }
   else if (a === 'rules') { openRules(); }
@@ -3645,7 +3676,7 @@ function onGames() {
   renderNet();
 }
 function enterOnline(g) {
-  G.review = null;
+  G.review = null; gameShown = true;
   const color = g.white === NET.me ? 'w' : 'b';
   G.settings = Object.assign({}, G.settings, { mode: 'online', variant: g.variant || 'super', time: 0 });
   G.online = { id: g.id, opp: oppOf(g) };
@@ -3922,9 +3953,10 @@ function snapshot() {
 function start(data) {
   if (data && data.G && data.G.states && data.G.states.length) {
     Object.assign(G, data.G, { sel: null, targets: [], hintMove: null, thinking: false, arm: null });
+    gameShown = true;
     renderAll(); maybeAI();
   } else if (loadLocal()) { renderAll(); showHome(); } // la dernière partie attend dans « Reprendre la partie »
-  else { newGame({}); showHome(); }
+  else { newGame({}); gameShown = false; showHome(); }
 }
 applyTheme();
 applyView(true);
