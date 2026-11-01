@@ -1,0 +1,50 @@
+rules_version = '2';
+// Règles de sécurité de Super Chess — à coller dans Firebase › Firestore Database › Règles › Publier.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function me() { return request.auth.uid; }
+
+    // Pseudos uniques : réservés une fois, jamais modifiés.
+    match /usernames/{name} {
+      allow get: if true;
+      allow create: if signedIn()
+        && request.resource.data.uid == me()
+        && name.matches('^[a-z0-9_-]{3,20}$');
+      allow update, delete: if false;
+    }
+
+    // Profil : lisible par les joueurs connectés, modifiable seulement par son propriétaire.
+    match /players/{uid} {
+      allow read: if signedIn();
+      allow create, update: if signedIn() && uid == me();
+      allow delete: if false;
+    }
+
+    // Demandes d'ami : visibles par l'expéditeur et le destinataire.
+    match /requests/{id} {
+      allow read: if signedIn() && (resource.data.from == me() || resource.data.to == me());
+      allow create: if signedIn() && request.resource.data.from == me()
+        && request.resource.data.status == 'pending';
+      allow update: if signedIn() && resource.data.to == me()
+        && request.resource.data.status == 'accepted'
+        && request.resource.data.from == resource.data.from
+        && request.resource.data.to == resource.data.to;
+      allow delete: if signedIn() && (resource.data.from == me() || resource.data.to == me());
+    }
+
+    // Parties : seuls les deux joueurs les voient et y jouent ; les couleurs ne changent jamais.
+    match /games/{id} {
+      allow read: if signedIn() && me() in resource.data.players;
+      allow create: if signedIn() && request.resource.data.from == me()
+        && me() in request.resource.data.players
+        && request.resource.data.players.size() == 2
+        && request.resource.data.status == 'pending';
+      allow update: if signedIn() && me() in resource.data.players
+        && request.resource.data.players == resource.data.players
+        && request.resource.data.white == resource.data.white
+        && request.resource.data.black == resource.data.black;
+      allow delete: if signedIn() && me() in resource.data.players;
+    }
+  }
+}

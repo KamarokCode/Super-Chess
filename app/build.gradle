@@ -1,0 +1,48 @@
+plugins {
+    id 'com.android.application'
+}
+
+// Numéro de version : le numéro de compilation GitHub, pour que chaque APK remplace le précédent.
+def buildNumber = (System.getenv('GITHUB_RUN_NUMBER') ?: '1').toInteger()
+
+android {
+    namespace 'fr.superchess.app'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'fr.superchess.app'
+        minSdk 26
+        targetSdk 34
+        versionCode buildNumber
+        versionName "1.0.${buildNumber}"
+    }
+
+    // Une clé de signature fixe : les nouvelles versions s'installent par-dessus les anciennes.
+    signingConfigs {
+        shared {
+            storeFile rootProject.file('keystore/superchess.keystore')
+            storePassword 'superchess'
+            keyAlias 'superchess'
+            keyPassword 'superchess'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.shared
+        }
+        debug {
+            signingConfig signingConfigs.shared
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'androidx.webkit:webkit:1.11.0'
+}
