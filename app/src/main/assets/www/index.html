@@ -330,8 +330,7 @@ body[data-sc-theme="pirate"] .home-head h1 { font-weight: 400; letter-spacing: .
 .hbtn:active { transform: scale(.985); }
 .hbtn.resume { background: var(--gold); color: var(--gold-ink); border-color: var(--gold); }
 .hbtn.resume svg, .hbtn.resume small { color: var(--gold-ink); }
-.home-foot { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-@media (max-width: 480px) { .home-foot { grid-template-columns: 1fr 1fr; } .home-foot .hbtn:last-child { grid-column: 1 / -1; } }
+.home-foot { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 .stats-grid { display: grid; gap: 8px; }
 .modal.tuto { width: min(400px, 100%); text-align: center; gap: 10px; }
 .tuto-ico { width: 76px; height: 76px; margin: 0 auto; border-radius: 20px; display: grid; place-items: center; background: var(--panel-2); border: 1px solid var(--line); position: relative; }
@@ -376,6 +375,17 @@ body[data-sc-theme="pirate"] .home-head h1 { font-weight: 400; letter-spacing: .
 .hbtn.small { padding: 11px 12px; font-size: 14px; gap: 10px; } .hbtn.small svg { width: 22px; height: 22px; } .hbtn.small small { font-size: 12px; }
 /* ---------- Paramètres ---------- */
 .home.settings { z-index: 47; place-items: start center; }
+.set-card.ars-card { grid-template-columns: 1fr; width: min(820px, 100%); }
+.ars-card > * { grid-column: 1 / -1; }
+.ars-sec h5 { display: flex; align-items: center; gap: 8px; } .ars-sec h5 svg { width: 30px; height: 30px; }
+.ars-opts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding-top: 6px; }
+@media (max-width: 560px) { .ars-opts { grid-template-columns: 1fr; } }
+.ars-opt { text-align: left; display: grid; gap: 4px; align-content: start; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel-2); color: var(--fg); font: inherit; cursor: pointer; }
+.ars-opt b { font-size: 14px; display: flex; flex-direction: column; gap: 1px; } .ars-opt b small { font-weight: 600; color: var(--muted); font-size: 11.5px; }
+.ars-opt p { margin: 0; font-size: 12.5px; color: var(--muted); line-height: 1.35; }
+.ars-opt[aria-checked="true"] { border-color: var(--gold); box-shadow: inset 0 0 0 1px var(--gold), 0 0 16px -6px var(--gold); }
+.ars-opt[aria-checked="true"] b::after { content: "✓ Équipé"; color: var(--gold); font-size: 11.5px; }
+.ars-opt[aria-checked="true"] b small { display: none; }
 .set-card { width: min(580px, 100%); display: grid; gap: 14px; padding-block: 8px 24px; }
 .set-head { display: flex; align-items: center; gap: 12px; }
 .set-head h2 { margin: 0; font-family: var(--f-display); font-size: 26px; }
@@ -582,6 +592,7 @@ body:not(.moves-open) #moves { display: none; }
       <button class="hbtn" data-home="online"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg><span>En ligne avec mes amis<small id="homeOnline">Défiez vos amis sur leur propre appareil</small></span></button>
     </div>
     <div class="home-foot">
+      <button class="hbtn small" data-home="arsenal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 17.5L3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2"/><path d="M9.5 6.5L13 3h3v3l-3.5 3.5"/></svg><span>Arsenal<small id="homeArsenalSub">Choisir les pouvoirs</small></span></button>
       <button class="hbtn small" data-home="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg><span>Paramètres<small>Son, vue, coups, règles</small></span></button>
       <button class="hbtn small" data-home="stats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Statistiques<small id="homeStatsSub">Votre palmarès</small></span></button>
       <button class="hbtn small" data-home="rules"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 012-2h13v16H6a2 2 0 00-2 2z"/><path d="M4 19V5M9 7h6M9 11h6"/></svg><span>Règles du jeu<small>Pouvoirs et événements</small></span></button>
@@ -602,10 +613,20 @@ body:not(.moves-open) #moves { display: none; }
       <div class="set-row"><span>Ambiance sonore<small>Vagues, vent et mouettes en ambiance pirate</small></span><div class="seg" data-pref="ambient"><button data-v="on">Activée</button><button data-v="off">Coupée</button></div></div>
     </section>
     <section class="set-sec"><h5>Règles des pouvoirs <small>· s'appliquent à la prochaine partie</small></h5>
+      <div class="set-row"><span>Arsenal<small>Le pouvoir de chacune de vos pièces</small></span><button class="btn" data-open-arsenal>Choisir</button></div>
       <div class="set-row col"><span>Pouvoirs en jeu<small>Touchez un pouvoir pour l'activer ou le désactiver.</small></span><div class="pw-toggles" id="pwToggles"></div></div>
       <div class="set-row"><span>Recharge<small>Tours d'attente avant de réutiliser un pouvoir</small></span><div class="seg" data-pref="cdMul"><button data-v="0.5">Rapide</button><button data-v="1">Normale</button><button data-v="1.5">Lente</button></div></div>
       <p class="set-note">En ligne, ce sont les règles de celui qui lance le défi qui comptent. <button class="linkbtn" id="setRules">Voir le détail des pouvoirs et des événements</button></p>
     </section>
+  </div>
+</div>
+
+<div class="home settings" id="arsenal" hidden>
+  <div class="set-card ars-card" role="dialog" aria-modal="true" aria-labelledby="arsTitle">
+    <div class="set-head"><button class="btn" id="arsBack"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Retour</button><h2 id="arsTitle">Arsenal</h2></div>
+    <p class="set-note" style="margin:0">Choisissez un pouvoir pour chaque pièce. Votre arsenal s'applique à vos prochaines parties, contre l'ordinateur, à deux et en ligne.</p>
+    <div id="arsList" style="display:grid;gap:12px"></div>
+    <button class="btn" id="arsReset">Revenir aux pouvoirs d'origine</button>
   </div>
 </div>
 
@@ -1758,24 +1779,45 @@ const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 /* ===================== POUVOIRS =====================
    Un pouvoir par type de pièce. Utiliser un pouvoir remplace le coup du tour.
    cd = recharge (en tours du joueur). Règle d'or : un pouvoir ne touche jamais un roi. */
-const POWERS = {
-  p: { name: 'Percée',      cd: 3, desc: 'Le pion capture la pièce ennemie posée juste devant lui.' },
-  n: { name: 'Double bond', cd: 4, desc: 'Le cavalier enchaîne deux sauts. La case d\'escale doit être libre.' },
-  b: { name: 'Spectre',     cd: 4, desc: 'Le fou glisse en diagonale à travers les pièces, amies comme ennemies.' },
-  r: { name: 'Catapulte',   cd: 5, desc: 'La tour capture en sautant par-dessus exactement une pièce.' },
-  q: { name: 'Supernova',   cd: 8, desc: 'La dame se sacrifie en capturant : elle détruit aussi chaque pièce ennemie adjacente.' },
-  k: { name: 'Permutation', cd: 5, desc: 'Le roi échange sa place avec une pièce alliée (hors pion) à deux cases au plus.' }
+/* Bibliothèque : trois pouvoirs au choix par type de pièce. Chaque joueur en équipe un par pièce (son « arsenal »). */
+const POWER_LIB = {
+  percee:     { t: 'p', name: 'Percée',        cd: 3, desc: 'Le pion capture la pièce ennemie posée juste devant lui.' },
+  charge:     { t: 'p', name: 'Charge',        cd: 3, desc: 'Le pion avance de deux cases d\'un coup, de n\'importe où, si les deux cases sont libres.' },
+  esquive:    { t: 'p', name: 'Esquive',       cd: 2, desc: 'Le pion fait un pas de côté, à gauche ou à droite, sur une case libre.' },
+  doublebond: { t: 'n', name: 'Double bond',   cd: 4, desc: 'Le cavalier enchaîne deux sauts. La case d\'escale doit être libre.' },
+  grandsaut:  { t: 'n', name: 'Grand saut',    cd: 4, desc: 'Le cavalier saute de trois cases dans un sens et d\'une dans l\'autre, et peut capturer à l\'arrivée.' },
+  sabot:      { t: 'n', name: 'Coup de sabot', cd: 3, desc: 'Le cavalier capture une pièce ennemie collée à lui, dans n\'importe quelle direction.' },
+  spectre:    { t: 'b', name: 'Spectre',       cd: 4, desc: 'Le fou glisse en diagonale à travers les pièces, amies comme ennemies.' },
+  ricochet:   { t: 'b', name: 'Ricochet',      cd: 4, desc: 'Le fou rebondit une fois sur le bord de l\'échiquier et poursuit sa diagonale, capture possible au bout.' },
+  detour:     { t: 'b', name: 'Détour',        cd: 3, desc: 'Le fou fait un pas en ligne droite (haut, bas, gauche ou droite), capture possible.' },
+  catapulte:  { t: 'r', name: 'Catapulte',     cd: 5, desc: 'La tour capture en sautant par-dessus exactement une pièce.' },
+  belier:     { t: 'r', name: 'Bélier',        cd: 4, desc: 'La tour fonce sur la première pièce ennemie de sa ligne et la repousse d\'une case, si la case derrière est libre.' },
+  barricade:  { t: 'r', name: 'Barricade',     cd: 5, desc: 'La tour reste en place et dresse un bloc de glace sur une case libre voisine, pour 3 tours.' },
+  supernova:  { t: 'q', name: 'Supernova',     cd: 8, desc: 'La dame se sacrifie en capturant : elle détruit aussi chaque pièce ennemie adjacente.' },
+  eclipse:    { t: 'q', name: 'Éclipse',       cd: 6, desc: 'La dame se téléporte sur une case libre à trois cases au plus, même hors de ses lignes.' },
+  onde:       { t: 'q', name: 'Onde de choc',  cd: 6, desc: 'La dame se déplace sur une case libre et repousse d\'une case chaque pièce ennemie adjacente.' },
+  permutation:{ t: 'k', name: 'Permutation',   cd: 5, desc: 'Le roi échange sa place avec une pièce alliée (hors pion) à deux cases au plus.' },
+  sprint:     { t: 'k', name: 'Sprint',        cd: 4, desc: 'Le roi file de deux cases en ligne droite ou en diagonale, sans capturer, si le chemin est libre.' },
+  echappee:   { t: 'k', name: 'Échappée',      cd: 5, desc: 'Le roi saute comme un cavalier vers une case libre.' }
 };
+const DEFAULT_LOAD = { p: 'percee', n: 'doublebond', b: 'spectre', r: 'catapulte', q: 'supernova', k: 'permutation' };
+const POWERS = {}; for (const t in DEFAULT_LOAD) POWERS[t] = POWER_LIB[DEFAULT_LOAD[t]]; // pouvoirs d'origine (compatibilité)
+const powerChoices = t => Object.keys(POWER_LIB).filter(id => POWER_LIB[id].t === t);
+const normLoad = l => { const o = {}; for (const t in DEFAULT_LOAD) o[t] = l && POWER_LIB[l[t]] && POWER_LIB[l[t]].t === t ? l[t] : DEFAULT_LOAD[t]; return o; };
+const randomLoad = () => { const o = {}; for (const t in DEFAULT_LOAD) { const c = powerChoices(t); o[t] = c[Math.random() * c.length | 0]; } return o; };
+const pidOf = (st, c, t) => (st.load && st.load[c] && st.load[c][t]) || DEFAULT_LOAD[t];
+const pdef = (st, c, t) => POWER_LIB[pidOf(st, c, t)];
 const CD_START = { p: 1, n: 2, b: 2, r: 3, q: 6, k: 3 };
 const PTYPES = ['p', 'n', 'b', 'r', 'q', 'k'];
 
 /* Règles réglables : rules = { off: ['q', …] pouvoirs désactivés, cdMul: 0.5 | 1 | 1.5 vitesse de recharge } */
 const normRules = r => ({ off: Array.isArray(r && r.off) ? r.off.filter(t => PTYPES.includes(t)) : [], cdMul: [0.5, 1, 1.5].includes(r && r.cdMul) ? r.cdMul : 1 });
-const cdFor = (st, t) => Math.max(1, Math.round(POWERS[t].cd * ((st.rules && st.rules.cdMul) || 1)));
-function initialState(powers, events, rules) {
+const cdFor = (st, t, c) => Math.max(1, Math.round(pdef(st, c || st.turn, t).cd * ((st.rules && st.rules.cdMul) || 1)));
+function initialState(powers, events, rules, load) {
   const st = fromFEN(START_FEN);
   if (powers) {
     st.powers = true; st.rules = normRules(rules);
+    st.load = { w: normLoad(load && load.w), b: normLoad(load && load.b) };
     const start = {}; for (const t of PTYPES) start[t] = Math.round(CD_START[t] * st.rules.cdMul);
     st.cd = { w: Object.assign({}, start), b: Object.assign({}, start) };
   }
@@ -1785,70 +1827,163 @@ function initialState(powers, events, rules) {
 
 const enemyHit = (b, t, c) => b[t] && b[t].c === other(c) && b[t].t !== 'k';
 function powerMoves(st, s, p, out) {
-  const b = st.board, r = s >> 3, f = s & 7, c = p.c;
-  const normal = new Set(out.map(m => m.to));
+  const b = st.board, r = s >> 3, f = s & 7, c = p.c, pid = pidOf(st, c, p.t);
+  const normal = new Set(out.map(m => m.to)), seen = new Set();
   const add = (to, extra) => out.push(Object.assign(
-    { from: s, to, piece: p.t, color: c, captured: b[to] ? b[to].t : null, power: true }, extra));
-  if (p.t === 'p') {
-    const nr = r + (c === 'w' ? -1 : 1);
-    if (inB(nr, f) && enemyHit(b, idx(nr, f), c)) {
-      const t = idx(nr, f);
-      if (nr === 0 || nr === 7) for (const q of 'qrbn') add(t, { promo: q }); else add(t);
+    { from: s, to, piece: p.t, color: c, captured: b[to] ? b[to].t : null, power: true, pid }, extra));
+  const empty = t => !b[t];
+  const fresh = t => !normal.has(t) && !seen.has(t) && (seen.add(t), true);
+  const fwd = c === 'w' ? -1 : 1, lastR = c === 'w' ? 0 : 7;
+  const promoAdd = (t, extra) => { if ((t >> 3) === lastR) for (const q of 'qrbn') add(t, Object.assign({ promo: q }, extra)); else add(t, extra); };
+  switch (pid) {
+    case 'percee': {
+      const nr = r + fwd;
+      if (inB(nr, f) && enemyHit(b, idx(nr, f), c)) promoAdd(idx(nr, f));
+      break;
     }
-  } else if (p.t === 'n') {
-    const seen = new Set();
-    for (const [a1, b1] of KN) {
-      const r1 = r + a1, f1 = f + b1;
-      if (!inB(r1, f1) || b[idx(r1, f1)]) continue;
-      for (const [a2, b2] of KN) {
-        const r2 = r1 + a2, f2 = f1 + b2;
-        if (!inB(r2, f2)) continue;
-        const t = idx(r2, f2);
-        if (t === s || normal.has(t) || seen.has(t)) continue;
-        if (!b[t] || enemyHit(b, t, c)) { seen.add(t); add(t, { via: idx(r1, f1) }); }
-      }
+    case 'charge': { // deux cases devant, de n'importe où (le double pas classique existe déjà sur la rangée de départ)
+      const r1 = r + fwd, r2 = r + 2 * fwd;
+      if (inB(r2, f) && empty(idx(r1, f)) && empty(idx(r2, f)) && fresh(idx(r2, f))) promoAdd(idx(r2, f));
+      break;
     }
-  } else if (p.t === 'b') {
-    for (const [dr, df] of DIAG) {
-      let nr = r + dr, nf = f + df, passed = false;
-      while (inB(nr, nf)) {
-        const t = idx(nr, nf);
-        if (b[t]) { if (passed && enemyHit(b, t, c)) add(t); passed = true; }
-        else if (passed) add(t);
-        nr += dr; nf += df;
-      }
-    }
-  } else if (p.t === 'r') {
-    for (const [dr, df] of ORTH) {
-      let nr = r + dr, nf = f + df, screen = false;
-      while (inB(nr, nf)) {
-        const t = idx(nr, nf);
-        if (b[t]) {
-          if (!screen) screen = true;
-          else { if (enemyHit(b, t, c)) add(t, { over: true }); break; }
+    case 'esquive':
+      for (const df of [-1, 1]) if (inB(r, f + df) && empty(idx(r, f + df))) add(idx(r, f + df));
+      break;
+    case 'doublebond':
+      for (const [a1, b1] of KN) {
+        const r1 = r + a1, f1 = f + b1;
+        if (!inB(r1, f1) || b[idx(r1, f1)]) continue;
+        for (const [a2, b2] of KN) {
+          const r2 = r1 + a2, f2 = f1 + b2;
+          if (!inB(r2, f2)) continue;
+          const t = idx(r2, f2);
+          if (t === s || normal.has(t) || seen.has(t)) continue;
+          if (!b[t] || enemyHit(b, t, c)) { seen.add(t); add(t, { via: idx(r1, f1) }); }
         }
-        nr += dr; nf += df;
       }
-    }
-  } else if (p.t === 'q') {
-    for (const m of out.slice()) {
-      if (m.power || !m.captured) continue;
-      const blast = [];
-      let blastV = 0;
-      const tr = m.to >> 3, tf = m.to & 7;
+      break;
+    case 'grandsaut':
+      for (const [dr, df] of [[3, 1], [3, -1], [-3, 1], [-3, -1], [1, 3], [1, -3], [-1, 3], [-1, -3]]) {
+        if (!inB(r + dr, f + df)) continue;
+        const t = idx(r + dr, f + df);
+        if (empty(t) || enemyHit(b, t, c)) add(t);
+      }
+      break;
+    case 'sabot':
+      for (const [dr, df] of KG) { if (inB(r + dr, f + df) && enemyHit(b, idx(r + dr, f + df), c)) add(idx(r + dr, f + df)); }
+      break;
+    case 'spectre':
+      for (const [dr, df] of DIAG) {
+        let nr = r + dr, nf = f + df, passed = false;
+        while (inB(nr, nf)) {
+          const t = idx(nr, nf);
+          if (b[t]) { if (passed && enemyHit(b, t, c)) add(t); passed = true; }
+          else if (passed) add(t);
+          nr += dr; nf += df;
+        }
+      }
+      break;
+    case 'ricochet':
+      for (const [dr0, df0] of DIAG) {
+        let dr = dr0, df = df0, nr = r, nf = f, bounced = false, blocked = false;
+        for (let k = 0; k < 16 && !blocked; k++) {
+          if (!inB(nr + dr, nf + df)) { // rebond sur le bord (un seul)
+            if (bounced) break;
+            if (!inB(nr + dr, nf)) dr = -dr; if (!inB(nr, nf + df)) df = -df;
+            if (!inB(nr + dr, nf + df)) break;
+            bounced = true;
+          }
+          nr += dr; nf += df;
+          const t = idx(nr, nf);
+          if (t === s) break;
+          if (b[t]) { if (bounced && enemyHit(b, t, c) && fresh(t)) add(t); blocked = true; }
+          else if (bounced && fresh(t)) add(t);
+        }
+      }
+      break;
+    case 'detour':
+      for (const [dr, df] of ORTH) {
+        if (!inB(r + dr, f + df)) continue;
+        const t = idx(r + dr, f + df);
+        if (empty(t) || enemyHit(b, t, c)) add(t);
+      }
+      break;
+    case 'catapulte':
+      for (const [dr, df] of ORTH) {
+        let nr = r + dr, nf = f + df, screen = false;
+        while (inB(nr, nf)) {
+          const t = idx(nr, nf);
+          if (b[t]) {
+            if (!screen) screen = true;
+            else { if (enemyHit(b, t, c)) add(t, { over: true }); break; }
+          }
+          nr += dr; nf += df;
+        }
+      }
+      break;
+    case 'belier':
+      for (const [dr, df] of ORTH) {
+        let nr = r + dr, nf = f + df;
+        while (inB(nr, nf) && !b[idx(nr, nf)]) { nr += dr; nf += df; }
+        if (!inB(nr, nf)) continue;
+        const t = idx(nr, nf);
+        if (!enemyHit(b, t, c) || !inB(nr + dr, nf + df) || b[idx(nr + dr, nf + df)]) continue;
+        add(t, { captured: null, push: [[t, idx(nr + dr, nf + df)]] });
+      }
+      break;
+    case 'barricade':
+      for (const [dr, df] of KG) { if (inB(r + dr, f + df) && empty(idx(r + dr, f + df))) add(idx(r + dr, f + df), { wall: true, captured: null }); }
+      break;
+    case 'supernova':
+      for (const m of out.slice()) {
+        if (m.power || !m.captured) continue;
+        const blast = [];
+        let blastV = 0;
+        const tr = m.to >> 3, tf = m.to & 7;
+        for (const [dr, df] of KG) {
+          if (!inB(tr + dr, tf + df)) continue;
+          const t = idx(tr + dr, tf + df);
+          if (enemyHit(b, t, c)) { blast.push(t); blastV += VAL[b[t].t]; }
+        }
+        if (blast.length) add(m.to, { blast, blastV });
+      }
+      break;
+    case 'eclipse':
+      for (let dr = -3; dr <= 3; dr++) for (let df = -3; df <= 3; df++) {
+        if (!inB(r + dr, f + df)) continue;
+        const t = idx(r + dr, f + df);
+        if (empty(t) && !normal.has(t)) add(t);
+      }
+      break;
+    case 'onde':
+      for (const m of out.slice()) {
+        if (m.power || b[m.to]) continue;
+        const tr = m.to >> 3, tf = m.to & 7, push = [];
+        for (const [dr, df] of KG) {
+          const ar = tr + dr, af = tf + df;
+          if (!inB(ar, af) || !enemyHit(b, idx(ar, af), c)) continue;
+          if (inB(ar + dr, af + df) && !b[idx(ar + dr, af + df)] && idx(ar + dr, af + df) !== s) push.push([idx(ar, af), idx(ar + dr, af + df)]);
+        }
+        if (push.length) add(m.to, { push });
+      }
+      break;
+    case 'permutation':
+      for (let dr = -2; dr <= 2; dr++) for (let df = -2; df <= 2; df++) {
+        if (!dr && !df || !inB(r + dr, f + df)) continue;
+        const t = idx(r + dr, f + df), q = b[t];
+        if (q && q.c === c && q.t !== 'p' && q.t !== 'k') add(t, { swap: true, captured: null });
+      }
+      break;
+    case 'sprint':
       for (const [dr, df] of KG) {
-        if (!inB(tr + dr, tf + df)) continue;
-        const t = idx(tr + dr, tf + df);
-        if (enemyHit(b, t, c)) { blast.push(t); blastV += VAL[b[t].t]; }
+        if (!inB(r + 2 * dr, f + 2 * df)) continue;
+        const mid = idx(r + dr, f + df), t = idx(r + 2 * dr, f + 2 * df);
+        if (empty(mid) && empty(t) && fresh(t)) add(t);
       }
-      if (blast.length) add(m.to, { blast, blastV });
-    }
-  } else if (p.t === 'k') {
-    for (let dr = -2; dr <= 2; dr++) for (let df = -2; df <= 2; df++) {
-      if (!dr && !df || !inB(r + dr, f + df)) continue;
-      const t = idx(r + dr, f + df), q = b[t];
-      if (q && q.c === c && q.t !== 'p' && q.t !== 'k') add(t, { swap: true, captured: null });
-    }
+      break;
+    case 'echappee':
+      for (const [dr, df] of KN) { if (inB(r + dr, f + df) && empty(idx(r + dr, f + df))) add(idx(r + dr, f + df)); }
+      break;
   }
 }
 
@@ -1955,7 +2090,9 @@ function makeMove(st, m) {
     board: b, turn: other(st.turn), castle: Object.assign({}, st.castle), ep: null,
     half: st.half + 1, full: st.full + (st.turn === 'b' ? 1 : 0)
   };
+  if (m.push) for (const [a, z] of m.push) { b[z] = b[a]; b[a] = null; } // Bélier, Onde de choc : les pièces repoussées
   if (m.swap) { b[m.from] = b[m.to]; b[m.to] = p; }
+  else if (m.wall) b[m.to] = { t: 'x', c: 'n', kind: 'ice', ttl: 7 }; // Barricade : la tour ne bouge pas
   else { b[m.to] = m.promo ? { t: m.promo, c: p.c } : p; b[m.from] = null; }
   if (m.blast) {
     b[m.to] = null; // la dame disparaît avec sa cible
@@ -1964,9 +2101,9 @@ function makeMove(st, m) {
   if (st.cd) {
     const cd = { w: Object.assign({}, st.cd.w), b: Object.assign({}, st.cd.b) }, mine = cd[p.c];
     for (const k in mine) if (mine[k] > 0) mine[k]--;
-    if (m.power) mine[m.piece] = cdFor(st, m.piece);
+    if (m.power) mine[m.piece] = cdFor(st, m.piece, p.c);
     if (chest) for (const k in mine) mine[k] = 0; // le trésor recharge tous les pouvoirs du camp
-    n.cd = cd; n.powers = st.powers; n.rules = st.rules;
+    n.cd = cd; n.powers = st.powers; n.rules = st.rules; n.load = st.load;
   }
   // obstacles temporaires (cratères, glace) et effets d'événements qui s'écoulent
   for (let s = 0; s < 64; s++) {
@@ -1981,7 +2118,8 @@ function makeMove(st, m) {
   if (m.double) n.ep = (m.from + m.to) / 2;
   if (p.t === 'p' || m.captured) n.half = 0;
   if (p.t === 'k') { n.castle[p.c + 'K'] = false; n.castle[p.c + 'Q'] = false; }
-  if (ROOK_HOME[m.from]) n.castle[ROOK_HOME[m.from]] = false;
+  if (ROOK_HOME[m.from] && !m.wall) n.castle[ROOK_HOME[m.from]] = false;
+  if (m.push) for (const [a] of m.push) if (ROOK_HOME[a]) n.castle[ROOK_HOME[a]] = false;
   if (ROOK_HOME[m.to]) n.castle[ROOK_HOME[m.to]] = false;
   for (const h of Hooks.after) h(n, m, st);
   return n;
@@ -2046,6 +2184,7 @@ function san(st, m) {
   let s;
   if (m.castle) s = m.castle === 'K' ? 'O-O' : 'O-O-O';
   else if (m.swap) s = 'R⇄' + FR[st.board[m.to].t] + sqName(m.to);
+  else if (m.wall) s = FR[m.piece] + '▣' + sqName(m.to);
   else {
     s = FR[m.piece];
     if (m.piece !== 'p') {
@@ -2059,6 +2198,7 @@ function san(st, m) {
     if (m.captured) { if (m.piece === 'p') s += FILES[m.from & 7]; s += 'x'; }
     s += sqName(m.to);
     if (m.promo) s += '=' + FR[m.promo];
+    if (m.push) s += '»';
   }
   const n = makeMove(st, m);
   if (inCheck(n)) s += allLegal(n).length ? '+' : '#';
@@ -2568,7 +2708,7 @@ const PSND = (() => {
 })();
 
 /* Préférences de l'appareil (écran Paramètres), mémorisées localement */
-const PREFS = { theme: 'pirate', view: '3d', moves: null, sound: 'on', ambient: 'on', off: [], cdMul: 1 };
+const PREFS = { theme: 'pirate', view: '3d', moves: null, sound: 'on', ambient: 'on', off: [], cdMul: 1, load: null };
 try {
   Object.assign(PREFS, JSON.parse(localStorage.getItem('superchess.prefs') || '{}'));
   if (!localStorage.getItem('superchess.prefs')) { // anciennes clés séparées
@@ -2576,6 +2716,7 @@ try {
     if (localStorage.getItem('superchess.view') === '2d') PREFS.view = '2d';
   }
 } catch (e) {}
+PREFS.load = normLoad(PREFS.load);
 const savePrefs = () => { try { localStorage.setItem('superchess.prefs', JSON.stringify(PREFS)); } catch (e) {} };
 const gameRules = () => ({ off: PREFS.off.slice(), cdMul: PREFS.cdMul });
 let THEME = PREFS.theme === 'classic' ? 'classic' : 'pirate', audioUnlocked = false;
@@ -2620,6 +2761,14 @@ const humanTurn = () => G.review == null && !G.over && !G.thinking && (G.setting
 const viewSt = () => (G.review != null ? G.states[G.review] : cur());
 const viewLast = () => (G.review != null ? (G.review > 0 ? G.hist[G.review - 1].m : null) : lastMove());
 
+// pouvoir équipé : d'après le coup joué, ou d'après l'arsenal du camp dans la position
+const pwOfMove = m => POWER_LIB[m.pid] || POWERS[m.piece];
+const pwOf = (st, c, t) => (st && st.powers ? pdef(st, c, t) : POWER_LIB[PREFS.load[t]]);
+function gameLoad(s) { // arsenal de chaque camp pour une nouvelle partie
+  const mine = normLoad(PREFS.load);
+  if (s.mode === 'ai') { const ai = randomLoad(); return G.human === 'w' ? { w: mine, b: ai } : { w: ai, b: mine }; }
+  return { w: mine, b: mine };
+}
 let gameShown = false; // une partie a-t-elle été affichée depuis le lancement ?
 function newGame(settings) {
   gameShown = true;
@@ -2628,7 +2777,7 @@ function newGame(settings) {
   const s = G.settings;
   G.human = s.mode === 'local' ? 'w' : s.color === 'r' ? (Math.random() < .5 ? 'w' : 'b') : s.color;
   if (!s.variant) s.variant = 'super';
-  G.states = [initialState(s.variant !== 'classic', s.variant === 'super', gameRules())]; G.hist = []; G.keys = [posKey(cur())];
+  G.states = [initialState(s.variant !== 'classic', s.variant === 'super', gameRules(), gameLoad(s))]; G.hist = []; G.keys = [posKey(cur())];
   G.over = null; G.sel = null; G.targets = []; G.hintMove = null; G.thinking = false; aiReq++;
   G.arm = null; G.notice = '';
   G.clocks = { w: s.time * 1000, b: s.time * 1000 };
@@ -2772,7 +2921,7 @@ function renderMoves() {
   for (let i = 0; i < G.hist.length; i += 2) {
     const a = G.hist[i], b = G.hist[i + 1], last = G.hist.length - 1;
     const at = G.review != null ? G.review - 1 : last;
-    const cell = (h, k) => h ? `<span class="mv${k === at ? ' cur' : ''}${h.m.power ? ' pw' : ''}" data-i="${k + 1}" role="button" tabindex="0"${h.m.power ? ` title="${POWERS[h.m.piece].name}"` : ''}>${h.san}</span>` : '<span></span>';
+    const cell = (h, k) => h ? `<span class="mv${k === at ? ' cur' : ''}${h.m.power ? ' pw' : ''}" data-i="${k + 1}" role="button" tabindex="0"${h.m.power ? ` title="${pwOfMove(h.m).name}"` : ''}>${h.san}</span>` : '<span></span>';
     html += `<div class="mrow"><span class="n">${i / 2 + 1}.</span>${cell(a, i)}${cell(b, i + 1)}</div>`;
     for (const h of [a, b]) if (h && h.ev) html += `<div class="evrow">✷ ${EVENTS[h.ev.id].name}</div>`;
   }
@@ -2804,14 +2953,15 @@ function renderStatus() {
   else if (G.settings.mode === 'online') h2.textContent = st.turn === G.human ? 'À vous de jouer' : `Au tour de ${oppName()}`;
   else h2.textContent = `Aux ${WHO(st.turn)} de jouer`;
   if (G.arm) {
-    h2.textContent = `${POWERS[G.arm].name} armé`; h2.className = 'win';
+    const AP = pwOf(st, st.turn, G.arm);
+    h2.textContent = `${AP.name} armé`; h2.className = 'win';
     const none = !allLegal(st).some(m => m.power && m.piece === G.arm);
-    sub.textContent = none ? 'Aucune cible possible pour ce pouvoir en ce moment.' : POWERS[G.arm].desc;
+    sub.textContent = none ? 'Aucune cible possible pour ce pouvoir en ce moment.' : AP.desc;
     return;
   }
   const selP = G.sel != null ? st.board[G.sel] : null;
   if (selP && !G.arm && humanTurn() && st.powers) {
-    const t = selP.t, nm = POWERS[t].name, cd = st.cd && st.cd[selP.c][t];
+    const t = selP.t, nm = pwOf(st, selP.c, t).name, cd = st.cd && st.cd[selP.c][t];
     sub.textContent = st.rules && st.rules.off.includes(t) ? `${nm} est désactivé dans les paramètres de cette partie.`
       : cd > 0 ? `${nm} : prêt dans ${cd} tour${cd > 1 ? 's' : ''}.`
       : legalFrom(st, G.sel).some(m => m.power) ? `Touchez encore votre ${NAMES[t]} pour son pouvoir : ${nm}.`
@@ -2861,7 +3011,7 @@ function renderPowers() {
     const cls = 'pw-card ' + (G.arm === t ? 'armed' : usable ? 'ready' : 'cool');
     const stTxt = disabled ? 'Désactivé' : !ready ? `${cd} tour${cd > 1 ? 's' : ''}` : usable ? 'Prêt' : 'Sans cible';
     return `<button class="${cls}" data-t="${t}" ${usable || G.arm === t ? '' : 'disabled'} aria-pressed="${G.arm === t}"
-      title="${POWERS[t].name} : ${POWERS[t].desc}">${pieceSVG(t, side)}<span class="nm">${POWERS[t].name}</span><span class="st">${stTxt}</span></button>`;
+      title="${pwOf(st, side, t).name} : ${pwOf(st, side, t).desc}">${pieceSVG(t, side)}<span class="nm">${pwOf(st, side, t).name}</span><span class="st">${stTxt}</span></button>`;
   }).join('');
 }
 powerbarEl.addEventListener('click', e => {
@@ -2900,7 +3050,7 @@ function announcePower() {
   const who = G.settings.mode === 'ai' ? 'L\'ordinateur déclenche' : G.settings.mode === 'online' ? oppName() + ' déclenche' : `Les ${WHO(m.color)} déclenchent`;
   const el = document.createElement('div'); el.className = 'power-pill';
   el.innerHTML = pieceSVG(m.piece, m.color) + '<span></span>';
-  el.querySelector('span').textContent = `${who} ${POWERS[m.piece].name}` + (m.blast ? ` · ${m.blast.length + 1} pièces détruites` : '');
+  el.querySelector('span').textContent = `${who} ${pwOfMove(m).name}` + (m.blast ? ` · ${m.blast.length + 1} pièces détruites` : '');
   wrap.querySelectorAll('.power-pill').forEach(x => x.remove());
   wrap.appendChild(el); setTimeout(() => el.remove(), 2800);
 }
@@ -2926,7 +3076,7 @@ function commit(m, animate = true) {
   }
   G.states.push(n); G.hist.push({ m, san: s, ev }); G.keys.push(posKey(n));
   G.sel = null; G.targets = []; G.hintMove = null; G.arm = null;
-  G.notice = m.chest ? `${actor(m.color)} trouvé le coffre au trésor : tous ses pouvoirs sont rechargés !` : m.power ? `${actor(m.color)} déclenché ${POWERS[m.piece].name}${m.blast ? ` : ${m.blast.length + 1} pièce${m.blast.length ? 's' : ''} détruite${m.blast.length ? 's' : ''}` : ''}.` : '';
+  G.notice = m.chest ? `${actor(m.color)} trouvé le coffre au trésor : tous ses pouvoirs sont rechargés !` : m.power ? `${actor(m.color)} déclenché ${pwOfMove(m).name}${m.blast ? ` : ${m.blast.length + 1} pièce${m.blast.length ? 's' : ''} détruite${m.blast.length ? 's' : ''}` : ''}.` : '';
   for (const h of Hooks.turn) h(n);
   checkEnd();
   if (G.over) SND.end();
@@ -2935,8 +3085,8 @@ function commit(m, animate = true) {
   else if (m.castle) SND.castle();
   else if (m.captured) SND.capture();
   else SND.move();
-  renderAll(animate ? m : null);
-  if (m.power) flash(m.swap ? [m.from, m.to] : [m.to].concat(m.blast || []));
+  renderAll(animate && !m.wall ? m : null);
+  if (m.power) flash(m.swap ? [m.from, m.to] : [m.to].concat(m.blast || [], m.push ? m.push.map(x => x[1]) : []));
   if (m.chest) { flash([m.to], 'chest'); SND.power({}); }
   if (ev) {
     setTimeout(() => { showBanner(ev.id); flash(ev.squares, ev.id); SND.event(); }, m.power ? 450 : 200);
@@ -3082,7 +3232,7 @@ function showPieceCard(s) {
       chest: ['Coffre au trésor', 'Une pièce qui s\'y pose recharge tous les pouvoirs de son camp. On ne peut pas passer à travers.'] }[p.kind] || ['Obstacle', ''];
     ico = wallSVG(p.kind); [title, text] = K; stat = `Disparaît dans ${Math.ceil(p.ttl / 2)} tour${Math.ceil(p.ttl / 2) > 1 ? 's' : ''}`; cls = 'wait';
   } else {
-    const P = POWERS[p.t];
+    const P = pwOf(st, p.c, p.t);
     ico = pieceSVG(p.t, p.c);
     title = `${NAMES[p.t][0].toUpperCase() + NAMES[p.t].slice(1)} ${p.c === 'w' ? 'blanc' : 'noir'}${'qr'.includes(p.t) ? 'e' : ''} · ${P.name}`;
     text = P.desc;
@@ -3163,6 +3313,7 @@ document.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
   if (G.review != null && document.querySelectorAll('.modal-bg:not([hidden])').length === 0 && homeEl.hidden) { exitReview(); return; }
   const open = ['newModal', 'rulesModal', 'netModal', 'statsModal', 'tutoModal'].find(id => !document.getElementById(id).hidden);
+  if (!open && !arsEl.hidden) { closeArsenal(); return; }
   if (!open && !setEl.hidden) { closeSettings(); return; }
   if (!open && !homeEl.hidden) { if (!document.getElementById('homeBack').hidden) { hideHome(); maybeAI(); } return; }
   if (open) hideModal(open);
@@ -3210,10 +3361,10 @@ document.getElementById('btnUndo').onclick = () => {
 };
 const RARITY = { 3: 'Fréquent', 2: 'Occasionnel', 1: 'Rare' };
 function renderRules() { // reflète les réglages : pouvoirs désactivés, vitesse de recharge
-  document.getElementById('rulesList').innerHTML = '<h5>Les six pouvoirs</h5>' + PTYPES.map(t => {
-    const off = PREFS.off.includes(t), cd = Math.max(1, Math.round(POWERS[t].cd * PREFS.cdMul));
-    return `<div class="rule"${off ? ' style="opacity:.5"' : ''}>${pieceSVG(t, 'w')}<div><h4>${POWERS[t].name}<small>${NAMES[t]} · ${off ? 'désactivé dans vos paramètres' : 'recharge ' + cd + ' tours'}</small></h4><p>${POWERS[t].desc}</p></div></div>`;
-  }).join('');
+  document.getElementById('rulesList').innerHTML = '<h5>Votre arsenal <button class="linkbtn" data-open-arsenal>Changer</button></h5>' + PTYPES.map(t => {
+    const P = POWER_LIB[PREFS.load[t]], off = PREFS.off.includes(t), cd = Math.max(1, Math.round(P.cd * PREFS.cdMul));
+    return `<div class="rule"${off ? ' style="opacity:.5"' : ''}>${pieceSVG(t, 'w')}<div><h4>${P.name}<small>${NAMES[t]} · ${off ? 'désactivé dans vos paramètres' : 'recharge ' + cd + ' tours'}</small></h4><p>${P.desc}</p></div></div>`;
+  }).join('') + '<p class="set-note">Chaque pièce a trois pouvoirs au choix : on en équipe un par pièce dans l\'Arsenal. L\'ordinateur choisit le sien au hasard ; touchez longuement une pièce adverse pour voir son pouvoir.</p>';
 }
 renderRules();
 document.getElementById('eventsList').innerHTML = `<h5>Les ${Object.keys(EVENTS).length} événements</h5>` + Object.entries(EVENTS)
@@ -3359,6 +3510,7 @@ homeEl.addEventListener('click', e => {
   else if (a === 'rules') { openRules(); }
   else if (a === 'settings') openSettings(true);
   else if (a === 'stats') openStats();
+  else if (a === 'arsenal') openArsenal('home');
 });
 document.getElementById('btnMenu').onclick = showHome;
 /* Panneau d'informations (téléphone à l'horizontale) : repliable vers la droite */
@@ -3379,6 +3531,7 @@ window.scBack = () => {
   if (G.review != null && homeEl.hidden && document.querySelectorAll('.modal-bg:not([hidden])').length === 0) { exitReview(); return true; }
   const modal = ['tutoModal', 'statsModal', 'rulesModal', 'newModal', 'netModal', 'endModal', 'authModal'].find(id => { const el = document.getElementById(id); return el && !el.hidden; });
   if (modal) { if (modal === 'newModal' && newFromHome) { hideModal(modal); showHome(); } else hideModal(modal); return true; }
+  if (!arsEl.hidden) { closeArsenal(); return true; }
   if (!setEl.hidden) { closeSettings(); return true; }
   if (!homeEl.hidden) { if (!document.getElementById('homeBack').hidden) { hideHome(); maybeAI(); } return true; }
   if (G.sel != null) { clearSel(); return true; }
@@ -3403,7 +3556,7 @@ function renderSettings() {
     b.setAttribute('aria-pressed', String(b.dataset.v === val[seg.dataset.pref]))));
   document.getElementById('pwToggles').innerHTML = PTYPES.map(t => {
     const on = !PREFS.off.includes(t);
-    return `<button class="pw-tog" data-t="${t}" aria-pressed="${on}">${pieceSVG(t, 'w')}<span>${POWERS[t].name}<small>${on ? 'Activé' : 'Désactivé'}</small></span></button>`;
+    return `<button class="pw-tog" data-t="${t}" aria-pressed="${on}">${pieceSVG(t, 'w')}<span>${POWER_LIB[PREFS.load[t]].name}<small>${on ? 'Activé' : 'Désactivé'}</small></span></button>`;
   }).join('');
 }
 function openSettings(fromHome) {
@@ -3435,6 +3588,37 @@ setEl.addEventListener('click', e => {
   }
 });
 document.getElementById('setBack').onclick = closeSettings;
+
+/* ---------- Arsenal : un pouvoir au choix (parmi trois) pour chaque pièce ---------- */
+const arsEl = document.getElementById('arsenal');
+let arsFrom = 'home';
+function renderArsenal() {
+  document.getElementById('arsList').innerHTML = PTYPES.map(t => `<section class="set-sec ars-sec"><h5>${pieceSVG(t, 'w')}${NAMES[t][0].toUpperCase() + NAMES[t].slice(1)}</h5>
+    <div class="ars-opts" role="radiogroup" aria-label="Pouvoir du ${NAMES[t]}">${powerChoices(t).map(id => { const P = POWER_LIB[id];
+      return `<button class="ars-opt" role="radio" data-t="${t}" data-id="${id}" aria-checked="${PREFS.load[t] === id}"><b>${P.name}<small>recharge ${P.cd}</small></b><p>${P.desc}</p></button>`; }).join('')}</div></section>`).join('');
+  const sub = document.getElementById('homeArsenalSub');
+  if (sub) sub.textContent = PTYPES.filter(t => PREFS.load[t] !== DEFAULT_LOAD[t]).length ? 'Arsenal personnalisé' : 'Choisir les pouvoirs';
+}
+function openArsenal(from) {
+  arsFrom = from; renderArsenal();
+  arsEl.hidden = false; if (from === 'game' && view3d) view3d.setActive(false);
+  document.getElementById('arsBack').focus();
+}
+function closeArsenal() {
+  arsEl.hidden = true;
+  if (arsFrom === 'game') { if (view3d) view3d.setActive(G.view === '3d'); renderAll(); }
+  if (arsFrom === 'settings') renderSettings();
+  renderRules();
+}
+arsEl.addEventListener('click', e => {
+  const b = e.target.closest('.ars-opt'); if (!b) return;
+  PREFS.load[b.dataset.t] = b.dataset.id; savePrefs(); renderArsenal();
+  try { navigator.vibrate && navigator.vibrate(10); } catch (err) {}
+});
+document.getElementById('arsBack').onclick = closeArsenal;
+document.getElementById('arsReset').onclick = () => { PREFS.load = normLoad(null); savePrefs(); renderArsenal(); };
+document.addEventListener('click', e => { if (e.target.closest('[data-open-arsenal]')) { hideModal('rulesModal'); openArsenal(!homeEl.hidden ? 'home' : !setEl.hidden ? 'settings' : 'game'); } });
+renderArsenal();
 document.getElementById('setRules').onclick = openRules;
 document.getElementById('btnSettings').onclick = () => openSettings(false);
 document.getElementById('endAgain').onclick = () => {
@@ -3688,15 +3872,16 @@ function sendChallenge(id, variant, myColor) {
     players: [NET.me, id], white: meWhite ? NET.me : id, black: meWhite ? id : NET.me,
     names: { [NET.me]: NET.myName, [id]: NET.names[id] || 'Joueur' },
     from: NET.me, to: id, variant: VAR_NAMES[variant] ? variant : 'super',
-    status: 'pending', plies: [], result: null, rules: gameRules(), createdAt: now, updatedAt: now
+    status: 'pending', plies: [], result: null, rules: gameRules(), load: { [NET.me]: normLoad(PREFS.load) }, createdAt: now, updatedAt: now
   }));
   NET.chalOpen = null;
   toast(`Défi envoyé à ${NET.names[id] || 'votre ami'}.`);
   renderNet();
 }
 function acceptChallenge(g) {
-  write('games/' + g.id, () => NET.db.doc('games/' + g.id).update({ status: 'active', updatedAt: Date.now() }));
-  enterOnline(Object.assign({}, g, { status: 'active' }));
+  const load = Object.assign({}, g.load, { [NET.me]: normLoad(PREFS.load) }); // chacun joue avec son propre arsenal
+  write('games/' + g.id, () => NET.db.doc('games/' + g.id).update({ status: 'active', load, updatedAt: Date.now() }));
+  enterOnline(Object.assign({}, g, { status: 'active', load }));
 }
 function dropGame(g) { write('games/' + g.id, () => NET.db.doc('games/' + g.id).delete()); }
 
@@ -3738,7 +3923,7 @@ function enterOnline(g) {
 }
 function syncOnline(g, live) {
   const variant = g.variant || 'super';
-  let st = initialState(variant !== 'classic', variant === 'super', g.rules);
+  let st = initialState(variant !== 'classic', variant === 'super', g.rules, { w: g.load && g.load[g.white], b: g.load && g.load[g.black] });
   const states = [st], hist = [], keys = [posKey(st)];
   for (const ply of Array.isArray(g.plies) ? g.plies : []) {
     // chaque coup reçu est revalidé par le moteur : un coup impossible arrête la relecture
@@ -3766,7 +3951,7 @@ function syncOnline(g, live) {
   if (grew && last) {
     const m = last.m;
     if (m.chest) G.notice = `${actor(m.color)} trouvé le coffre au trésor : tous ses pouvoirs sont rechargés !`;
-    else if (m.power) G.notice = `${actor(m.color)} déclenché ${POWERS[m.piece].name}.`;
+    else if (m.power) G.notice = `${actor(m.color)} déclenché ${pwOfMove(m).name}.`;
     if (G.over) SND.end(); else if (m.power) SND.power(m); else if (last.san.endsWith('+')) SND.check();
     else if (m.castle) SND.castle(); else if (m.captured) SND.capture(); else SND.move();
     try { navigator.vibrate && navigator.vibrate(40); } catch (e) {}
@@ -3932,7 +4117,7 @@ function recordEnd() { // appelée à chaque rendu : n'enregistre qu'une fois ch
     try { navigator.vibrate && navigator.vibrate(res === 0 ? [60, 60, 120] : 200); } catch (e) {}
   }
   for (const h of G.hist) {
-    if (h.m.power && (G.settings.mode === 'local' || h.m.color === G.human)) STATS.powers[h.m.piece] = (STATS.powers[h.m.piece] || 0) + 1;
+    if (h.m.power && (G.settings.mode === 'local' || h.m.color === G.human)) STATS.powers[h.m.pid || h.m.piece] = (STATS.powers[h.m.pid || h.m.piece] || 0) + 1;
     if (h.ev) STATS.events++;
   }
   checkAchievements(res);
@@ -4015,7 +4200,7 @@ function openStats() {
     [1, 2, 3, 4].map(l => row('Ordinateur · ' + LEVELS[l].name, STATS.ai[l])).join('') + row('En ligne', STATS.online) +
     `<p class="net-empty">À deux sur cet appareil : ${STATS.local} partie${STATS.local > 1 ? 's' : ''} · Événements vécus : ${STATS.events}</p>` +
     `<div><p class="net-empty" style="margin-bottom:6px">Succès · ${ACH.filter(a => STATS.ach[a.id]).length}/${ACH.length}</p><div class="ach-grid">${ACH.map(a => `<div class="ach${STATS.ach[a.id] ? ' on' : ''}" title="${a.desc}"><span class="ach-ico">${STATS.ach[a.id] ? a.ico : '🔒'}</span><b>${a.name}</b><small>${a.desc}</small></div>`).join('')}</div></div>` +
-    (fav.length ? `<div><p class="net-empty" style="margin-bottom:6px">Vos pouvoirs favoris</p><div class="st-fav">${fav.map(([t, n]) => `<span>${pieceSVG(t, 'w')}${POWERS[t].name} · ${n}</span>`).join('')}</div></div>` : '');
+    (fav.length ? `<div><p class="net-empty" style="margin-bottom:6px">Vos pouvoirs favoris</p><div class="st-fav">${fav.map(([k, n]) => { const P = POWER_LIB[k] || POWERS[k]; return P ? `<span>${pieceSVG(P.t, 'w')}${P.name} · ${n}</span>` : ''; }).join('')}</div></div>` : '');
   showModal('statsModal');
 }
 // succès déjà mérités avant leur apparition : débloqués sans annonce
@@ -4036,7 +4221,7 @@ document.getElementById('statsModal').addEventListener('click', e => { if (e.tar
 /* ---------- Premiers pas (au premier lancement, puis depuis les Règles) ---------- */
 const TUTO = [
   { ico: () => pieceSVG('p', 'w'), title: 'Jouer un coup', text: 'Touchez une de vos pièces : les cases où elle peut aller s\'affichent. Touchez ensuite la case d\'arrivée. En 2D, vous pouvez aussi la faire glisser.' },
-  { ico: () => '<div class="pwring armed"></div>' + pieceSVG('n', 'w'), title: 'Les pouvoirs', text: 'Un cercle doré au sol signale une pièce dont le pouvoir est prêt. Touchez-la deux fois pour son coup spécial, une troisième fois pour revenir aux coups normaux.' },
+  { ico: () => '<div class="pwring armed"></div>' + pieceSVG('n', 'w'), title: 'Les pouvoirs', text: 'Un cercle doré au sol signale une pièce dont le pouvoir est prêt. Touchez-la deux fois pour son coup spécial, une troisième fois pour revenir aux coups normaux. Dans l\'Arsenal du menu, choisissez le pouvoir de chaque pièce parmi trois.' },
   { ico: () => `<span style="color:var(--gold)">${evIcon('gust')}</span>`, title: 'Les événements', text: 'Tous les 4 tours, un événement secoue la partie : rafale de vent, météores, coffre au trésor… Le compteur du panneau vous prévient à l\'avance.' },
   { ico: () => pieceSVG('k', 'w'), title: 'Le roi est protégé', text: 'Un pouvoir ne touche jamais un roi : seuls les coups normaux donnent échec. Les pièces qui mettent votre roi en échec sont soulignées en rouge.' },
   { ico: () => '<svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>', title: 'Menu et panneau', text: 'Le panneau de droite se replie pour agrandir l\'échiquier. Le menu donne accès aux parties, aux paramètres (son, 3D, règles des pouvoirs) et à vos statistiques. Touchez un coup de la liste pour revoir la partie.' }
