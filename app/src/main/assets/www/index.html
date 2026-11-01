@@ -170,6 +170,13 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--gold);
 .pw-card:not(:disabled):active { transform: scale(.96); }
 .pw-head { display: flex; justify-content: space-between; align-items: baseline; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: -2px; }
 .pw-head button { border: 0; background: none; color: var(--gold); font-size: 12px; font-weight: 700; letter-spacing: 0; text-transform: none; padding: 2px 0; }
+.pwring { position: absolute; inset: 9%; z-index: 1; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, rgba(232, 182, 76, .32) 0%, rgba(232, 182, 76, .12) 55%, transparent 72%);
+  box-shadow: inset 0 0 0 2.5px rgba(232, 182, 76, .85), 0 0 12px rgba(232, 182, 76, .55); animation: pwPulse 1.7s ease-in-out infinite; }
+.pwring.armed { inset: 4%; background: radial-gradient(circle, rgba(255, 214, 120, .55) 0%, rgba(232, 182, 76, .25) 60%, transparent 75%);
+  box-shadow: inset 0 0 0 4px #e8b64c, 0 0 18px rgba(232, 182, 76, .9); animation-duration: .9s; }
+@keyframes pwPulse { 0%, 100% { opacity: .65; transform: scale(.94); } 50% { opacity: 1; transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) { .pwring { animation: none; } }
 .hint.pow::before { width: 30%; height: 30%; border-radius: 3px; transform: rotate(45deg); background: var(--gold); box-shadow: 0 0 12px rgba(232, 182, 76, .9); }
 .hint.pow.cap::before { width: 84%; height: 84%; border-radius: 50%; transform: none; background: none; border: 5px solid var(--gold); box-shadow: 0 0 14px rgba(232, 182, 76, .8), inset 0 0 14px rgba(232, 182, 76, .6); }
 .sq.can .pc svg { filter: drop-shadow(0 0 5px rgba(232, 182, 76, 1)) drop-shadow(0 0 2px rgba(232, 182, 76, 1)); }
@@ -546,7 +553,7 @@ body:not(.moves-open) #moves { display: none; }
     <h3 id="rulesTitle">Pouvoirs et événements</h3>
     <div class="rules" id="rulesList"></div>
     <div class="rules" id="eventsList"></div>
-    <p class="golden"><b>Comment jouer un pouvoir :</b> touchez sa carte sous l'échiquier, puis la pièce et la case marquée d'un losange doré. Un pouvoir remplace votre coup, puis se recharge pendant le nombre de tours indiqué. <b>Règle d'or :</b> aucun pouvoir ni événement ne peut toucher un roi, et vous ne pouvez jamais laisser votre roi en échec. <b>Événements :</b> en variante Super, un événement tiré au sort frappe l'échiquier au début des tours 5, 9, 13, 17… Le même ne tombe jamais deux fois de suite, et aucun ne peut donner mat.</p>
+    <p class="golden"><b>Comment jouer un pouvoir :</b> les pièces dont le pouvoir est prêt ont un cercle doré au sol. Touchez une fois la pièce pour ses coups normaux, une deuxième fois pour son coup spécial (cases marquées d'un losange doré), une troisième fois pour revenir aux coups normaux. Un pouvoir remplace votre coup, puis se recharge pendant le nombre de tours indiqué. <b>Échec par pouvoir :</b> une Catapulte, un Spectre, un Double bond ou une Percée prêts peuvent mettre le roi en échec, et même le mater : il faut parer la menace. Le roi n'est jamais capturé, la Supernova l'épargne et aucun événement ne le touche. <b>Événements :</b> en variante Super, un événement tiré au sort frappe l'échiquier au début des tours 5, 9, 13, 17… Le même ne tombe jamais deux fois de suite, et aucun ne peut donner mat.</p>
     <div class="actions"><button class="btn primary" id="rulesClose">Compris</button></div>
   </div>
 </div>
@@ -1296,7 +1303,11 @@ function createBoard3D(container, opts) {
 
   const pieces = new T.Group(), hints = new T.Group(), fx = new T.Group();
   scene.add(pieces, hints, fx);
-  const spinners = [];
+  const spinners = [], pulsers = [];
+  // cercle doré au sol sous les pièces dont le pouvoir peut servir
+  const pwRingGeo = new T.RingGeometry(.4, .49, 44), pwDiscGeo = new T.CircleGeometry(.49, 44);
+  const pwRingMat = () => new T.MeshBasicMaterial({ color: 0xffc95a, transparent: true, opacity: .85, depthWrite: false, blending: T.AdditiveBlending });
+  const pwDiscMat = () => new T.MeshBasicMaterial({ color: 0xe8b64c, transparent: true, opacity: .22, depthWrite: false, blending: T.AdditiveBlending });
 
   /* ---------- Animations ---------- */
   const tweens = [];
@@ -1306,7 +1317,7 @@ function createBoard3D(container, opts) {
   function update(model, anim) {
     lastModel = model;
     baseAz = model.flipped ? Math.PI : 0;
-    pieces.clear(); hints.clear(); spinners.length = 0;
+    pieces.clear(); hints.clear(); spinners.length = 0; pulsers.length = 0;
     checkMesh.visible = false;
     for (let s = 0; s < 64; s++) {
       const q = model.squares[s], ov = overlays[s], pos = sqPos(s);
@@ -1318,6 +1329,11 @@ function createBoard3D(container, opts) {
       ov.visible = col !== null;
       if (col !== null) { ov.material.color.setHex(col); ov.material.opacity = op; }
       if (q.check) { checkMesh.visible = true; checkMesh.position.copy(pos).setY(.008); }
+      if (q.pwr) {
+        const ring = new T.Mesh(pwRingGeo, pwRingMat()), disc = new T.Mesh(pwDiscGeo, pwDiscMat());
+        for (const m of [ring, disc]) { m.rotation.x = -Math.PI / 2; m.position.copy(pos).setY(.012); m.userData.s = s; hints.add(m); }
+        pulsers.push({ ring, disc, armed: q.armed, ph: s * .7 });
+      }
       if (q.p) {
         const obj = q.p.t === 'x' ? makeWall(q.p) : makePiece(q.p.t, q.p.c, q.can || q.sel);
         obj.position.copy(pos);
@@ -1473,7 +1489,12 @@ function createBoard3D(container, opts) {
       }
     }
     for (const s of spinners) { s.rotation.y = now / 600; s.position.y = .35 + Math.sin(now / 300) * .04; }
-    const busy = tweens.length || spinners.length || now < idleUntil;
+    for (const p of pulsers) {
+      const k = .5 + .5 * Math.sin(now / (p.armed ? 140 : 270) + p.ph), sc = p.armed ? 1.05 + k * .08 : .92 + k * .08;
+      p.ring.scale.setScalar(sc); p.disc.scale.setScalar(sc);
+      p.ring.material.opacity = (p.armed ? .75 : .45) + k * .4; p.disc.material.opacity = (p.armed ? .35 : .12) + k * .15;
+    }
+    const busy = tweens.length || spinners.length || pulsers.length || now < idleUntil;
     // en mer, la scène vit en permanence ; au repos on se contente de 30 images par seconde
     if (busy || !P || now - lastRender > 31) { renderer.render(scene, camera); lastRender = now; }
     if (active && (busy || (P && !calm))) raf = requestAnimationFrame(frame);
@@ -1719,6 +1740,55 @@ function attacked(st, s, by) {
       const q = b[idx(nr, nf)];
       if (q) { if (q.c === by && (q.t === 'r' || q.t === 'q')) return true; break; }
       nr += dr; nf += df;
+    }
+  }
+  // un roi peut aussi être mis en échec par un pouvoir prêt de l'adversaire
+  if (b[s] && b[s].t === 'k' && powerThreat(st, s, by)) return true;
+  return false;
+}
+
+/* Menaces de pouvoirs sur une case (utilisé pour le roi) : Percée, Catapulte, Spectre, Double bond.
+   La Supernova épargne toujours le roi, la Permutation ne capture rien. Un pouvoir désactivé
+   ou en recharge ne menace rien ; par Calme plat, seules les menaces à deux cases comptent. */
+function powerThreat(st, s, by) {
+  if (!st.powers || !st.cd || !st.cd[by]) return false;
+  const ready = t => st.cd[by][t] === 0 && !(st.rules && st.rules.off.includes(t));
+  const b = st.board, r = s >> 3, f = s & 7, calm = st.ev && st.ev.calm > 0;
+  const near = (rr, ff) => !calm || Math.max(Math.abs(rr - r), Math.abs(ff - f)) <= 2;
+  const own = (rr, ff, t) => { const q = b[idx(rr, ff)]; return q && q.c === by && q.t === t; };
+  if (ready('p')) { // Percée : un pion ennemi juste devant (de son point de vue)
+    const pr = by === 'w' ? r + 1 : r - 1;
+    if (inB(pr, f) && own(pr, f, 'p')) return true;
+  }
+  if (ready('r')) { // Catapulte : exactement une pièce entre la tour et le roi
+    for (const [dr, df] of ORTH) {
+      let nr = r + dr, nf = f + df, screen = false;
+      while (inB(nr, nf)) {
+        if (b[idx(nr, nf)]) {
+          if (!screen) screen = true;
+          else { if (own(nr, nf, 'r') && near(nr, nf)) return true; break; }
+        }
+        nr += dr; nf += df;
+      }
+    }
+  }
+  if (ready('b')) { // Spectre : un fou ennemi sur la diagonale, au-delà d'au moins une pièce
+    for (const [dr, df] of DIAG) {
+      let nr = r + dr, nf = f + df, passed = false;
+      while (inB(nr, nf)) {
+        if (b[idx(nr, nf)]) { if (passed && own(nr, nf, 'b') && near(nr, nf)) return true; passed = true; }
+        nr += dr; nf += df;
+      }
+    }
+  }
+  if (ready('n')) { // Double bond : deux sauts de cavalier par une case d'escale libre
+    for (const [a1, b1] of KN) {
+      const r1 = r + a1, f1 = f + b1;
+      if (!inB(r1, f1) || b[idx(r1, f1)]) continue;
+      for (const [a2, b2] of KN) {
+        const r2 = r1 + a2, f2 = f1 + b2;
+        if (inB(r2, f2) && (r2 !== r || f2 !== f) && own(r2, f2, 'n') && near(r2, f2)) return true;
+      }
     }
   }
   return false;
@@ -2408,7 +2478,8 @@ function renderBoard(animFrom) {
   const checkSq = !G.over || G.over.type === 'mate' ? (inCheck(st) ? findKing(st, st.turn) : -1) : -1;
   const tgt = new Map(G.targets.map(m => [m.to, m]));
   // pièces capables d'utiliser le pouvoir armé + zones d'explosion de la Supernova
-  const can = new Set(), blastZone = new Set();
+  const can = new Set(), blastZone = new Set(), pwr = new Set();
+  if (humanTurn() && st.powers) for (const m of allLegal(st)) if (m.power) pwr.add(m.from);
   if (G.arm && humanTurn()) {
     for (const m of allLegal(st)) if (m.power && m.piece === G.arm) can.add(m.from);
     for (const m of G.targets) if (m.blast) m.blast.forEach(t => blastZone.add(t));
@@ -2431,6 +2502,7 @@ function renderBoard(animFrom) {
         p: fog ? null : p0, fog: !!fog, sel: G.sel === s, check: s === checkSq,
         last: !!((lm && (lm.from === s || lm.to === s)) || (G.hintMove && (G.hintMove.from === s || G.hintMove.to === s))),
         can: can.has(s) && G.sel !== s, blast: blastZone.has(s),
+        pwr: pwr.has(s) && !fog, armed: G.sel === s && !!G.arm,
         hint: tm ? ((p0 || tm.ep) && !fog ? (tm.power ? 'powcap' : 'cap') : (tm.power ? 'pow' : 'dot')) : null
       };
     }
@@ -2448,6 +2520,7 @@ function renderBoard(animFrom) {
     if (d % 8 === 0) html += `<span class="coord rk">${8 - r}</span>`;
     if (d >= 56) html += `<span class="coord fl">${FILES[f]}</span>`;
     const p = st.board[s];
+    if (pwr.has(s) && !fog) html += `<div class="pwring${G.sel === s && G.arm ? ' armed' : ''}"></div>`;
     if (p && !fog) html += p.t === 'x'
       ? `<div class="wall ${p.kind}">${wallSVG(p.kind)}<span class="ttl" title="Tours restants">${Math.ceil(p.ttl / 2)}</span></div>`
       : `<div class="pc" data-s="${s}">${pieceSVG(p.t, p.c)}</div>`;
@@ -2552,6 +2625,11 @@ function renderStatus() {
     sub.textContent = none ? 'Aucune cible possible pour ce pouvoir en ce moment.' : POWERS[G.arm].desc;
     return;
   }
+  const selP = G.sel != null ? st.board[G.sel] : null;
+  if (selP && !G.arm && humanTurn() && legalFrom(st, G.sel).some(m => m.power)) {
+    sub.textContent = `Touchez encore votre ${NAMES[selP.t]} pour son pouvoir : ${POWERS[selP.t].name}.`;
+    return;
+  }
   sub.textContent = G.notice || (st.half >= 80 ? `Règle des 50 coups : ${Math.ceil((100 - st.half) / 2)} coups avant nulle` : '');
 }
 function renderChips() {
@@ -2602,13 +2680,12 @@ powerbarEl.addEventListener('click', e => {
   const b = e.target.closest('.pw-card');
   if (!b || b.disabled || !humanTurn()) return;
   const t = b.dataset.t, st = cur();
-  if (G.arm === t) { G.arm = null; if (G.sel != null) select(G.sel); else renderBoard(); }
+  if (G.arm === t) { if (G.sel != null) select(G.sel, false); else { G.arm = null; renderBoard(); } }
   else {
-    G.arm = t;
     const users = [...new Set(allLegal(st).filter(m => m.power && m.piece === t).map(m => m.from))];
-    if (G.sel != null && users.includes(G.sel)) select(G.sel);
-    else if (users.length === 1) select(users[0]);
-    else { G.sel = null; G.targets = []; renderBoard(); }
+    if (G.sel != null && users.includes(G.sel)) select(G.sel, true);
+    else if (users.length === 1) select(users[0], true);
+    else { G.arm = t; G.sel = null; G.targets = []; renderBoard(); }
   }
   renderPowers(); renderStatus();
 });
@@ -2735,19 +2812,27 @@ function sqAt(e) {
   const d = Math.floor(y / (r.height / 8)) * 8 + Math.floor(x / (r.width / 8));
   return G.flipped ? 63 - d : d;
 }
-function select(s) {
-  const st = cur(), p = st.board[s];
-  let all = legalFrom(st, s);
-  if (G.arm && (p.t !== G.arm || !all.some(m => m.power))) { G.arm = null; renderPowers(); renderStatus(); }
-  G.sel = s; G.targets = all.filter(m => !!m.power === !!G.arm); G.hintMove = null; renderBoard();
+/* Sélection : 1er toucher = coups normaux, 2e = coup spécial (pouvoir), 3e = coups normaux, etc. */
+function select(s, armed = false) {
+  const st = cur(), p = st.board[s], all = legalFrom(st, s);
+  G.arm = armed && all.some(m => m.power) ? p.t : null;
+  G.sel = s; G.targets = all.filter(m => !!m.power === !!G.arm); G.hintMove = null;
+  renderBoard(); renderPowers(); renderStatus();
 }
-function clearSel() { G.sel = null; G.targets = []; renderBoard(); }
+function cycleSel(s) {
+  const st = cur(), p = st.board[s];
+  if (!legalFrom(st, s).some(m => m.power)) { clearSel(); return; } // pas de pouvoir prêt : on désélectionne
+  const arming = G.arm !== p.t;
+  select(s, arming);
+  if (arming) { try { navigator.vibrate && navigator.vibrate(25); } catch (e) {} }
+}
+function clearSel() { G.sel = null; G.targets = []; const was = G.arm; G.arm = null; renderBoard(); if (was) { renderPowers(); renderStatus(); } }
 
 function tapSquare(s) {
   if (s == null || !humanTurn()) return;
   const st = cur(), p = st.board[s];
   if (G.sel != null && G.targets.some(m => m.to === s)) { tryMove(G.sel, s); return; }
-  if (p && p.c === st.turn) { if (G.sel === s) clearSel(); else select(s); }
+  if (p && p.c === st.turn) { if (G.sel === s) cycleSel(s); else select(s); }
   else clearSel();
 }
 
@@ -2767,7 +2852,7 @@ function applyView(first) {
   if (view3d) view3d.setActive(on);
   if (on && first) {
     const tip = document.createElement('div');
-    tip.className = 'view-tip'; tip.textContent = 'Glissez pour tourner · touchez pour jouer';
+    tip.className = 'view-tip'; tip.textContent = 'Glissez pour tourner · touchez deux fois une pièce pour son pouvoir';
     wrap.appendChild(tip);
     setTimeout(() => { tip.style.opacity = '0'; setTimeout(() => tip.remove(), 700); }, 3500);
   }
@@ -2783,7 +2868,7 @@ boardEl.addEventListener('pointerdown', e => {
   if (G.sel != null && G.targets.some(m => m.to === s)) { tryMove(G.sel, s); return; }
   if (p && p.c === st.turn) {
     const wasSel = G.sel === s;
-    select(s);
+    if (!wasSel) select(s); // déjà sélectionnée : on garde le mode en cours (glisser reste possible)
     drag = { s, x: e.clientX, y: e.clientY, active: false, wasSel };
     boardEl.setPointerCapture(e.pointerId);
     e.preventDefault();
@@ -2817,7 +2902,7 @@ function endDrag(e, cancel) {
     if (t != null && t !== d.s && G.targets.some(m => m.to === t)) {
       tryMove(d.s, t, false); // déposée à la main : pas d'animation de glissement
     } else renderBoard();
-  } else if (d.wasSel) clearSel();
+  } else if (d.wasSel) cycleSel(d.s);
 }
 boardEl.addEventListener('pointerup', e => endDrag(e, false));
 boardEl.addEventListener('pointercancel', e => endDrag(e, true));
