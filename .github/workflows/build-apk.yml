@@ -28,6 +28,20 @@ jobs:
           echo "SDK Android dans $ANDROID_HOME"
           ls "$ANDROID_HOME/platforms"
 
+      - name: Vérifier le serveur Firebase (informatif, ne crée rien)
+        continue-on-error: true
+        run: |
+          CFG=app/src/main/assets/www/firebase-config.js
+          K=$(grep -o 'apiKey: "[^"]*"' $CFG | cut -d'"' -f2)
+          P=$(grep -o 'projectId: "[^"]*"' $CFG | cut -d'"' -f2)
+          echo "== Comptes (Authentication)"
+          curl -s -X POST "https://identitytoolkit.googleapis.com/v1/accounts:createAuthUri?key=$K" \
+            -H 'Content-Type: application/json' -d '{"identifier":"verification@exemple.fr","continueUri":"http://localhost"}'
+          echo
+          echo "== Base de données et règles (Firestore)"
+          curl -s "https://firestore.googleapis.com/v1/projects/$P/databases/(default)/documents/usernames/verification?key=$K"
+          echo
+
       - name: Compiler
         run: gradle --no-daemon assembleRelease
 

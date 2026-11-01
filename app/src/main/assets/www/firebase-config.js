@@ -1,10 +1,9 @@
-/* Identifiants publics du projet Firebase (Paramètres du projet › Vos applications › Web).
+/* Identifiants publics du projet Firebase « super-chess-d7fc0 » (tirés de google-services.json).
    Ce ne sont pas des secrets : la sécurité repose sur les règles Firestore (firestore.rules). */
 window.SUPERCHESS_FIREBASE = {
-  apiKey: "REMPLACER",
-  authDomain: "REMPLACER.firebaseapp.com",
-  projectId: "REMPLACER",
-  storageBucket: "REMPLACER.appspot.com",
-  messagingSenderId: "REMPLACER",
-  appId: "REMPLACER"
+  apiKey: "AIzaSyB5-Jj0XFzMCvVhaZoOOnJUoDX4JEmCCag",
+  authDomain: "super-chess-d7fc0.firebaseapp.com",
+  projectId: "super-chess-d7fc0",
+  storageBucket: "super-chess-d7fc0.firebasestorage.app",
+  messagingSenderId: "334596825915"
 };
