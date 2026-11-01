@@ -1,7 +1,7 @@
 <!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style></head><body><title>Super Chess</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800&family=Pirata+One&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
 <style>
 /* Layout : plateau au centre, joueurs au-dessus/au-dessous, panneau de partie à droite (sous le plateau sur mobile). */
 :root {
@@ -254,6 +254,27 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--gold);
   box-shadow: 0 20px 50px -10px rgba(0,0,0,.8); max-width: calc(100% - 32px); font-size: 14px; animation: evin .35s ease-out both; }
 .toast .btn { padding: 7px 12px; }
 
+/* ---------- Thème pirate ----------
+   Nuit marine et teck, parchemin, laiton ; titres en Pirata One. */
+body[data-sc-theme="pirate"] {
+  --bg: #0a1620; --panel: #12202b; --panel-2: #1a2b38; --line: #2a3f4f;
+  --fg: #f1e7d0; --muted: #9db0bd; --gold: #e3b04b; --gold-ink: #2a1a04; --danger: #e0574b;
+  --sq-light: #e6d1a2; --sq-dark: #7d4a28; --coord-on-light: #7d4a28; --coord-on-dark: #f0e1bf;
+  --pw: #f3e7cc; --pw-s: #2a1a0e; --pw-d: #8a6a3c; --pb: #2b211c; --pb-s: #0d0807; --pb-d: #c9a46a;
+  --f-display: "Pirata One", Georgia, "Times New Roman", serif;
+  background: radial-gradient(1100px 520px at 50% -8%, #1f4a5e 0%, transparent 62%), linear-gradient(180deg, #0a1620, #07111a 70%);
+}
+html:has(body[data-sc-theme="pirate"]) { background: #07111a; }
+body[data-sc-theme="pirate"] .logo { font-weight: 400; font-size: 27px; letter-spacing: .01em; }
+body[data-sc-theme="pirate"] .status h2, body[data-sc-theme="pirate"] .modal h3, body[data-sc-theme="pirate"] .evbanner h3 { font-weight: 400; letter-spacing: .01em; font-size: 1.25em; }
+body[data-sc-theme="pirate"] .board-wrap:not(.is3d) { box-shadow: 0 0 0 6px #3b2314, 0 0 0 7.5px #c89b45, 0 24px 50px -16px rgba(0,0,0,.85); border-radius: 3px; }
+body[data-sc-theme="pirate"] .board-wrap.is3d { background: linear-gradient(180deg, #5f86b0 0%, #e7c08e 52%, #1d5468 53%, #0b3a52 100%); }
+body[data-sc-theme="pirate"] .sq.d { background-image: repeating-linear-gradient(92deg, rgba(0,0,0,.06) 0 2px, transparent 2px 9px); }
+.btn.theme svg { width: 18px; height: 18px; }
+.logo, .btn { white-space: nowrap; }
+@media (max-width: 420px) { #btnNet .lbl { display: none; } #btnNet { padding: 9px 10px; } body[data-sc-theme="pirate"] .logo { font-size: 23px; } .top { gap: 8px; } }
+@media (max-width: 520px) { .btn.theme span { display: none; } .btn.theme { padding: 9px 10px; } }
+
 /* Écran de compte (application) */
 .modal.auth { width: min(400px, 100%); gap: 12px; }
 .auth-logo { display: flex; align-items: center; gap: 10px; font-family: var(--f-display); font-weight: 800; font-size: 18px; }
@@ -297,7 +318,8 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--gold);
     <span>Super <b>Chess</b></span>
   </div>
   <div class="top-actions">
-    <button class="btn" id="btnNet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 010 6.8M18 14.8c1.9.8 3.1 2.6 3.5 5.2"/></svg>En ligne<span class="badge" id="netBadge" hidden>0</span></button>
+    <button class="btn" id="btnNet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 010 6.8M18 14.8c1.9.8 3.1 2.6 3.5 5.2"/></svg><span class="lbl">En ligne</span><span class="badge" id="netBadge" hidden>0</span></button>
+    <button class="btn theme" id="btnTheme" title="Changer d'ambiance" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2.2"/><path d="M12 7.2V21M8 11h8M4.5 14.5c.5 3.6 3.6 6.5 7.5 6.5s7-2.9 7.5-6.5M4.5 14.5l-1.8 1.6M4.5 14.5l1.9 1.4M19.5 14.5l1.8 1.6M19.5 14.5l-1.9 1.4"/></svg><span id="themeLabel">Pirate</span></button>
     <button class="btn primary" id="btnNewTop">Nouvelle partie</button>
   </div>
 </header>
@@ -412,15 +434,459 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--gold);
 <script src="firebase-config.js"></script>
 <script>
 /* ============================================================
+   SUPER CHESS — MONDE PIRATE (Three.js r128)
+   createPirateWorld(T, canvasTex) → { env, pieces, materials, boardTex, frameTex, tick, sky }
+   L'échiquier géant est posé au milieu du pont d'un galion ; les pièces sont des pirates grandeur nature.
+   Repère : le navire est orienté le long de l'axe x (proue vers +x), le pont est à y = DECK.
+   ============================================================ */
+function createPirateWorld(T, canvasTex) {
+  const DECK = -1.0, WATER = DECK - 4.2;
+  const env = new T.Group();
+  const anim = []; // fonctions (t) appelées à chaque image
+
+  /* ---------- Textures peintes ---------- */
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  const plankTex = (base, rows, seamCol) => {
+    const t = canvasTex(512, (x, N) => {
+      const h = N / rows;
+      for (let r = 0; r < rows; r++) {
+        const l = rnd(-14, 14);
+        x.fillStyle = `hsl(${base[0] + rnd(-4, 4)},${base[1]}%,${base[2] + l * .35}%)`;
+        x.fillRect(0, r * h, N, h);
+        for (let g = 0; g < 26; g++) { // veines du bois
+          x.strokeStyle = `rgba(30,15,5,${rnd(.04, .12)})`; x.lineWidth = rnd(.6, 1.6);
+          const y0 = r * h + rnd(2, h - 2); x.beginPath(); x.moveTo(0, y0);
+          for (let k = 1; k <= 8; k++) x.lineTo(k * N / 8, y0 + rnd(-2, 2));
+          x.stroke();
+        }
+        x.fillStyle = seamCol; x.fillRect(0, r * h, N, 2.5);
+        const cut = rnd(.2, .8) * N; x.fillRect(cut, r * h, 2.5, h); // joint d'about
+        x.fillStyle = 'rgba(20,10,5,.55)';
+        for (const cx of [cut - 7, cut + 9]) { x.beginPath(); x.arc(cx, r * h + h * .3, 1.8, 0, 7); x.arc(cx, r * h + h * .7, 1.8, 0, 7); x.fill(); }
+      }
+    });
+    t.wrapS = t.wrapT = T.RepeatWrapping;
+    return t;
+  };
+  const deckTex = plankTex([32, 38, 34], 8, 'rgba(25,12,4,.75)'); deckTex.repeat.set(.22, .22);
+  const hullTex = plankTex([22, 42, 18], 10, 'rgba(10,5,2,.8)'); hullTex.repeat.set(.12, .5);
+  const sailTex = canvasTex(256, (x, N) => {
+    x.fillStyle = '#efe4c8'; x.fillRect(0, 0, N, N);
+    x.strokeStyle = 'rgba(120,95,60,.35)'; x.lineWidth = 2;
+    for (let i = 1; i < 6; i++) { x.beginPath(); x.moveTo(i * N / 6, 0); x.lineTo(i * N / 6, N); x.stroke(); }
+    for (let i = 0; i < 14; i++) { x.fillStyle = `rgba(110,80,40,${rnd(.03, .08)})`; x.beginPath(); x.arc(rnd(0, N), rnd(0, N), rnd(6, 30), 0, 7); x.fill(); }
+    x.strokeStyle = 'rgba(90,65,35,.6)'; x.lineWidth = 6; x.strokeRect(0, 0, N, N);
+  });
+  const flagTex = canvasTex(256, (x, N) => { // pavillon noir : crâne et tibias croisés
+    x.fillStyle = '#121014'; x.fillRect(0, 0, N, N);
+    x.fillStyle = x.strokeStyle = '#ece6da'; x.lineCap = 'round';
+    x.lineWidth = 16;
+    for (const [a, b, c, d] of [[60, 190, 196, 236], [196, 190, 60, 236]]) {
+      x.beginPath(); x.moveTo(a, b); x.lineTo(c, d); x.stroke();
+      for (const [px, py] of [[a, b], [c, d]]) { x.beginPath(); x.arc(px - 6, py - 4, 10, 0, 7); x.arc(px + 6, py + 4, 10, 0, 7); x.fill(); }
+    }
+    x.beginPath(); x.arc(128, 104, 54, 0, 7); x.fill(); x.fillRect(96, 130, 64, 44);
+    x.fillStyle = '#121014';
+    x.beginPath(); x.arc(106, 104, 15, 0, 7); x.arc(150, 104, 15, 0, 7); x.fill();
+    x.beginPath(); x.moveTo(128, 120); x.lineTo(120, 136); x.lineTo(136, 136); x.fill();
+    for (let i = 0; i < 4; i++) x.fillRect(104 + i * 14, 152, 4, 22);
+  });
+
+  /* ---------- Matériaux du décor ---------- */
+  const M = {
+    deck: new T.MeshStandardMaterial({ map: deckTex, roughness: .85 }),
+    hull: new T.MeshStandardMaterial({ map: hullTex, roughness: .8, color: 0xffffff }),
+    dark: new T.MeshStandardMaterial({ color: 0x3a2416, roughness: .8 }),
+    wood: new T.MeshStandardMaterial({ color: 0x6b4426, roughness: .75 }),
+    rope: new T.MeshStandardMaterial({ color: 0x9c8155, roughness: 1 }),
+    iron: new T.MeshStandardMaterial({ color: 0x222428, roughness: .45, metalness: .75 }),
+    brass: new T.MeshStandardMaterial({ color: 0xc89b45, roughness: .35, metalness: .85 }),
+    sail: new T.MeshStandardMaterial({ map: sailTex, roughness: .95, side: T.DoubleSide }),
+    flag: new T.MeshStandardMaterial({ map: flagTex, roughness: .9, side: T.DoubleSide }),
+    gold: new T.MeshStandardMaterial({ color: 0xd8a63e, roughness: .3, metalness: .9 }),
+    glass: new T.MeshBasicMaterial({ color: 0xffc46b }),
+    island: new T.MeshStandardMaterial({ color: 0x2f4a3a, roughness: 1, flatShading: true }),
+    sand: new T.MeshStandardMaterial({ color: 0xc8b083, roughness: 1 })
+  };
+  const add = (geo, mat, x, y, z, o = {}) => {
+    const m = new T.Mesh(geo, mat);
+    m.position.set(x, y, z);
+    if (o.rx) m.rotation.x = o.rx; if (o.ry) m.rotation.y = o.ry; if (o.rz) m.rotation.z = o.rz;
+    if (o.s) m.scale.set(...o.s);
+    m.castShadow = !!o.shadow; m.receiveShadow = !!o.receive;
+    (o.parent || env).add(m);
+    return m;
+  };
+
+  /* ---------- Coque et pont ---------- */
+  const outline = new T.Shape();
+  outline.moveTo(-21, -8.5); outline.lineTo(12, -8.5);
+  outline.quadraticCurveTo(23, -7.6, 28, 0); outline.quadraticCurveTo(23, 7.6, 12, 8.5);
+  outline.lineTo(-21, 8.5); outline.quadraticCurveTo(-23, 0, -21, -8.5);
+  const HD = 6.5;
+  const hullGeo = new T.ExtrudeGeometry(outline, { depth: HD, bevelEnabled: false, curveSegments: 24 });
+  const hull = new T.Mesh(hullGeo, [M.deck, M.hull]);
+  hull.rotation.x = -Math.PI / 2; hull.position.y = DECK - HD; hull.receiveShadow = true;
+  env.add(hull);
+  // liston doré le long de la coque
+  const pts = outline.getSpacedPoints(120).map(p => new T.Vector3(p.x, 0, -p.y));
+  const ring = (y, r, mat) => { const c = new T.CatmullRomCurve3(pts.map(p => p.clone().setY(y)), true); add(new T.TubeGeometry(c, 240, r, 6, true), mat, 0, 0, 0); };
+  ring(DECK - 1.2, .09, M.gold); ring(DECK - 3.4, .07, M.dark);
+  // bastingage : montants et main courante (côté caméra ajouré pour garder la vue)
+  ring(DECK + 1.15, .1, M.wood);
+  ring(DECK + .55, .05, M.wood);
+  const postGeo = new T.CylinderGeometry(.08, .1, 1.2, 8);
+  for (let i = 0; i < pts.length; i += 3) add(postGeo, M.wood, pts[i].x, DECK + .58, pts[i].z);
+  // pavois plein du côté opposé à la caméra
+  add(new T.BoxGeometry(33, 1.2, .25), M.hull, -4.5, DECK + .58, -8.35, { receive: true });
+  // gaillard d'arrière (poupe surélevée) et sa rambarde
+  add(new T.BoxGeometry(7.5, 1.6, 16.2), M.hull, -17.6, DECK + .8, 0, { receive: true });
+  add(new T.BoxGeometry(7.5, .05, 16.2), M.deck, -17.6, DECK + 1.62, 0, { receive: true });
+  for (let z = -7.5; z <= 7.5; z += 1.25) add(new T.CylinderGeometry(.06, .06, .9, 6), M.wood, -13.85, DECK + 2.05, z);
+  add(new T.BoxGeometry(.18, .1, 16), M.wood, -13.85, DECK + 2.5, 0);
+  for (let s = 0; s < 4; s++) add(new T.BoxGeometry(.5, .4 * (s + 1), 3), M.wood, -13.6 + s * .5 - 1.5 + 1.5, DECK + .2 * (s + 1), 4.5); // escalier
+
+  /* ---------- Estrade de l'échiquier ---------- */
+  add(new T.BoxGeometry(10.6, .5, 10.6), M.dark, 0, DECK + .25, 0, { receive: true });
+  add(new T.BoxGeometry(11.2, .12, 11.2), M.wood, 0, DECK + .06, 0, { receive: true });
+  for (const [x, z] of [[-5, -5], [5, -5], [-5, 5], [5, 5]]) add(new T.CylinderGeometry(.22, .26, .1, 10), M.brass, x, DECK + .53, z);
+
+  /* ---------- Mâts, vergues, voiles, cordages ---------- */
+  const sails = [];
+  function mast(x, z, baseY, h, yards) {
+    const g = new T.Group(); g.position.set(x, baseY, z); env.add(g);
+    add(new T.CylinderGeometry(.22, .38, h, 12), M.wood, 0, h / 2, 0, { parent: g, shadow: true });
+    add(new T.CylinderGeometry(.42, .5, .5, 12), M.dark, 0, .25, 0, { parent: g });
+    yards.forEach(([y, w, sh]) => {
+      const yg = new T.Group(); yg.position.y = y; yg.rotation.y = .38; g.add(yg);
+      add(new T.CylinderGeometry(.09, .12, w, 8), M.wood, 0, 0, 0, { rx: Math.PI / 2, parent: yg });
+      // voile gonflée : un plan dont on bombe les sommets
+      const geo = new T.PlaneGeometry(w * .92, sh, 12, 8);
+      const p = geo.attributes.position;
+      for (let i = 0; i < p.count; i++) {
+        const u = p.getX(i) / (w * .46), v = (p.getY(i) + sh / 2) / sh;
+        p.setZ(i, (1 - u * u) * Math.sin(Math.PI * (1 - v) * .9) * w * .09);
+      }
+      geo.computeVertexNormals();
+      const s = add(geo, M.sail, .25, -sh / 2 - .1, 0, { ry: Math.PI / 2, parent: yg });
+      sails.push(s);
+    });
+    return g;
+  }
+  const main = mast(-7.5, -2.8, DECK, 27, [[9.5, 15, 6.6], [16.5, 12, 5.4], [22.5, 8.5, 4]]);
+  mast(14.5, 0, DECK, 22, [[8.5, 12.5, 5.6], [14.5, 10, 4.6], [19.5, 7, 3.4]]);
+  mast(-18.2, 0, DECK + 1.6, 17, [[7, 10, 4.6], [12.5, 7.5, 3.6]]);
+  // vigie (nid-de-pie) du grand mât
+  add(new T.CylinderGeometry(1.05, .9, .7, 16, 1, true), M.wood, 0, 19.2, 0, { parent: main });
+  add(new T.CylinderGeometry(1.0, 1.0, .12, 16), M.dark, 0, 18.85, 0, { parent: main });
+  // pavillon noir qui claque au vent
+  const flagGeo = new T.PlaneGeometry(3.2, 2.1, 14, 8);
+  const flag = add(flagGeo, M.flag, 1.7, 26.2, 0, { parent: main });
+  const flagBase = Float32Array.from(flagGeo.attributes.position.array);
+  anim.push(t => {
+    const p = flagGeo.attributes.position;
+    for (let i = 0; i < p.count; i++) {
+      const x = flagBase[i * 3] + 1.6;
+      p.setZ(i, Math.sin(x * 2.2 - t * 6.5) * .16 * x + Math.sin(x * 4.1 - t * 9) * .04 * x);
+    }
+    p.needsUpdate = true; flagGeo.computeVertexNormals();
+    sails.forEach((s, i) => { s.scale.z = 1 + Math.sin(t * 1.3 + i) * .08; });
+  });
+  // cordages : haubans tendus du haut des mâts vers le bastingage
+  const ropeMat = new T.LineBasicMaterial({ color: 0x3b2a1a, transparent: true, opacity: .85 });
+  const rope = (a, b) => env.add(new T.Line(new T.BufferGeometry().setFromPoints([a, b]), ropeMat));
+  for (const [mx, mz, top] of [[-7.5, -2.8, 25], [14.5, 0, 20.5], [-18.2, 0, 16.5]]) {
+    for (const dx of [-2.5, 0, 2.5]) { rope(new T.Vector3(mx, DECK + top, mz), new T.Vector3(mx + dx, DECK + 1.15, -8.4)); }
+    for (const dx of [-3, 3]) rope(new T.Vector3(mx, DECK + top, mz), new T.Vector3(mx + dx, DECK + 1.15, 8.4));
+  }
+  rope(new T.Vector3(14.5, DECK + 20.5, 0), new T.Vector3(31, DECK + 3.5, 0)); // étai vers le beaupré
+  add(new T.CylinderGeometry(.12, .22, 9, 8), M.wood, 30.5, DECK + 2.2, 0, { rz: -Math.PI / 2 + .25 }); // beaupré
+
+  /* ---------- Canons, tonneaux, caisses, gouvernail, lanternes ---------- */
+  function cannon(x, z, dir) {
+    const g = new T.Group(); g.position.set(x, DECK, z); g.rotation.y = dir; env.add(g);
+    add(new T.BoxGeometry(1.0, .45, 1.4), M.dark, 0, .38, 0, { parent: g, shadow: true });
+    const wheel = new T.CylinderGeometry(.24, .24, .12, 14);
+    for (const [wx, wz] of [[-.55, -.45], [.55, -.45], [-.55, .45], [.55, .45]]) add(wheel, M.wood, wx, .24, wz, { rz: Math.PI / 2, parent: g });
+    add(new T.CylinderGeometry(.17, .26, 2.1, 16), M.iron, 0, .78, .55, { rx: Math.PI / 2, parent: g, shadow: true });
+    add(new T.TorusGeometry(.2, .05, 8, 18), M.iron, 0, .78, 1.6, { parent: g });
+    add(new T.SphereGeometry(.2, 12, 10), M.iron, 0, .8, -.45, { parent: g });
+    // pyramide de boulets
+    const ball = new T.SphereGeometry(.16, 10, 8);
+    [[0, 0], [.33, 0], [.165, .29], [.165, .1, .27]].forEach(([bx, bz, by]) => add(ball, M.iron, 1 + bx, .16 + (by || 0), -.3 + bz, { parent: g }));
+  }
+  for (const x of [-12, -7.6, 7.2, 10.8]) cannon(x, -6.9, Math.PI);
+  for (const x of [-11.5, 9.5]) cannon(x, 6.9, 0);
+  const barrelGeo = new T.LatheGeometry([[0, 0], [.42, 0], [.5, .25], [.54, .6], [.5, .95], [.42, 1.2], [0, 1.2]].map(([a, b]) => new T.Vector2(a, b)), 18);
+  const hoopGeo = new T.TorusGeometry(.5, .03, 6, 22);
+  function barrel(x, z, lying) {
+    const g = new T.Group(); g.position.set(x, DECK, z); env.add(g);
+    if (lying) { g.rotation.z = Math.PI / 2; g.position.y = DECK + .54; g.position.x += .6; }
+    add(barrelGeo, M.wood, 0, 0, 0, { parent: g, shadow: true });
+    for (const y of [.2, 1.0]) add(hoopGeo, M.iron, 0, y, 0, { rx: Math.PI / 2, parent: g, s: [.96, .96, 1] });
+    add(new T.TorusGeometry(.54, .03, 6, 22), M.iron, 0, .6, 0, { rx: Math.PI / 2, parent: g });
+  }
+  [[9.5, 5.6], [10.7, 6.2], [10.1, 4.6], [-12.5, 5.8, 1], [-13.2, 4.4], [17, -5]].forEach(([x, z, l]) => barrel(x, z, l));
+  const crateGeo = new T.BoxGeometry(1.1, 1.1, 1.1), crateMat = new T.MeshStandardMaterial({ map: plankTex([34, 35, 40], 4, 'rgba(25,12,4,.7)'), roughness: .9 });
+  [[12.6, -5.6, 0], [12.6, -5.6, 1.1], [13.8, -5.2, 0], [-10.4, -5.7, 0]].forEach(([x, z, y]) => add(crateGeo, crateMat, x, DECK + .55 + y, z, { ry: rnd(-.3, .3), shadow: true }));
+  // gouvernail sur le gaillard d'arrière
+  const wheelG = new T.Group(); wheelG.position.set(-15.4, DECK + 3.1, 0); wheelG.rotation.y = Math.PI / 2; env.add(wheelG);
+  add(new T.TorusGeometry(.9, .07, 8, 28), M.wood, 0, 0, 0, { parent: wheelG });
+  for (let k = 0; k < 8; k++) { const a = k * Math.PI / 4; add(new T.CylinderGeometry(.04, .04, 2.3, 6), M.wood, 0, 0, 0, { rz: a, parent: wheelG }); }
+  add(new T.CylinderGeometry(.15, .15, .2, 12), M.brass, 0, 0, 0, { rx: Math.PI / 2, parent: wheelG });
+  add(new T.BoxGeometry(.3, 1.5, .3), M.dark, -15.4, DECK + 2.35, .3);
+  // lanternes vacillantes aux coins de l'estrade
+  const lights = [];
+  function lantern(x, z) {
+    add(new T.CylinderGeometry(.06, .08, 2.4, 8), M.dark, x, DECK + 1.2, z);
+    add(new T.BoxGeometry(.38, .5, .38), M.glass, x, DECK + 2.6, z);
+    add(new T.ConeGeometry(.32, .3, 4), M.dark, x, DECK + 3.0, z, { ry: Math.PI / 4 });
+    add(new T.BoxGeometry(.42, .06, .42), M.dark, x, DECK + 2.33, z);
+    const l = new T.PointLight(0xffa64a, .7, 9, 2); l.position.set(x, DECK + 2.6, z); env.add(l); lights.push(l);
+  }
+  lantern(-6.2, -6.2); lantern(6.2, -6.2);
+  lantern(-20.2, 7.4);
+  anim.push(t => lights.forEach((l, i) => { l.intensity = .62 + Math.sin(t * 9 + i * 2) * .06 + Math.sin(t * 23 + i) * .04; }));
+
+  /* ---------- Mer ---------- */
+  const sunDir = new T.Vector3(-.55, .32, -.78).normalize();
+  const horizon = new T.Color(0xf2c48d), zenith = new T.Color(0x3f6fa8), fogCol = new T.Color(0xc9b49a);
+  const waterU = {
+    uTime: { value: 0 }, uDeep: { value: new T.Color(0x0b3a52) }, uShallow: { value: new T.Color(0x1f7a8c) },
+    uSky: { value: new T.Color(0xa9c6d8) }, uSun: { value: new T.Color(0xffe0a8) }, uSunDir: { value: sunDir },
+    uFog: { value: fogCol }, uFogNear: { value: 60 }, uFogFar: { value: 330 }
+  };
+  const waterGeo = new T.PlaneGeometry(700, 700, 180, 180); waterGeo.rotateX(-Math.PI / 2);
+  const water = new T.Mesh(waterGeo, new T.ShaderMaterial({
+    uniforms: waterU,
+    vertexShader: `
+      uniform float uTime; varying vec3 vW; varying vec3 vN; varying float vH;
+      float H(vec2 p){
+        return .42*sin(dot(p,vec2(.95,.31))*.16+uTime*1.05)
+             + .2*sin(dot(p,vec2(-.37,.93))*.29+uTime*1.55)
+             + .09*sin(dot(p,vec2(.71,-.7))*.57+uTime*2.2)
+             + .035*sin(p.x*1.13+p.y*.4+uTime*3.1);
+      }
+      void main(){
+        vec4 w = modelMatrix*vec4(position,1.);
+        float h = H(w.xz), e = .25;
+        vec3 n = normalize(vec3(-(H(w.xz+vec2(e,0.))-h)/e, 1., -(H(w.xz+vec2(0.,e))-h)/e));
+        w.y += h; vW = w.xyz; vN = n; vH = h;
+        gl_Position = projectionMatrix*viewMatrix*w;
+      }`,
+    fragmentShader: `
+      uniform vec3 uDeep,uShallow,uSky,uSun,uSunDir,uFog; uniform float uFogNear,uFogFar;
+      varying vec3 vW; varying vec3 vN; varying float vH;
+      void main(){
+        vec3 V = normalize(cameraPosition - vW), N = normalize(vN);
+        float fres = pow(1.-max(dot(N,V),0.), 4.);
+        vec3 c = mix(uDeep, uShallow, clamp(vH*.9+.45,0.,1.)*.55);
+        c = mix(c, uSky, .15 + fres*.6);
+        float sp = pow(max(dot(reflect(-V,N), uSunDir),0.), 180.);
+        c += uSun*sp*2.2 + uSun*pow(max(dot(reflect(-V,N), uSunDir),0.), 12.)*.12;
+        c += vec3(.85,.9,.9)*smoothstep(.5,.72,vH)*.4;
+        float f = smoothstep(uFogNear, uFogFar, length(cameraPosition - vW));
+        gl_FragColor = vec4(mix(c, uFog, f), 1.);
+      }`
+  }));
+  water.position.y = WATER;
+  env.add(water);
+  anim.push(t => { waterU.uTime.value = t; });
+
+  /* ---------- Ciel, soleil couchant, îles, mouettes ---------- */
+  const sky = new T.Mesh(new T.SphereGeometry(480, 32, 16), new T.ShaderMaterial({
+    side: T.BackSide, depthWrite: false, fog: false,
+    uniforms: { uH: { value: horizon }, uZ: { value: zenith }, uS: { value: sunDir }, uFog: { value: fogCol } },
+    vertexShader: 'varying vec3 vD; void main(){ vD = normalize(position); gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.); }',
+    fragmentShader: `
+      uniform vec3 uH,uZ,uS,uFog; varying vec3 vD;
+      float hash(vec2 p){ return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453); }
+      float noise(vec2 p){ vec2 i=floor(p), f=fract(p); f=f*f*(3.-2.*f);
+        return mix(mix(hash(i),hash(i+vec2(1,0)),f.x), mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x), f.y); }
+      void main(){
+        float h = vD.y;
+        vec3 c = mix(uH, uZ, pow(clamp(h,0.,1.), .55));
+        if (h < 0.) c = mix(uFog, uFog*.6, clamp(-h*4.,0.,1.));
+        float s = max(dot(vD, uS), 0.);
+        c += vec3(1.,.82,.55)*(pow(s,900.)*3. + pow(s,40.)*.35 + pow(s,6.)*.18);
+        vec2 q = vD.xz/(h+.25)*2.2;
+        float cl = noise(q)*.6 + noise(q*2.3)*.3 + noise(q*5.1)*.1;
+        cl = smoothstep(.55,.85,cl)*smoothstep(0.,.25,h);
+        c = mix(c, mix(vec3(1.,.93,.84), vec3(1.,.75,.5), pow(s,3.)), cl*.65);
+        gl_FragColor = vec4(c,1.);
+      }`
+  }));
+  env.add(sky);
+  [[-160, -230, 26, 14], [140, -260, 34, 18], [260, -120, 18, 9]].forEach(([x, z, r, h]) => {
+    add(new T.ConeGeometry(r, h, 9, 1), M.island, x, WATER + h / 2 - 1.5, z, { ry: rnd(0, 3) });
+    add(new T.CylinderGeometry(r * 1.15, r * 1.2, 1.2, 12), M.sand, x, WATER - .2, z);
+  });
+  const gullMat = new T.MeshBasicMaterial({ color: 0xf6f3ee, side: T.DoubleSide });
+  const wingGeo = new T.PlaneGeometry(.9, .22); wingGeo.translate(.45, 0, 0);
+  const gulls = [];
+  for (let i = 0; i < 4; i++) {
+    const g = new T.Group(), l = new T.Mesh(wingGeo, gullMat), r = new T.Mesh(wingGeo, gullMat);
+    r.rotation.y = Math.PI; g.add(l, r); g.add(new T.Mesh(new T.SphereGeometry(.12, 6, 4), gullMat));
+    env.add(g); gulls.push({ g, l, r, rad: rnd(14, 26), h: rnd(14, 22), sp: rnd(.12, .22) * (i % 2 ? 1 : -1), ph: rnd(0, 6.3), cx: rnd(-8, 6) });
+  }
+  anim.push(t => gulls.forEach(b => {
+    const a = b.ph + t * b.sp;
+    b.g.position.set(b.cx + Math.cos(a) * b.rad, DECK + b.h + Math.sin(t * .7 + b.ph) * 1.2, Math.sin(a) * b.rad * .7 - 6);
+    b.g.rotation.y = -a + (b.sp > 0 ? Math.PI : 0);
+    const f = Math.sin(t * 7 + b.ph) * .55;
+    b.l.rotation.x = f; b.r.rotation.x = -f;
+  }));
+
+  /* ---------- Échiquier pirate : parchemin et teck ---------- */
+  const boardTex = () => canvasTex(1024, (x, N) => {
+    const S = N / 8;
+    for (let r = 0; r < 8; r++) for (let f = 0; f < 8; f++) {
+      const light = (r + f) % 2 === 0;
+      x.fillStyle = light ? '#e7d3a6' : '#7d4a28';
+      x.fillRect(f * S, r * S, S, S);
+      if (light) { for (let i = 0; i < 40; i++) { x.fillStyle = `rgba(120,80,30,${rnd(.02, .06)})`; x.beginPath(); x.arc(f * S + rnd(0, S), r * S + rnd(0, S), rnd(2, 14), 0, 7); x.fill(); } }
+      else { for (let i = 0; i < 18; i++) { x.strokeStyle = `rgba(30,12,3,${rnd(.08, .2)})`; x.lineWidth = rnd(.8, 2); const y0 = r * S + rnd(0, S); x.beginPath(); x.moveTo(f * S, y0); x.bezierCurveTo(f * S + S * .3, y0 + rnd(-6, 6), f * S + S * .7, y0 + rnd(-6, 6), f * S + S, y0 + rnd(-4, 4)); x.stroke(); } }
+      x.strokeStyle = 'rgba(40,20,5,.35)'; x.lineWidth = 2; x.strokeRect(f * S + 1, r * S + 1, S - 2, S - 2);
+    }
+    // rose des vents discrète au centre
+    x.save(); x.translate(N / 2, N / 2); x.globalAlpha = .13; x.fillStyle = '#3b1f0c';
+    for (let k = 0; k < 8; k++) { x.rotate(Math.PI / 4); x.beginPath(); x.moveTo(0, -S * (k % 2 ? .9 : 1.6)); x.lineTo(S * .14, 0); x.lineTo(-S * .14, 0); x.fill(); }
+    x.restore();
+  });
+  const frameTex = FW => canvasTex(1024, (x, N) => {
+    x.fillStyle = '#3b2314'; x.fillRect(0, 0, N, N);
+    for (let i = 0; i < 140; i++) { x.strokeStyle = `rgba(15,6,2,${rnd(.08, .2)})`; x.lineWidth = rnd(1, 3); const y0 = rnd(0, N); x.beginPath(); x.moveTo(0, y0); x.lineTo(N, y0 + rnd(-8, 8)); x.stroke(); }
+    const u = N / FW, m = (FW - 8) / 2;
+    x.strokeStyle = '#c89b45'; x.lineWidth = 5; x.strokeRect(m * u - 8, m * u - 8, 8 * u + 16, 8 * u + 16);
+    x.lineWidth = 2; x.strokeRect(10, 10, N - 20, N - 20);
+    x.fillStyle = '#d8a63e';
+    for (const [cx, cy] of [[22, 22], [N - 22, 22], [22, N - 22], [N - 22, N - 22]]) { x.beginPath(); x.arc(cx, cy, 9, 0, 7); x.fill(); }
+    x.font = `700 ${Math.round(u * .34)}px Georgia, "Times New Roman", serif`;
+    x.textAlign = 'center'; x.textBaseline = 'middle';
+    for (let i = 0; i < 8; i++) {
+      const c = (m + i + .5) * u;
+      x.fillText('abcdefgh'[i], c, N - m * u / 2); x.fillText('abcdefgh'[i], c, m * u / 2);
+      x.fillText(String(8 - i), m * u / 2, c); x.fillText(String(8 - i), N - m * u / 2, c);
+    }
+  });
+
+  /* ---------- Pièces pirates ----------
+     Pion : matelot au bandana · Tour : tonneau-vigie à fanion · Cavalier : hippocampe
+     Fou : perroquet sur son perchoir · Dame : la corsaire au chapeau à plume · Roi : le capitaine au tricorne
+     Ivoire et or (la Marine) contre ébène et pourpre (les pirates). */
+  const V2 = a => a.map(([x, y]) => new T.Vector2(x, y));
+  const lathe = (pts, seg = 32) => new T.LatheGeometry(V2(pts), seg);
+  const BASE = [[0, 0], [.35, 0], [.36, .04], [.34, .08], [.3, .1], [.28, .12]];
+  const P = (geo, mat, x = 0, y = 0, z = 0, o = {}) => Object.assign({ geo, mat, x, y, z }, o);
+  const sph = (r, ws = 20, hs = 14, ...rest) => new T.SphereGeometry(r, ws, hs, ...rest);
+  const pieces = {};
+  pieces.p = [
+    P(lathe(BASE.concat([[.2, .13], [.21, .2], [.19, .3], [.15, .36], [.11, .39], [0, .39]])), 'body'),
+    P(new T.TorusGeometry(.2, .022, 6, 24), 'accent', 0, .23, 0, { rx: Math.PI / 2 }),
+    P(new T.TorusGeometry(.18, .022, 6, 24), 'accent', 0, .31, 0, { rx: Math.PI / 2 }),
+    P(sph(.12), 'body', 0, .5),
+    P(sph(.128, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2), 'accent', 0, .515, 0, { sy: .85 }),
+    P(sph(.04, 8, 6), 'accent', -.12, .52, 0),
+    P(sph(.018, 6, 4), 'detail', .11, .52, .045), P(sph(.018, 6, 4), 'detail', .11, .52, -.045)
+  ];
+  pieces.r = [
+    P(lathe(BASE), 'body'),
+    P(lathe([[0, .12], [.24, .12], [.27, .22], [.29, .36], [.27, .5], [.24, .6], [0, .6]], 24), 'detail'),
+    P(new T.TorusGeometry(.262, .022, 6, 24), 'accent', 0, .19, 0, { rx: Math.PI / 2 }),
+    P(new T.TorusGeometry(.288, .022, 6, 24), 'accent', 0, .36, 0, { rx: Math.PI / 2 }),
+    P(new T.TorusGeometry(.262, .022, 6, 24), 'accent', 0, .53, 0, { rx: Math.PI / 2 }),
+    P(new T.CylinderGeometry(.3, .29, .05, 24), 'body', 0, .63),
+    P(new T.CylinderGeometry(.018, .018, .45, 6), 'body', 0, .87),
+    P(new T.PlaneGeometry(.24, .15), 'accent', .12, 1.0, 0, { side: true })
+  ];
+  const horse = new T.Shape();
+  horse.moveTo(0, .16); horse.quadraticCurveTo(.17, .15, .15, .27); horse.lineTo(.08, .31);
+  horse.quadraticCurveTo(.21, .39, .19, .52); horse.quadraticCurveTo(.17, .6, .1, .64);
+  horse.lineTo(.17, .68); horse.lineTo(.34, .7); horse.lineTo(.355, .75); horse.lineTo(.17, .79);
+  horse.quadraticCurveTo(.13, .9, .03, .89); horse.lineTo(-.01, .95); horse.lineTo(-.05, .87);
+  horse.quadraticCurveTo(-.15, .73, -.11, .58); horse.quadraticCurveTo(-.08, .45, -.13, .35);
+  horse.quadraticCurveTo(-.17, .22, -.06, .19); horse.lineTo(0, .16);
+  const horseGeo = new T.ExtrudeGeometry(horse, { depth: .11, bevelEnabled: true, bevelThickness: .035, bevelSize: .025, bevelSegments: 3, curveSegments: 8 });
+  horseGeo.translate(0, 0, -.055);
+  pieces.n = [
+    P(lathe(BASE.concat([[.22, .14], [.22, .17], [0, .17]])), 'body'),
+    P(horseGeo, 'body'),
+    P(new T.ConeGeometry(.05, .16, 4), 'accent', -.12, .68, 0, { rz: .9 }),
+    P(new T.ConeGeometry(.05, .14, 4), 'accent', -.13, .5, 0, { rz: 1.2 }),
+    P(sph(.022, 8, 6), 'detail', .13, .8, .085), P(sph(.022, 8, 6), 'detail', .13, .8, -.085)
+  ];
+  pieces.b = [
+    P(lathe(BASE), 'body'),
+    P(new T.CylinderGeometry(.035, .045, .34, 8), 'detail', 0, .29),
+    P(new T.CylinderGeometry(.028, .028, .4, 8), 'detail', 0, .46, 0, { rx: Math.PI / 2 }),
+    P(sph(.14), 'body', -.01, .62, 0, { sx: .95, sy: 1.35, sz: .9, rz: .25 }),
+    P(sph(.12, 14, 10), 'accent', -.03, .62, .1, { sx: .5, sy: 1.25, sz: .5, rz: .3 }),
+    P(sph(.12, 14, 10), 'accent', -.03, .62, -.1, { sx: .5, sy: 1.25, sz: .5, rz: .3 }),
+    P(new T.BoxGeometry(.06, .26, .1), 'accent', -.11, .41, 0, { rz: .45 }),
+    P(sph(.1), 'body', .05, .85),
+    P(new T.ConeGeometry(.045, .11, 10), 'detail', .16, .83, 0, { rz: -Math.PI / 2 - .35 }),
+    P(new T.ConeGeometry(.035, .12, 6), 'accent', .0, .97, 0, { rz: .5 }),
+    P(sph(.018, 6, 4), 'detail', .1, .88, .065), P(sph(.018, 6, 4), 'detail', .1, .88, -.065)
+  ];
+  pieces.q = [
+    P(lathe(BASE.concat([[.27, .13], [.24, .2], [.17, .4], [.12, .56], [.14, .6], [.1, .65], [0, .65]])), 'body'),
+    P(new T.TorusGeometry(.135, .025, 6, 24), 'accent', 0, .54, 0, { rx: Math.PI / 2 }),
+    P(sph(.11), 'body', 0, .75),
+    P(new T.CylinderGeometry(.25, .25, .025, 28), 'detail', 0, .83, 0, { rz: .1 }),
+    P(new T.CylinderGeometry(.1, .125, .12, 20), 'detail', 0, .9),
+    P(sph(.06, 10, 8), 'accent', -.06, .99, .02, { sx: .8, sy: .8, sz: 4.2, rx: -.6, ry: .9 }),
+    P(new T.TorusGeometry(.06, .012, 6, 16), 'accent', 0, .64, 0, { rx: Math.PI / 2 })
+  ];
+  const tri = new T.Shape();
+  for (let k = 0; k <= 3; k++) {
+    const a = Math.PI / 2 + k * 2 * Math.PI / 3, b = a - Math.PI / 3;
+    const px = Math.cos(a) * .3, py = Math.sin(a) * .3;
+    if (!k) tri.moveTo(px, py); else tri.quadraticCurveTo(Math.cos(b) * .1, Math.sin(b) * .1, px, py);
+  }
+  const tricorn = new T.ExtrudeGeometry(tri, { depth: .08, bevelEnabled: true, bevelThickness: .02, bevelSize: .02, bevelSegments: 2, curveSegments: 8 });
+  tricorn.rotateX(-Math.PI / 2); tricorn.rotateY(Math.PI / 2);
+  pieces.k = [
+    P(lathe(BASE.concat([[.28, .13], [.26, .2], [.18, .42], [.14, .63], [.17, .67], [.1, .71], [0, .71]])), 'body'),
+    P(new T.TorusGeometry(.2, .03, 6, 24), 'accent', 0, .37, 0, { rx: Math.PI / 2, sx: 1.08, sy: 1.08 }),
+    P(new T.BoxGeometry(.06, .07, .09), 'accent', .21, .37, 0),
+    P(sph(.065, 12, 8), 'accent', 0, .65, .15, { sy: .45 }), P(sph(.065, 12, 8), 'accent', 0, .65, -.15, { sy: .45 }),
+    P(sph(.115), 'body', 0, .81),
+    P(tricorn, 'detail', 0, .89),
+    P(sph(.125, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2), 'detail', 0, .96),
+    P(sph(.035, 10, 8), 'accent', .25, 1.01, 0),
+    P(new T.CylinderGeometry(.012, .012, .16, 6), 'accent', .25, 1.01, 0, { rx: Math.PI / 2, rz: .5 })
+  ];
+  const mk = (c, r, m, extra) => new T.MeshStandardMaterial(Object.assign({ color: c, roughness: r, metalness: m }, extra || {}));
+  const materials = {
+    w: { body: mk(0xefe2c4, .4, .05), accent: mk(0xd5a23a, .3, .85), detail: mk(0x22365c, .55, .1) },
+    b: { body: mk(0x2b211c, .32, .18), accent: mk(0xa3222a, .4, .2), detail: mk(0x120d0b, .6, .05) }
+  };
+  for (const c of ['w', 'b']) {
+    const g = materials[c + 'g'] = {};
+    for (const k in materials[c]) { g[k] = materials[c][k].clone(); g[k].emissive = new T.Color(0xe8b64c); g[k].emissiveIntensity = k === 'body' ? .5 : .25; }
+  }
+  materials.wflag = materials.w.accent.clone(); materials.wflag.side = T.DoubleSide;
+  materials.bflag = materials.b.accent.clone(); materials.bflag.side = T.DoubleSide;
+
+  return {
+    env, pieces, materials, boardTex, frameTex, sunDir, horizon: fogCol,
+    tick: t => anim.forEach(f => f(t))
+  };
+}
+
+/* ============================================================
    SUPER CHESS — VUE 3D (Three.js r128)
-   createBoard3D(container, { onTap }) → { update(model, anim), flash(squares, kind), setActive(bool) }
+   createBoard3D(container, { onTap, theme }) → { update(model, anim), flash(squares, kind), setActive(bool), setTheme(name) }
+   Thèmes : 'classic' (échiquier seul) et 'pirate' (échiquier géant sur le pont d'un galion, voir pirate3d.js).
    model.squares[s] = { p, last, sel, check, can, blast, fog, hint } ; model.flipped
    Repère : case s → x = f - 3.5, z = r - 3.5 (r = 0 : 8e rangée, côté -z). Les Blancs regardent depuis +z.
    ============================================================ */
 function createBoard3D(container, opts) {
   if (!window.THREE) return null;
   const T = THREE;
-  let active = false, raf = 0, idleUntil = 0; // état de la boucle de rendu
+  let active = false, raf = 0, idleUntil = 0, lastRender = 0; // état de la boucle de rendu
+  let theme = 'classic', PW = null;
+  const calm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   let renderer;
   try {
     renderer = new T.WebGLRenderer({ antialias: true, alpha: true });
@@ -434,10 +900,11 @@ function createBoard3D(container, opts) {
 
   const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim() || '#888';
   const scene = new T.Scene();
-  const camera = new T.PerspectiveCamera(32, 1, 0.1, 100);
+  const camera = new T.PerspectiveCamera(32, 1, 0.1, 1200);
 
   /* ---------- Lumières ---------- */
-  scene.add(new T.HemisphereLight(0xf4ecff, 0x2a1f38, 0.42));
+  const hemi = new T.HemisphereLight(0xf4ecff, 0x2a1f38, 0.42);
+  scene.add(hemi);
   const sun = new T.DirectionalLight(0xfff0d8, 0.72);
   sun.position.set(-4.5, 11, 6);
   sun.castShadow = true;
@@ -458,7 +925,7 @@ function createBoard3D(container, opts) {
     t.anisotropy = renderer.capabilities.getMaxAnisotropy ? renderer.capabilities.getMaxAnisotropy() : 1;
     return t;
   }
-  const boardTex = canvasTex(1024, (x, N) => {
+  const classicBoardTex = canvasTex(1024, (x, N) => {
     const S = N / 8, L = css('--sq-light'), D = css('--sq-dark');
     for (let r = 0; r < 8; r++) for (let f = 0; f < 8; f++) {
       x.fillStyle = (r + f) % 2 === 0 ? L : D;
@@ -470,14 +937,15 @@ function createBoard3D(container, opts) {
       x.fillRect(Math.random() * N, Math.random() * N, 2 + Math.random() * 6, 1);
     }
   });
-  const board = new T.Mesh(new T.PlaneGeometry(8, 8), new T.MeshStandardMaterial({ map: boardTex, roughness: .55, metalness: 0 }));
+  const boardMat = new T.MeshStandardMaterial({ map: classicBoardTex, roughness: .55, metalness: 0 });
+  const board = new T.Mesh(new T.PlaneGeometry(8, 8), boardMat);
   board.rotation.x = -Math.PI / 2;
   board.position.y = 0.002;
   board.receiveShadow = true;
   scene.add(board);
 
   const FW = 9.3; // largeur du cadre
-  const frameTex = canvasTex(1024, (x, N) => {
+  const classicFrameTex = canvasTex(1024, (x, N) => {
     x.fillStyle = '#2a2136'; x.fillRect(0, 0, N, N);
     const u = N / FW, m = (FW - 8) / 2;
     x.strokeStyle = 'rgba(232,182,76,.55)'; x.lineWidth = 3;
@@ -491,8 +959,8 @@ function createBoard3D(container, opts) {
     }
   });
   const frameSide = new T.MeshStandardMaterial({ color: 0x1d1726, roughness: .6, metalness: .1 });
-  const frameMesh = new T.Mesh(new T.BoxGeometry(FW, .45, FW), [frameSide, frameSide,
-    new T.MeshStandardMaterial({ map: frameTex, roughness: .5 }), frameSide, frameSide, frameSide]);
+  const frameTop = new T.MeshStandardMaterial({ map: classicFrameTex, roughness: .5 });
+  const frameMesh = new T.Mesh(new T.BoxGeometry(FW, .45, FW), [frameSide, frameSide, frameTop, frameSide, frameSide, frameSide]);
   frameMesh.position.y = -0.225;
   frameMesh.receiveShadow = true;
   scene.add(frameMesh);
@@ -566,6 +1034,7 @@ function createBoard3D(container, opts) {
   mat.bg = mat.b.clone(); mat.bg.emissive = new T.Color(0xe8b64c); mat.bg.emissiveIntensity = .5;
 
   function makePiece(t, c, glowOn) {
+    if (theme === 'pirate' && PW) return makePiratePiece(t, c, glowOn);
     const g = new T.Group(), m = mat[c + (glowOn ? 'g' : '')];
     for (const pt of G[t]) {
       const mesh = new T.Mesh(pt.geo, m);
@@ -576,6 +1045,49 @@ function createBoard3D(container, opts) {
     if (t === 'n') g.rotation.y = c === 'w' ? Math.PI - .55 : -.55; // de profil, tourné vers l'adversaire
     if (t === 'b') g.rotation.y = c === 'w' ? 0 : Math.PI;
     return g;
+  }
+
+  function makePiratePiece(t, c, glowOn) {
+    const g = new T.Group(), set = PW.materials[c + (glowOn ? 'g' : '')];
+    for (const pt of PW.pieces[t]) {
+      const mesh = new T.Mesh(pt.geo, pt.side ? PW.materials[c + 'flag'] : set[pt.mat]);
+      mesh.position.set(pt.x, pt.y, pt.z);
+      mesh.rotation.set(pt.rx || 0, pt.ry || 0, pt.rz || 0);
+      mesh.scale.set(pt.sx || 1, pt.sy || 1, pt.sz || 1);
+      mesh.castShadow = true; mesh.receiveShadow = true;
+      g.add(mesh);
+    }
+    // chaque pièce regarde l'adversaire ; hippocampes et perroquets de trois quarts pour montrer leur profil
+    const toward = c === 'w' ? Math.PI / 2 : -Math.PI / 2;
+    g.rotation.y = t === 'n' || t === 'b' ? (c === 'w' ? Math.PI - .55 : -.55) : toward;
+    return g;
+  }
+
+  /* ---------- Thème ---------- */
+  let pirateBoardTex = null, pirateFrameTex = null;
+  function setTheme(name) {
+    const want = name === 'pirate' ? 'pirate' : 'classic';
+    if (want === 'pirate' && !PW) {
+      try {
+        PW = createPirateWorld(T, canvasTex);
+        pirateBoardTex = PW.boardTex(); pirateFrameTex = PW.frameTex(FW);
+      } catch (e) { PW = null; }
+    }
+    theme = want === 'pirate' && PW ? 'pirate' : 'classic';
+    const P = theme === 'pirate';
+    if (PW) { if (P) scene.add(PW.env); else scene.remove(PW.env); }
+    boardMat.map = P ? pirateBoardTex : classicBoardTex; boardMat.roughness = P ? .7 : .55; boardMat.needsUpdate = true;
+    frameTop.map = P ? pirateFrameTex : classicFrameTex; frameTop.needsUpdate = true;
+    frameSide.color.setHex(P ? 0x2a170c : 0x1d1726);
+    glow.visible = !P;
+    scene.fog = P ? new T.Fog(PW.horizon, 70, 380) : null;
+    hemi.color.setHex(P ? 0xd6e4f0 : 0xf4ecff); hemi.groundColor.setHex(P ? 0x5a3d22 : 0x2a1f38); hemi.intensity = P ? .46 : .42;
+    sun.color.setHex(P ? 0xffd7a0 : 0xfff0d8); sun.intensity = P ? .8 : .72;
+    rim.color.setHex(P ? 0xffb070 : 0xc6a6ff); rim.intensity = P ? .35 : .3;
+    if (!P && zoom > 1.45) zoom = 1.45;
+    resetView();
+    if (lastModel) update(lastModel, null);
+    wake();
   }
 
   /* ---------- Obstacles d'événements ---------- */
@@ -631,7 +1143,7 @@ function createBoard3D(container, opts) {
     for (let s = 0; s < 64; s++) {
       const q = model.squares[s], ov = overlays[s], pos = sqPos(s);
       let col = null, op = 0;
-      if (q.fog) { col = 0x221b2e; op = .9; }
+      if (q.fog) { col = theme === 'pirate' ? 0x0e1820 : 0x221b2e; op = .9; }
       else if (q.sel) { col = 0xe8b64c; op = .62; }
       else if (q.last) { col = 0xe8b64c; op = .4; }
       else if (q.blast) { col = 0xe5534b; op = .38; }
@@ -679,7 +1191,7 @@ function createBoard3D(container, opts) {
       squares.forEach((s, i) => {
         const to = sqPos(s), dir = new T.Vector3(-3, 9, -2), from = to.clone().add(dir);
         const m = new T.Group();
-        m.add(new T.Mesh(meteorGeo, new T.MeshBasicMaterial({ color: 0xfff0c8 })));
+        m.add(new T.Mesh(meteorGeo, new T.MeshBasicMaterial({ color: theme === 'pirate' ? 0x2b2622 : 0xfff0c8 }))); // pirate : boulet de canon
         const halo = new T.Mesh(meteorGeo, new T.MeshBasicMaterial({ color: 0xff8a3c, transparent: true, opacity: .55, blending: T.AdditiveBlending, depthWrite: false }));
         halo.scale.setScalar(1.9); m.add(halo);
         // traînée de feu : un cône orienté vers le ciel, d'où vient le météore
@@ -701,6 +1213,8 @@ function createBoard3D(container, opts) {
 
   /* ---------- Caméra : glisser pour tourner, molette pour zoomer ---------- */
   let baseAz = 0, userAz = 0, az = 0, pol = .8, zoom = 1, fitR = 17;
+  // en mer, la caméra est un peu plus basse et plus loin : on voit l'horizon derrière l'échiquier
+  function resetView() { userAz = 0; pol = theme === 'pirate' ? .78 : .8; zoom = theme === 'pirate' ? 1.15 : 1; wake(); }
   function fit() {
     const w = container.clientWidth || 1, h = container.clientHeight || 1;
     renderer.setSize(w, h, false);
@@ -736,7 +1250,8 @@ function createBoard3D(container, opts) {
     if (!pd.moved && Math.hypot(dx, dy) > 8) pd.moved = true;
     if (pd.moved) {
       userAz = pd.az - dx * .009;
-      pol = Math.min(1.18, Math.max(.12, pd.pol - dy * .006));
+      if (touches.size > 1) return;
+      pol = Math.min(theme === 'pirate' ? 1.4 : 1.18, Math.max(.12, pd.pol - dy * .006));
       wake();
     }
   });
@@ -745,9 +1260,19 @@ function createBoard3D(container, opts) {
     pd = null;
   });
   el.addEventListener('pointercancel', () => { pd = null; });
-  el.addEventListener('wheel', e => { e.preventDefault(); zoom = Math.min(1.45, Math.max(.7, zoom * (1 + e.deltaY * .001))); wake(); }, { passive: false });
+  const maxZoom = () => (theme === 'pirate' ? 2.6 : 1.45);
+  el.addEventListener('wheel', e => { e.preventDefault(); zoom = Math.min(maxZoom(), Math.max(.7, zoom * (1 + e.deltaY * .001))); wake(); }, { passive: false });
+  // pincer à deux doigts pour zoomer (utile sur téléphone pour admirer le navire)
+  const touches = new Map(); let pinch0 = 0, zoom0 = 1;
+  el.addEventListener('pointerdown', e => { if (e.pointerType === 'touch') { touches.set(e.pointerId, e); if (touches.size === 2) { const [a, b] = [...touches.values()]; pinch0 = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY); zoom0 = zoom; } } });
+  el.addEventListener('pointermove', e => {
+    if (!touches.has(e.pointerId)) return; touches.set(e.pointerId, e);
+    if (touches.size === 2 && pinch0) { const [a, b] = [...touches.values()]; const d = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY); zoom = Math.min(maxZoom(), Math.max(.7, zoom0 * pinch0 / d)); if (pd) pd.moved = true; wake(); }
+  });
+  const endTouch = e => { touches.delete(e.pointerId); if (touches.size < 2) pinch0 = 0; };
+  el.addEventListener('pointerup', endTouch); el.addEventListener('pointercancel', endTouch);
   el.addEventListener('dblclick', () => { resetView(); });
-  function resetView() { userAz = 0; pol = .8; zoom = 1; wake(); }
+
 
   /* ---------- Boucle de rendu (s'endort quand rien ne bouge) ---------- */
   function wake() { idleUntil = performance.now() + 600; if (active && !raf) raf = requestAnimationFrame(frame); }
@@ -758,8 +1283,12 @@ function createBoard3D(container, opts) {
     if (Math.abs(targetAz - az) > .001) idleUntil = now + 100;
     const half = 4.85 + 1.45 * Math.abs(Math.sin(2 * (az - baseAz))); // un plateau vu en diagonale est plus large
     const R = fitR * half * zoom;
+    const P = theme === 'pirate', t = now / 1000;
     camera.position.set(R * Math.sin(pol) * Math.sin(az), R * Math.cos(pol), R * Math.sin(pol) * Math.cos(az));
-    camera.lookAt(0, -.2, .35 * Math.cos(az - baseAz));
+    if (P && !calm) camera.position.y += Math.sin(t * .55) * .14; // la houle soulève doucement le navire
+    camera.lookAt(0, -.2, (P ? -1.1 : .35) * Math.cos(az - baseAz));
+    if (P && !calm) camera.rotateZ(Math.sin(t * .42) * .013 + Math.sin(t * .97) * .004); // et le fait rouler
+    if (P) PW.tick(calm ? 0 : t);
     for (let i = tweens.length - 1; i >= 0; i--) {
       const tw = tweens[i], k = Math.min(1, Math.max(0, (now - tw.t0) / tw.dur));
       if (tw.kind === 'burst') {
@@ -776,17 +1305,20 @@ function createBoard3D(container, opts) {
       }
     }
     for (const s of spinners) { s.rotation.y = now / 600; s.position.y = .35 + Math.sin(now / 300) * .04; }
-    renderer.render(scene, camera);
-    if (active && (tweens.length || spinners.length || now < idleUntil)) raf = requestAnimationFrame(frame);
+    const busy = tweens.length || spinners.length || now < idleUntil;
+    // en mer, la scène vit en permanence ; au repos on se contente de 30 images par seconde
+    if (busy || !P || now - lastRender > 31) { renderer.render(scene, camera); lastRender = now; }
+    if (active && (busy || (P && !calm))) raf = requestAnimationFrame(frame);
   }
   function setActive(on) { active = on; if (on) { fit(); wake(); } }
 
   // position écran d'une case (utile aux tests et aux futures info-bulles)
-  function screenOf(s) {
-    const v = sqPos(s).project(camera), r = el.getBoundingClientRect();
+  function screenOf(s, y = 0) {
+    const v = sqPos(s).setY(y).project(camera), r = el.getBoundingClientRect();
     return { x: r.left + (v.x + 1) / 2 * r.width, y: r.top + (1 - v.y) / 2 * r.height };
   }
-  return { update, flash, setActive, resetView, screenOf };
+  if (opts.theme) setTheme(opts.theme);
+  return { update, flash, setActive, resetView, screenOf, setTheme };
 }
 
 </script>
@@ -1387,7 +1919,7 @@ function tone(freq, dur, type = 'triangle', gain = .18, delay = 0) {
     o.connect(g).connect(actx.destination); o.start(t0); o.stop(t0 + dur + .02);
   } catch (e) {}
 }
-const SND = {
+const SND_CLASSIC = {
   move: () => tone(330, .08),
   capture: () => { tone(220, .12, 'square', .1); tone(150, .14, 'triangle', .2, .02); },
   check: () => { tone(660, .1, 'sine', .15); tone(880, .14, 'sine', .15, .09); },
@@ -1399,6 +1931,172 @@ const SND = {
   event: () => { tone(196, .25, 'sine', .14); tone(294, .25, 'sine', .14, .12); tone(392, .4, 'sine', .14, .24); tone(587, .5, 'triangle', .08, .36); },
   end: () => { tone(523, .2, 'sine', .15); tone(659, .2, 'sine', .15, .15); tone(784, .35, 'sine', .15, .3); }
 };
+/* ---------- Sons pirates : tout est synthétisé en direct (WebAudio), aucun fichier ----------
+   Ambiance : houle (bruit filtré qui enfle et retombe), vent dans les voiles, craquements de la coque,
+   cris de mouettes. Jeu : pièce de bois posée sur le pont, choc de sabres, cloche du bord,
+   coup de canon, corne de brume, petite gigue de victoire. Une réverbération donne l'espace du large. */
+const PSND = (() => {
+  let ctx = null, master = null, verb = null, noise = null, amb = null;
+  const rand = (a, b) => a + Math.random() * (b - a);
+  function init() {
+    if (ctx) return true;
+    try { ctx = actx = actx || new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return false; }
+    master = ctx.createGain(); master.gain.value = .9;
+    const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -16; comp.ratio.value = 4;
+    master.connect(comp).connect(ctx.destination);
+    // réverbération : réponse impulsionnelle faite de bruit qui s'éteint
+    verb = ctx.createConvolver();
+    const len = ctx.sampleRate * 2.4, ir = ctx.createBuffer(2, len, ctx.sampleRate);
+    for (let c = 0; c < 2; c++) { const d = ir.getChannelData(c); for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.6); }
+    verb.buffer = ir;
+    const vg = ctx.createGain(); vg.gain.value = .32; verb.connect(vg).connect(master);
+    noise = ctx.createBuffer(1, ctx.sampleRate * 3, ctx.sampleRate);
+    const nd = noise.getChannelData(0); for (let i = 0; i < nd.length; i++) nd[i] = Math.random() * 2 - 1;
+    return true;
+  }
+  const now = () => ctx.currentTime;
+  function out(node, wet = .25, pan = 0) {
+    let n = node;
+    if (pan && ctx.createStereoPanner) { const p = ctx.createStereoPanner(); p.pan.value = pan; n.connect(p); n = p; }
+    n.connect(master);
+    if (wet) { const g = ctx.createGain(); g.gain.value = wet; n.connect(g).connect(verb); }
+  }
+  function env(g, t, a, peak, d) { g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(peak, t + a); g.gain.exponentialRampToValueAtTime(0.0001, t + a + d); }
+  function noiseSrc(t, dur) { const s = ctx.createBufferSource(); s.buffer = noise; s.loop = true; s.loopStart = rand(0, 2); s.start(t, rand(0, 2)); s.stop(t + dur); return s; }
+  function osc(type, f, t, dur) { const o = ctx.createOscillator(); o.type = type; o.frequency.setValueAtTime(f, t); o.start(t); o.stop(t + dur); return o; }
+
+  /* --- sons de jeu --- */
+  function thock(t, pitch = 1, vol = 1) { // pièce de bois posée sur le pont
+    const n = noiseSrc(t, .12), bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 950 * pitch; bp.Q.value = 2.5;
+    const g = ctx.createGain(); env(g, t, .002, .55 * vol, .07); n.connect(bp).connect(g); out(g, .12);
+    const o = osc('sine', 170 * pitch, t, .2); o.frequency.exponentialRampToValueAtTime(95 * pitch, t + .12);
+    const g2 = ctx.createGain(); env(g2, t, .003, .5 * vol, .13); o.connect(g2); out(g2, .08);
+  }
+  function clang(t, vol = 1) { // deux lames qui s'entrechoquent
+    [2120, 3390, 4870, 6340, 2890].forEach((f, i) => {
+      const o = osc('sine', f * rand(.98, 1.02), t, 1.2), g = ctx.createGain();
+      env(g, t, .001, (.16 / (i + 1)) * vol, rand(.35, .9)); o.connect(g); out(g, .35, rand(-.3, .3));
+    });
+    const n = noiseSrc(t, .08), hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 3500;
+    const g = ctx.createGain(); env(g, t, .001, .35 * vol, .05); n.connect(hp).connect(g); out(g, .2);
+  }
+  function bell(t, f = 560, vol = 1) { // cloche du bord : partiels inharmoniques
+    [[.5, .35, 3], [1, .5, 2.4], [1.19, .3, 1.8], [1.56, .22, 1.4], [2, .2, 1.2], [2.74, .14, .9], [4.07, .08, .6]].forEach(([r, a, d]) => {
+      const o = osc('sine', f * r, t, d + .1), g = ctx.createGain(); env(g, t, .002, a * .35 * vol, d); o.connect(g); out(g, .45);
+    });
+  }
+  function cannon(t, vol = 1) {
+    const n = noiseSrc(t, 2), lp = ctx.createBiquadFilter(); lp.type = 'lowpass';
+    lp.frequency.setValueAtTime(2400, t); lp.frequency.exponentialRampToValueAtTime(90, t + 1.2);
+    const g = ctx.createGain(); env(g, t, .004, 1.0 * vol, 1.6); n.connect(lp).connect(g); out(g, .6);
+    const o = osc('sine', 70, t, 1); o.frequency.exponentialRampToValueAtTime(28, t + .8);
+    const g2 = ctx.createGain(); env(g2, t, .003, .9 * vol, .8); o.connect(g2); out(g2, .3);
+  }
+  function swoosh(t, vol = 1) { // un sabre fend l'air
+    const n = noiseSrc(t, .4), bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 3;
+    bp.frequency.setValueAtTime(3200, t); bp.frequency.exponentialRampToValueAtTime(500, t + .28);
+    const g = ctx.createGain(); env(g, t, .06, .45 * vol, .24); n.connect(bp).connect(g); out(g, .25, rand(-.4, .4));
+  }
+  function horn(t) { // corne de brume
+    const g = ctx.createGain(), lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 650; lp.Q.value = 1.5;
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.32, t + .35); g.gain.setValueAtTime(.32, t + 1.3); g.gain.exponentialRampToValueAtTime(.0001, t + 2.1);
+    [98, 98.6, 147].forEach(f => { const o = osc('sawtooth', f, t, 2.2); o.connect(lp); });
+    lp.connect(g); out(g, .5);
+  }
+  function note(t, f, d, vol = .12) { // accordéon : deux dents de scie désaccordées et un léger trémolo
+    const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 1900;
+    const g = ctx.createGain(); g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + .03); g.gain.setValueAtTime(vol, t + d * .8); g.gain.exponentialRampToValueAtTime(.0001, t + d);
+    const trem = osc('sine', 6, t, d), tg = ctx.createGain(); tg.gain.value = vol * .25; trem.connect(tg).connect(g.gain);
+    [f, f * 1.006, f / 2].forEach(x => osc('sawtooth', x, t, d).connect(lp));
+    lp.connect(g); out(g, .3);
+  }
+  function jig(t, win) { // petite gigue maison en ré mineur
+    const D = 293.66, seq = win
+      ? [[D, .14], [D * 1.189, .14], [D * 1.335, .14], [D * 1.498, .28], [D * 1.335, .14], [D * 1.498, .14], [D * 1.782, .14], [D * 2, .5]]
+      : [[D * 1.498, .3], [D * 1.335, .3], [D * 1.189, .3], [D, .7]];
+    let k = t; seq.forEach(([f, d]) => { note(k, f, d * 1.05); k += d; });
+  }
+
+  /* --- ambiance --- */
+  function startAmbient() {
+    if (amb || !init()) return;
+    const t = now(), bus = ctx.createGain(); bus.gain.value = 0; bus.gain.linearRampToValueAtTime(1, t + 3); out(bus, .15);
+    // houle : bruit grave dont le volume et la brillance suivent des vagues irrégulières
+    const sea = ctx.createBufferSource(); sea.buffer = noise; sea.loop = true;
+    const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 520; lp.Q.value = .6;
+    const sg = ctx.createGain(); sg.gain.value = .06;
+    sea.connect(lp).connect(sg).connect(bus); sea.start();
+    // écume : souffle aigu qui n'apparaît qu'au sommet des vagues
+    const foam = ctx.createBufferSource(); foam.buffer = noise; foam.loop = true; foam.loopStart = 1;
+    const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 2600;
+    const fg = ctx.createGain(); fg.gain.value = .0;
+    foam.connect(hp).connect(fg).connect(bus); foam.start();
+    // vent dans le gréement
+    const wind = ctx.createBufferSource(); wind.buffer = noise; wind.loop = true; wind.loopStart = 2;
+    const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 480; bp.Q.value = 1.2;
+    const wg = ctx.createGain(); wg.gain.value = .025;
+    const wl = osc('sine', .07, t, 1e6), wlg = ctx.createGain(); wlg.gain.value = 180; wl.connect(wlg).connect(bp.frequency);
+    wind.connect(bp).connect(wg).connect(bus); wind.start();
+    const timers = [];
+    const swell = () => {
+      const s = now(), up = rand(2.2, 3.6), down = rand(2.5, 4.5), peak = rand(.11, .2);
+      sg.gain.setTargetAtTime(peak, s, up / 3); sg.gain.setTargetAtTime(.04, s + up, down / 3);
+      lp.frequency.setTargetAtTime(rand(800, 1100), s, up / 3); lp.frequency.setTargetAtTime(420, s + up, down / 3);
+      fg.gain.setTargetAtTime(peak * .12, s + up * .7, .3); fg.gain.setTargetAtTime(0, s + up + .4, .6);
+      timers.push(setTimeout(swell, (up + down) * 1000 * rand(.8, 1)));
+    };
+    const creak = () => { // la coque et les cordages travaillent
+      const s = now() + .05, d = rand(.5, 1.3), o = osc('sawtooth', rand(85, 150), s, d + .1);
+      o.frequency.linearRampToValueAtTime(o.frequency.value * rand(.75, 1.25), s + d);
+      const am = osc('square', rand(18, 38), s, d + .1), amg = ctx.createGain(); amg.gain.value = .5;
+      const g = ctx.createGain(); g.gain.value = 0; am.connect(amg).connect(g.gain);
+      const f = ctx.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = rand(500, 900); f.Q.value = 7;
+      const e = ctx.createGain(); env(e, s, d * .4, rand(.05, .1), d * .6);
+      o.connect(g).connect(f).connect(e).connect(bus);
+      timers.push(setTimeout(creak, rand(5, 13) * 1000));
+    };
+    const gull = () => { // mouettes
+      const s = now() + .05, pan = rand(-.8, .8), n = Math.floor(rand(2, 4));
+      for (let i = 0; i < n; i++) {
+        const t0 = s + i * rand(.32, .45), o = osc('triangle', 1500, t0, .5);
+        o.frequency.linearRampToValueAtTime(rand(2000, 2300), t0 + .07); o.frequency.exponentialRampToValueAtTime(rand(1000, 1200), t0 + .38);
+        const vib = osc('sine', 13, t0, .5), vg = ctx.createGain(); vg.gain.value = 45; vib.connect(vg).connect(o.frequency);
+        const f = ctx.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 1800; f.Q.value = 1.4;
+        const g = ctx.createGain(); env(g, t0, .03, rand(.025, .05), .35);
+        o.connect(f).connect(g);
+        if (ctx.createStereoPanner) { const p = ctx.createStereoPanner(); p.pan.value = pan; g.connect(p).connect(bus); } else g.connect(bus);
+      }
+      timers.push(setTimeout(gull, rand(9, 22) * 1000));
+    };
+    swell(); timers.push(setTimeout(creak, 2500), setTimeout(gull, 5000));
+    amb = { bus, nodes: [sea, foam, wind, wl], timers };
+  }
+  function stopAmbient() {
+    if (!amb) return;
+    const a = amb; amb = null;
+    a.timers.forEach(clearTimeout);
+    a.bus.gain.setTargetAtTime(0, now(), .4);
+    setTimeout(() => a.nodes.forEach(n => { try { n.stop(); } catch (e) {} }), 1500);
+  }
+  const play = fn => (...args) => { if (!G.sound || !init()) return; try { fn(now() + .01, ...args); } catch (e) {} };
+  return {
+    ambient: on => (on && G.sound ? startAmbient() : stopAmbient()),
+    move: play(t => thock(t, rand(.95, 1.05))),
+    capture: play(t => { thock(t, .8, 1.1); clang(t + .03); }),
+    check: play(t => { bell(t, 560); bell(t + .55, 560, .8); }),
+    castle: play(t => { thock(t, 1.05); thock(t + .16, .92); }),
+    power: play((t, m) => { if (m && m.blast) { cannon(t); clang(t + .25, .5); } else { swoosh(t); bell(t + .12, 1180, .45); } }),
+    event: play(t => { horn(t); bell(t + .1, 560, .7); bell(t + .5, 560, .6); bell(t + .9, 560, .5); }),
+    end: play(t => { const w = G.over && G.over.winner; jig(t, !w || (G.settings.mode === 'local') || w === G.human); if (G.over && G.over.type === 'mate') cannon(t + .05, .7); })
+  };
+})();
+
+// Ambiance : pirate (par défaut) ou classique, mémorisée sur cet appareil
+let THEME = 'pirate', audioUnlocked = false;
+try { THEME = localStorage.getItem('superchess.theme') === 'classic' ? 'classic' : 'pirate'; } catch (e) {}
+const SND = {};
+for (const k of Object.keys(SND_CLASSIC)) SND[k] = (...a) => (THEME === 'pirate' ? PSND : SND_CLASSIC)[k](...a);
+document.addEventListener('pointerdown', () => { if (!audioUnlocked) { audioUnlocked = true; PSND.ambient(THEME === 'pirate'); } }, true);
 
 /* ---------- IA dans un Worker (l'interface reste fluide) ---------- */
 let worker = null;
@@ -1625,7 +2323,7 @@ function showBanner(id) {
   clearTimeout(bannerTimer);
   const el = document.createElement('div');
   el.className = 'evbanner'; el.setAttribute('role', 'status');
-  el.innerHTML = `<div class="k">✷ Événement</div><h3>${EVENTS[id].name}</h3><p>${EVENTS[id].desc}</p>`;
+  el.innerHTML = `<div class="k">${THEME === 'pirate' ? '☠ Avis à l\'équipage' : '✷ Événement'}</div><h3>${EVENTS[id].name}</h3><p>${EVENTS[id].desc}</p>`;
   const close = () => { el.classList.add('out'); setTimeout(() => el.remove(), 300); };
   el.addEventListener('pointerdown', e => { e.stopPropagation(); close(); });
   wrap.appendChild(el);
@@ -1802,7 +2500,7 @@ function tapSquare(s) {
 /* ---------- Vue 3D ---------- */
 const view3dEl = document.getElementById('view3d');
 let view3d = null;
-try { view3d = typeof createBoard3D === 'function' ? createBoard3D(view3dEl, { onTap: tapSquare }) : null; } catch (e) { view3d = null; }
+try { view3d = typeof createBoard3D === 'function' ? createBoard3D(view3dEl, { onTap: tapSquare, theme: THEME }) : null; } catch (e) { view3d = null; }
 G.view = '2d';
 if (view3d) {
   let saved = null;
@@ -1929,6 +2627,19 @@ document.getElementById('btnSound').onclick = e => {
   G.sound = !G.sound;
   e.currentTarget.classList.toggle('on', G.sound);
   document.getElementById('soundWave').style.display = G.sound ? '' : 'none';
+  PSND.ambient(THEME === 'pirate' && G.sound && audioUnlocked);
+};
+function applyTheme() {
+  document.body.dataset.scTheme = THEME;
+  document.getElementById('themeLabel').textContent = THEME === 'pirate' ? 'Pirate' : 'Classique';
+  document.getElementById('btnTheme').setAttribute('aria-pressed', String(THEME === 'pirate'));
+  if (view3d) view3d.setTheme(THEME);
+  PSND.ambient(THEME === 'pirate' && G.sound && audioUnlocked);
+}
+document.getElementById('btnTheme').onclick = () => {
+  THEME = THEME === 'pirate' ? 'classic' : 'pirate';
+  try { localStorage.setItem('superchess.theme', THEME); } catch (e) {}
+  applyTheme();
 };
 document.getElementById('btnHint').onclick = async () => {
   if (!humanTurn()) return;
@@ -2464,6 +3175,7 @@ function start(data) {
     renderAll(); maybeAI();
   } else newGame({});
 }
+applyTheme();
 applyView(true);
 window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
 })();
