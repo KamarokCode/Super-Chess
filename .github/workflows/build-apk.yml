@@ -24,7 +24,9 @@ jobs:
           gradle-version: '8.9'
 
       - name: Vérifier le SDK Android
-        run: echo "SDK Android : $ANDROID_HOME" && ls "$ANDROID_HOME/platforms"
+        run: |
+          echo "SDK Android dans $ANDROID_HOME"
+          ls "$ANDROID_HOME/platforms"
 
       - name: Compiler
         run: gradle --no-daemon assembleRelease
