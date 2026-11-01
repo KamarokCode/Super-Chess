@@ -300,6 +300,8 @@ body[data-sc-theme="pirate"] .home { background:
     radial-gradient(circle at 50% 56%, rgba(255, 228, 172, .95) 0, rgba(255, 196, 120, .45) 48px, transparent 150px),
     linear-gradient(180deg, #1d3152 0%, #5d4f6e 30%, #c98656 50%, #f0c48a 56%, #1b4f63 56.5%, #0d3445 74%, #07161f 100%); }
 .home-card { width: min(440px, 100%); display: grid; gap: 22px; }
+.home-back { position: fixed; z-index: 2; top: max(14px, env(safe-area-inset-top, 0px)); left: max(14px, env(safe-area-inset-left, 0px));
+  background: color-mix(in srgb, var(--panel) 85%, transparent); }
 body[data-sc-theme="pirate"] .home-card { padding: 24px; border-radius: 22px; background: rgba(8, 20, 30, .8); border: 1px solid rgba(227, 176, 75, .3); box-shadow: 0 30px 80px -20px rgba(0, 0, 0, .7); }
 .home-head { text-align: center; display: grid; justify-items: center; gap: 4px; }
 .home-crown { width: 58px; height: 58px; filter: drop-shadow(0 6px 18px rgba(232, 182, 76, .45)); }
@@ -492,6 +494,7 @@ body:not(.moves-open) #moves { display: none; }
 </main>
 
 <div class="home" id="home" hidden>
+  <button class="btn home-back" id="homeBack" title="Revenir à l'échiquier"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Retour</button>
   <div class="home-card" role="dialog" aria-modal="true" aria-labelledby="homeTitle">
     <div class="home-head">
       <svg class="home-crown" viewBox="0 0 45 45" aria-hidden="true"><path d="M10 31l-2-17 5.5 8L16 10l4 10 2.5-12 2.5 12 4-10 2.5 12 5.5-8-2 17z" fill="#e8b64c" stroke="#2a1d05" stroke-width="1.5" stroke-linejoin="round"/><rect x="9" y="33" width="27" height="5" rx="1.5" fill="#e8b64c" stroke="#2a1d05" stroke-width="1.5"/></svg>
@@ -3050,6 +3053,18 @@ homeEl.addEventListener('click', e => {
   else if (a === 'settings') openSettings(true);
 });
 document.getElementById('btnMenu').onclick = showHome;
+document.getElementById('homeBack').onclick = () => { hideHome(); maybeAI(); };
+
+/* Bouton Retour du téléphone (application Android) : ferme d'abord ce qui est ouvert.
+   Renvoie true si quelque chose a été fermé, false s'il ne reste plus qu'à quitter. */
+window.scBack = () => {
+  const modal = ['rulesModal', 'newModal', 'netModal', 'endModal', 'authModal'].find(id => { const el = document.getElementById(id); return el && !el.hidden; });
+  if (modal) { if (modal === 'newModal' && newFromHome) { hideModal(modal); showHome(); } else hideModal(modal); return true; }
+  if (!setEl.hidden) { closeSettings(); return true; }
+  if (!homeEl.hidden) { hideHome(); maybeAI(); return true; }
+  if (G.sel != null) { clearSel(); return true; }
+  showHome(); return true; // depuis la partie, Retour mène au menu ; depuis le menu, on revient à l'échiquier
+};
 
 /* Liste des coups : par défaut affichée sur grand écran, masquée sur téléphone à l'horizontale */
 const phoneLandscape = window.matchMedia('(orientation: landscape) and (max-height: 560px)');

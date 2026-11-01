@@ -89,6 +89,15 @@ public class MainActivity extends Activity {
         if (hasFocus) immersive();
     }
 
+    /** Bouton Retour : le jeu ferme d'abord la fenêtre ouverte (paramètres, règles, menu…). */
+    @Override
+    @SuppressWarnings("deprecation")
+    public void onBackPressed() {
+        webView.evaluateJavascript("(window.scBack ? window.scBack() : false)", result -> {
+            if (!"true".equals(result)) MainActivity.super.onBackPressed();
+        });
+    }
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
