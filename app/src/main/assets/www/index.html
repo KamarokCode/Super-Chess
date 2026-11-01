@@ -1864,31 +1864,31 @@ const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
    cd = recharge (en tours du joueur). Règle d'or : un pouvoir ne touche jamais un roi. */
 /* Bibliothèque : trois pouvoirs au choix par type de pièce. Chaque joueur en équipe un par pièce (son « arsenal »). */
 const POWER_LIB = {
-  percee:     { t: 'p', name: 'Percée',        cd: 3, desc: 'Le pion capture la pièce ennemie posée juste devant lui.' },
-  charge:     { t: 'p', name: 'Charge',        cd: 3, desc: 'Le pion avance de deux cases d\'un coup, de n\'importe où, si les deux cases sont libres.' },
-  esquive:    { t: 'p', name: 'Esquive',       cd: 2, desc: 'Le pion fait un pas de côté, à gauche ou à droite, sur une case libre.' },
-  doublebond: { t: 'n', name: 'Double bond',   cd: 4, desc: 'Le cavalier enchaîne deux sauts. La case d\'escale doit être libre.' },
-  grandsaut:  { t: 'n', name: 'Grand saut',    cd: 4, desc: 'Le cavalier saute de trois cases dans un sens et d\'une dans l\'autre, et peut capturer à l\'arrivée.' },
-  sabot:      { t: 'n', name: 'Coup de sabot', cd: 3, desc: 'Le cavalier capture une pièce ennemie collée à lui, dans n\'importe quelle direction.' },
-  spectre:    { t: 'b', name: 'Spectre',       cd: 4, desc: 'Le fou glisse en diagonale à travers les pièces, amies comme ennemies.' },
-  ricochet:   { t: 'b', name: 'Ricochet',      cd: 4, desc: 'Le fou rebondit une fois sur le bord de l\'échiquier et poursuit sa diagonale, capture possible au bout.' },
-  detour:     { t: 'b', name: 'Détour',        cd: 3, desc: 'Le fou fait un pas en ligne droite (haut, bas, gauche ou droite), capture possible.' },
-  catapulte:  { t: 'r', name: 'Catapulte',     cd: 5, desc: 'La tour capture en sautant par-dessus exactement une pièce.' },
-  belier:     { t: 'r', name: 'Bélier',        cd: 4, desc: 'La tour fonce sur la première pièce ennemie de sa ligne et la repousse d\'une case, si la case derrière est libre.' },
-  barricade:  { t: 'r', name: 'Barricade',     cd: 5, desc: 'La tour reste en place et dresse un bloc de glace sur une case libre voisine, pour 3 tours.' },
-  supernova:  { t: 'q', name: 'Supernova',     cd: 8, desc: 'La dame se sacrifie en capturant : elle détruit aussi chaque pièce ennemie adjacente.' },
-  eclipse:    { t: 'q', name: 'Éclipse',       cd: 6, desc: 'La dame se téléporte sur une case libre à trois cases au plus, même hors de ses lignes.' },
-  onde:       { t: 'q', name: 'Onde de choc',  cd: 6, desc: 'La dame se déplace sur une case libre et repousse d\'une case chaque pièce ennemie adjacente.' },
-  permutation:{ t: 'k', name: 'Permutation',   cd: 5, desc: 'Le roi échange sa place avec une pièce alliée (hors pion) à deux cases au plus.' },
-  sprint:     { t: 'k', name: 'Sprint',        cd: 4, desc: 'Le roi file de deux cases en ligne droite ou en diagonale, sans capturer, si le chemin est libre.' },
-  echappee:   { t: 'k', name: 'Échappée',      cd: 5, desc: 'Le roi saute comme un cavalier vers une case libre.' }
+  percee:      { t: 'p', name: 'Percée',          cd: 3, desc: 'Le pion capture la pièce ennemie posée juste devant lui.' },
+  poudre:      { t: 'p', name: 'Baril de poudre', cd: 5, desc: 'Le pion se fait sauter : il disparaît et détruit chaque pièce ennemie collée à lui.' },
+  recrutement: { t: 'p', name: 'Recrutement',     cd: 5, desc: 'Un pion ennemi collé à lui (devant, en diagonale ou à côté) change de camp et rejoint votre équipage.' },
+  doublebond:  { t: 'n', name: 'Double bond',     cd: 4, desc: 'Le cavalier enchaîne deux sauts. La case d\'escale doit être libre.' },
+  grandsaut:   { t: 'n', name: 'Grand saut',      cd: 4, desc: 'Le cavalier saute de trois cases dans un sens et d\'une dans l\'autre, et peut capturer à l\'arrivée.' },
+  pietinement: { t: 'n', name: 'Piétinement',     cd: 5, desc: 'Le cavalier saute normalement et écrase en plus chaque pion ennemi collé à sa case d\'arrivée.' },
+  spectre:     { t: 'b', name: 'Spectre',         cd: 4, desc: 'Le fou glisse en diagonale à travers les pièces, amies comme ennemies.' },
+  croisade:    { t: 'b', name: 'Croisade',        cd: 6, desc: 'Le fou charge en diagonale et détruit chaque pièce ennemie qu\'il traverse ; un allié ou un roi l\'arrête.' },
+  foudre:      { t: 'b', name: 'Foudre',          cd: 5, desc: 'Sans bouger, le fou foudroie la première pièce ennemie de l\'une de ses diagonales, à n\'importe quelle distance.' },
+  catapulte:   { t: 'r', name: 'Catapulte',       cd: 5, desc: 'La tour capture la première pièce ennemie cachée derrière une ou plusieurs autres pièces de sa ligne.' },
+  bordee:      { t: 'r', name: 'Bordée',          cd: 6, desc: 'Sans bouger, la tour tire un boulet en ligne droite : il détruit les deux premières pièces ennemies sur sa route (un allié ou un roi l\'arrête).' },
+  canonnade:   { t: 'r', name: 'Canonnade',       cd: 8, desc: 'Sans bouger, la tour tire dans les quatre directions : la première pièce ennemie de chaque ligne est détruite.' },
+  supernova:   { t: 'q', name: 'Supernova',       cd: 8, desc: 'La dame se sacrifie en capturant : elle détruit aussi chaque pièce ennemie adjacente.' },
+  eclipse:     { t: 'q', name: 'Éclipse',         cd: 6, desc: 'La dame se téléporte sur une case libre à trois cases au plus, même hors de ses lignes.' },
+  seduction:   { t: 'q', name: 'Séduction',       cd: 8, desc: 'Une pièce ennemie à deux cases au plus de la dame (ni roi, ni dame) change de camp.' },
+  ordre:       { t: 'k', name: 'Ordre du capitaine', cd: 8, desc: 'Le roi donne l\'ordre : tous les autres pouvoirs de votre camp sont rechargés sur-le-champ. Touchez une pièce alliée pour le lancer.' },
+  rugissement: { t: 'k', name: 'Rugissement',     cd: 5, desc: 'Les pièces ennemies à deux cases au plus du roi reculent d\'une case ; celles qui ne peuvent pas reculer sont écrasées.' },
+  adoubement:  { t: 'k', name: 'Adoubement',      cd: 7, desc: 'Une pièce alliée à deux cases au plus monte en grade : pion → cavalier, cavalier ou fou → tour, tour → dame.' }
 };
-const DEFAULT_LOAD = { p: 'percee', n: 'doublebond', b: 'spectre', r: 'catapulte', q: 'supernova', k: 'permutation' };
+const DEFAULT_LOAD = { p: 'percee', n: 'doublebond', b: 'spectre', r: 'catapulte', q: 'supernova', k: 'adoubement' };
 const POWERS = {}; for (const t in DEFAULT_LOAD) POWERS[t] = POWER_LIB[DEFAULT_LOAD[t]]; // pouvoirs d'origine (compatibilité)
 const powerChoices = t => Object.keys(POWER_LIB).filter(id => POWER_LIB[id].t === t);
 const normLoad = l => { const o = {}; for (const t in DEFAULT_LOAD) o[t] = l && POWER_LIB[l[t]] && POWER_LIB[l[t]].t === t ? l[t] : DEFAULT_LOAD[t]; return o; };
 const randomLoad = () => { const o = {}; for (const t in DEFAULT_LOAD) { const c = powerChoices(t); o[t] = c[Math.random() * c.length | 0]; } return o; };
-const pidOf = (st, c, t) => (st.load && st.load[c] && st.load[c][t]) || DEFAULT_LOAD[t];
+const pidOf = (st, c, t) => { const id = st.load && st.load[c] && st.load[c][t]; return POWER_LIB[id] && POWER_LIB[id].t === t ? id : DEFAULT_LOAD[t]; };
 const pdef = (st, c, t) => POWER_LIB[pidOf(st, c, t)];
 const CD_START = { p: 1, n: 2, b: 2, r: 3, q: 6, k: 3 };
 const PTYPES = ['p', 'n', 'b', 'r', 'q', 'k'];
@@ -1924,14 +1924,6 @@ function powerMoves(st, s, p, out) {
       if (inB(nr, f) && enemyHit(b, idx(nr, f), c)) promoAdd(idx(nr, f));
       break;
     }
-    case 'charge': { // deux cases devant, de n'importe où (le double pas classique existe déjà sur la rangée de départ)
-      const r1 = r + fwd, r2 = r + 2 * fwd;
-      if (inB(r2, f) && empty(idx(r1, f)) && empty(idx(r2, f)) && fresh(idx(r2, f))) promoAdd(idx(r2, f));
-      break;
-    }
-    case 'esquive':
-      for (const df of [-1, 1]) if (inB(r, f + df) && empty(idx(r, f + df))) add(idx(r, f + df));
-      break;
     case 'doublebond':
       for (const [a1, b1] of KN) {
         const r1 = r + a1, f1 = f + b1;
@@ -1952,9 +1944,6 @@ function powerMoves(st, s, p, out) {
         if (empty(t) || enemyHit(b, t, c)) add(t);
       }
       break;
-    case 'sabot':
-      for (const [dr, df] of KG) { if (inB(r + dr, f + df) && enemyHit(b, idx(r + dr, f + df), c)) add(idx(r + dr, f + df)); }
-      break;
     case 'spectre':
       for (const [dr, df] of DIAG) {
         let nr = r + dr, nf = f + df, passed = false;
@@ -1966,56 +1955,18 @@ function powerMoves(st, s, p, out) {
         }
       }
       break;
-    case 'ricochet':
-      for (const [dr0, df0] of DIAG) {
-        let dr = dr0, df = df0, nr = r, nf = f, bounced = false, blocked = false;
-        for (let k = 0; k < 16 && !blocked; k++) {
-          if (!inB(nr + dr, nf + df)) { // rebond sur le bord (un seul)
-            if (bounced) break;
-            if (!inB(nr + dr, nf)) dr = -dr; if (!inB(nr, nf + df)) df = -df;
-            if (!inB(nr + dr, nf + df)) break;
-            bounced = true;
-          }
-          nr += dr; nf += df;
-          const t = idx(nr, nf);
-          if (t === s) break;
-          if (b[t]) { if (bounced && enemyHit(b, t, c) && fresh(t)) add(t); blocked = true; }
-          else if (bounced && fresh(t)) add(t);
-        }
-      }
-      break;
-    case 'detour':
-      for (const [dr, df] of ORTH) {
-        if (!inB(r + dr, f + df)) continue;
-        const t = idx(r + dr, f + df);
-        if (empty(t) || enemyHit(b, t, c)) add(t);
-      }
-      break;
-    case 'catapulte':
+    case 'catapulte': // la première pièce ennemie cachée derrière au moins une autre pièce
       for (const [dr, df] of ORTH) {
         let nr = r + dr, nf = f + df, screen = false;
         while (inB(nr, nf)) {
           const t = idx(nr, nf);
           if (b[t]) {
-            if (!screen) screen = true;
-            else { if (enemyHit(b, t, c)) add(t, { over: true }); break; }
+            if (screen && enemyHit(b, t, c)) { add(t, { over: true }); break; }
+            screen = true;
           }
           nr += dr; nf += df;
         }
       }
-      break;
-    case 'belier':
-      for (const [dr, df] of ORTH) {
-        let nr = r + dr, nf = f + df;
-        while (inB(nr, nf) && !b[idx(nr, nf)]) { nr += dr; nf += df; }
-        if (!inB(nr, nf)) continue;
-        const t = idx(nr, nf);
-        if (!enemyHit(b, t, c) || !inB(nr + dr, nf + df) || b[idx(nr + dr, nf + df)]) continue;
-        add(t, { captured: null, push: [[t, idx(nr + dr, nf + df)]] });
-      }
-      break;
-    case 'barricade':
-      for (const [dr, df] of KG) { if (inB(r + dr, f + df) && empty(idx(r + dr, f + df))) add(idx(r + dr, f + df), { wall: true, captured: null }); }
       break;
     case 'supernova':
       for (const m of out.slice()) {
@@ -2038,35 +1989,110 @@ function powerMoves(st, s, p, out) {
         if (empty(t) && !normal.has(t)) add(t);
       }
       break;
-    case 'onde':
-      for (const m of out.slice()) {
-        if (m.power || b[m.to]) continue;
-        const tr = m.to >> 3, tf = m.to & 7, push = [];
-        for (const [dr, df] of KG) {
-          const ar = tr + dr, af = tf + df;
-          if (!inB(ar, af) || !enemyHit(b, idx(ar, af), c)) continue;
-          if (inB(ar + dr, af + df) && !b[idx(ar + dr, af + df)] && idx(ar + dr, af + df) !== s) push.push([idx(ar, af), idx(ar + dr, af + df)]);
-        }
-        if (push.length) add(m.to, { push });
+    case 'poudre': { // explosion : le pion disparaît avec les ennemis collés à lui
+      const kill = [];
+      for (const [dr, df] of KG) if (inB(r + dr, f + df) && enemyHit(b, idx(r + dr, f + df), c)) kill.push(idx(r + dr, f + df));
+      for (const t of kill) add(t, { stay: true, self: true, kill, captured: b[t].t, gain: kill.reduce((n, k) => n + VAL[b[k].t], 0) - VAL.p });
+      break;
+    }
+    case 'recrutement':
+      for (const [dr, df] of [[fwd, -1], [fwd, 0], [fwd, 1], [0, -1], [0, 1]]) {
+        if (!inB(r + dr, f + df)) continue;
+        const t = idx(r + dr, f + df);
+        if (b[t] && b[t].c === other(c) && b[t].t === 'p') add(t, { stay: true, convert: t, captured: null, gain: 2 * VAL.p });
       }
       break;
-    case 'permutation':
+    case 'pietinement':
+      for (const m of out.slice()) {
+        if (m.power || m.chest) continue;
+        const tr = m.to >> 3, tf = m.to & 7, kill = [];
+        for (const [dr, df] of KG) {
+          if (!inB(tr + dr, tf + df)) continue;
+          const t = idx(tr + dr, tf + df), q = b[t];
+          if (t !== m.to && q && q.c === other(c) && q.t === 'p') kill.push(t);
+        }
+        if (kill.length) add(m.to, { kill, gain: kill.length * VAL.p });
+      }
+      break;
+    case 'foudre':
+      for (const [dr, df] of DIAG) {
+        let nr = r + dr, nf = f + df;
+        while (inB(nr, nf) && !b[idx(nr, nf)]) { nr += dr; nf += df; }
+        if (inB(nr, nf) && enemyHit(b, idx(nr, nf), c)) { const t = idx(nr, nf); add(t, { stay: true, kill: [t], gain: VAL[b[t].t] }); }
+      }
+      break;
+    case 'bordee':
+      for (const [dr, df] of ORTH) {
+        let nr = r + dr, nf = f + df;
+        const kill = [];
+        while (inB(nr, nf) && kill.length < 2) {
+          const q = b[idx(nr, nf)];
+          if (q) { if (enemyHit(b, idx(nr, nf), c)) kill.push(idx(nr, nf)); else break; }
+          nr += dr; nf += df;
+        }
+        if (kill.length) add(kill[0], { stay: true, kill, gain: kill.reduce((n, k) => n + VAL[b[k].t], 0) });
+      }
+      break;
+    case 'canonnade': {
+      const kill = [];
+      for (const [dr, df] of ORTH) {
+        let nr = r + dr, nf = f + df;
+        while (inB(nr, nf) && !b[idx(nr, nf)]) { nr += dr; nf += df; }
+        if (inB(nr, nf) && enemyHit(b, idx(nr, nf), c)) kill.push(idx(nr, nf));
+      }
+      for (const t of kill) add(t, { stay: true, kill, gain: kill.reduce((n, k) => n + VAL[b[k].t], 0) });
+      break;
+    }
+    case 'croisade':
+      for (const [dr, df] of DIAG) {
+        let nr = r + dr, nf = f + df;
+        const kill = [];
+        while (inB(nr, nf)) {
+          const t = idx(nr, nf), q = b[t];
+          if (q && !enemyHit(b, t, c)) break; // allié, roi ou obstacle : la charge s'arrête
+          if (q) kill.push(t);
+          else if (kill.length && !normal.has(t)) add(t, { kill: kill.slice(), captured: b[kill[0]].t, gain: kill.reduce((n, k) => n + VAL[b[k].t], 0) });
+          nr += dr; nf += df;
+        }
+        if (kill.length > 1) { const last = kill[kill.length - 1]; add(last, { kill: kill.slice(0, -1), gain: kill.reduce((n, k) => n + VAL[b[k].t], 0) }); }
+      }
+      break;
+    case 'seduction':
+      for (let dr = -2; dr <= 2; dr++) for (let df = -2; df <= 2; df++) {
+        if ((!dr && !df) || !inB(r + dr, f + df)) continue;
+        const t = idx(r + dr, f + df), q = b[t];
+        if (q && q.c === other(c) && q.t !== 'k' && q.t !== 'q' && q.t !== 'x') add(t, { stay: true, convert: t, captured: null, gain: 2 * VAL[q.t] });
+      }
+      break;
+    case 'rugissement': {
+      const push = [], kill = [];
+      for (let dr = -2; dr <= 2; dr++) for (let df = -2; df <= 2; df++) {
+        const ar = r + dr, af = f + df;
+        if ((!dr && !df) || !inB(ar, af) || !enemyHit(b, idx(ar, af), c)) continue;
+        const sr = Math.sign(dr), sf = Math.sign(df), dest = inB(ar + sr, af + sf) ? idx(ar + sr, af + sf) : -1;
+        if (dest >= 0 && !b[dest]) push.push([idx(ar, af), dest]); else kill.push(idx(ar, af));
+      }
+      const seen2 = new Set(); // deux pièces poussées vers la même case : la seconde est écrasée
+      for (let i = push.length - 1; i >= 0; i--) { if (seen2.has(push[i][1])) { kill.push(push[i][0]); push.splice(i, 1); } else seen2.add(push[i][1]); }
+      const all = push.map(x => x[0]).concat(kill);
+      for (const t of all) add(t, { stay: true, captured: kill.length ? b[kill[0]].t : null, push, kill, gain: kill.reduce((n, k) => n + VAL[b[k].t], 0) + 20 * push.length });
+      break;
+    }
+    case 'adoubement': {
+      const UP = { p: 'n', n: 'r', b: 'r', r: 'q' };
       for (let dr = -2; dr <= 2; dr++) for (let df = -2; df <= 2; df++) {
         if (!dr && !df || !inB(r + dr, f + df)) continue;
         const t = idx(r + dr, f + df), q = b[t];
-        if (q && q.c === c && q.t !== 'p' && q.t !== 'k') add(t, { swap: true, captured: null });
+        if (q && q.c === c && UP[q.t]) add(t, { stay: true, captured: null, upgrade: UP[q.t], gain: VAL[UP[q.t]] - VAL[q.t] });
       }
       break;
-    case 'sprint':
-      for (const [dr, df] of KG) {
-        if (!inB(r + 2 * dr, f + 2 * df)) continue;
-        const mid = idx(r + dr, f + df), t = idx(r + 2 * dr, f + 2 * df);
-        if (empty(mid) && empty(t) && fresh(t)) add(t);
-      }
+    }
+    case 'ordre': { // recharge tous les autres pouvoirs du camp ; on désigne une pièce alliée pour le lancer
+      const waiting = Object.keys(st.cd[c]).filter(k => k !== 'k' && st.cd[c][k] > 0);
+      if (!waiting.length) break;
+      for (let t = 0; t < 64; t++) { const q = b[t]; if (q && q.c === c && q.t !== 'k' && q.t !== 'x') add(t, { stay: true, captured: null, recharge: true, gain: 60 * waiting.length }); }
       break;
-    case 'echappee':
-      for (const [dr, df] of KN) { if (inB(r + dr, f + df) && empty(idx(r + dr, f + df))) add(idx(r + dr, f + df)); }
-      break;
+    }
   }
 }
 
@@ -2173,8 +2199,13 @@ function makeMove(st, m) {
     board: b, turn: other(st.turn), castle: Object.assign({}, st.castle), ep: null,
     half: st.half + 1, full: st.full + (st.turn === 'b' ? 1 : 0)
   };
-  if (m.push) for (const [a, z] of m.push) { b[z] = b[a]; b[a] = null; } // Bélier, Onde de choc : les pièces repoussées
-  if (m.swap) { b[m.from] = b[m.to]; b[m.to] = p; }
+  if (m.kill) for (const t of m.kill) { b[t] = null; if (ROOK_HOME[t]) n.castle[ROOK_HOME[t]] = false; } // Foudre, Bordée, Poudre, Piétinement…
+  if (m.push) for (const [a, z] of m.push) { if (b[a]) { b[z] = b[a]; b[a] = null; } if (ROOK_HOME[a]) n.castle[ROOK_HOME[a]] = false; } // Grappin, Rugissement
+  if (m.convert != null) { b[m.convert] = Object.assign({}, b[m.convert], { c: p.c }); if (ROOK_HOME[m.convert]) n.castle[ROOK_HOME[m.convert]] = false; } // Recrutement, Séduction
+  if (m.upgrade) b[m.to] = { t: m.upgrade, c: p.c }; // Adoubement
+  if (m.self) b[m.from] = null; // Baril de poudre : le pion saute avec
+  if (m.stay) { /* la pièce reste en place */ }
+  else if (m.swap) { b[m.from] = b[m.to]; b[m.to] = p; }
   else if (m.wall) b[m.to] = { t: 'x', c: 'n', kind: 'ice', ttl: 7 }; // Barricade : la tour ne bouge pas
   else { b[m.to] = m.promo ? { t: m.promo, c: p.c } : p; b[m.from] = null; }
   if (m.blast) {
@@ -2186,6 +2217,7 @@ function makeMove(st, m) {
     for (const k in mine) if (mine[k] > 0) mine[k]--;
     if (m.power) mine[m.piece] = cdFor(st, m.piece, p.c);
     if (chest) for (const k in mine) mine[k] = 0; // le trésor recharge tous les pouvoirs du camp
+    if (m.recharge) for (const k in mine) if (k !== m.piece) mine[k] = 0; // Ordre du capitaine
     n.cd = cd; n.powers = st.powers; n.rules = st.rules; n.load = st.load;
   }
   // obstacles temporaires (cratères, glace) et effets d'événements qui s'écoulent
@@ -2199,9 +2231,9 @@ function makeMove(st, m) {
   if (m.castle === 'K') { b[m.from + 1] = b[m.from + 3]; b[m.from + 3] = null; }
   if (m.castle === 'Q') { b[m.from - 1] = b[m.from - 4]; b[m.from - 4] = null; }
   if (m.double) n.ep = (m.from + m.to) / 2;
-  if (p.t === 'p' || m.captured) n.half = 0;
-  if (p.t === 'k') { n.castle[p.c + 'K'] = false; n.castle[p.c + 'Q'] = false; }
-  if (ROOK_HOME[m.from] && !m.wall) n.castle[ROOK_HOME[m.from]] = false;
+  if (p.t === 'p' || m.captured || m.kill || m.convert != null) n.half = 0;
+  if (p.t === 'k' && !m.stay) { n.castle[p.c + 'K'] = false; n.castle[p.c + 'Q'] = false; }
+  if (ROOK_HOME[m.from] && !m.wall && !m.stay) n.castle[ROOK_HOME[m.from]] = false;
   if (m.push) for (const [a] of m.push) if (ROOK_HOME[a]) n.castle[ROOK_HOME[a]] = false;
   if (ROOK_HOME[m.to]) n.castle[ROOK_HOME[m.to]] = false;
   for (const h of Hooks.after) h(n, m, st);
@@ -2268,6 +2300,7 @@ function san(st, m) {
   if (m.castle) s = m.castle === 'K' ? 'O-O' : 'O-O-O';
   else if (m.swap) s = 'R⇄' + FR[st.board[m.to].t] + sqName(m.to);
   else if (m.wall) s = FR[m.piece] + '▣' + sqName(m.to);
+  else if (m.stay) s = (FR[m.piece] || 'P') + (m.kill ? '✶x' : m.convert != null ? '⇆' : m.upgrade ? '↑' : '✶') + sqName(m.to) + (m.upgrade ? '=' + FR[m.upgrade] : '');
   else {
     s = FR[m.piece];
     if (m.piece !== 'p') {
@@ -2517,7 +2550,7 @@ function evaluate(st) {
   }
   return st.turn === 'w' ? sc : -sc;
 }
-const orderScore = m => (m.chest ? 400 : 0) + (m.captured ? VAL[m.captured] * 10 - VAL[m.piece] / 10 + 1000 : 0) + (m.promo ? VAL[m.promo] : 0) +
+const orderScore = m => (m.gain ? m.gain * 10 + 900 : 0) + (m.chest ? 400 : 0) + (m.captured ? VAL[m.captured] * 10 - VAL[m.piece] / 10 + 1000 : 0) + (m.promo ? VAL[m.promo] : 0) +
   (m.blast ? (m.blastV - VAL.q) * 10 : 0);
 function quiesce(st, a, b, d) {
   const stand = evaluate(st);
@@ -2647,7 +2680,7 @@ const SND_CLASSIC = {
   check: () => { tone(660, .1, 'sine', .15); tone(880, .14, 'sine', .15, .09); },
   castle: () => { tone(330, .07); tone(390, .07, 'triangle', .18, .08); },
   power: m => {
-    if (m.blast) { tone(90, .5, 'sawtooth', .16); tone(60, .7, 'square', .1, .05); tone(880, .3, 'sine', .08); return; }
+    if (m.blast || (m.kill && m.stay) || m.self) { tone(90, .5, 'sawtooth', .16); tone(60, .7, 'square', .1, .05); tone(880, .3, 'sine', .08); return; }
     tone(440, .09, 'sine', .14); tone(660, .09, 'sine', .14, .07); tone(990, .18, 'sine', .12, .14);
   },
   event: () => { tone(196, .25, 'sine', .14); tone(294, .25, 'sine', .14, .12); tone(392, .4, 'sine', .14, .24); tone(587, .5, 'triangle', .08, .36); },
@@ -2807,7 +2840,7 @@ const PSND = (() => {
     capture: play(t => { thock(t, .8, 1.1); clang(t + .03); }),
     check: play(t => { bell(t, 560); bell(t + .55, 560, .8); }),
     castle: play(t => { thock(t, 1.05); thock(t + .16, .92); }),
-    power: play((t, m) => { if (m && m.blast) { cannon(t); clang(t + .25, .5); } else { swoosh(t); bell(t + .12, 1180, .45); } }),
+    power: play((t, m) => { if (m && (m.blast || (m.kill && m.stay) || m.self)) { cannon(t); clang(t + .25, .5); } else { swoosh(t); bell(t + .12, 1180, .45); } }),
     event: play(t => { horn(t); bell(t + .1, 560, .7); bell(t + .5, 560, .6); bell(t + .9, 560, .5); }),
     end: play(t => { const w = G.over && G.over.winner; jig(t, !w || (G.settings.mode === 'local') || w === G.human); if (G.over && G.over.type === 'mate') cannon(t + .05, .7); })
   };
@@ -2957,6 +2990,15 @@ const viewSt = () => (G.review != null ? G.states[G.review] : cur());
 const viewLast = () => (G.review != null ? (G.review > 0 ? G.hist[G.review - 1].m : null) : lastMove());
 
 // pouvoir équipé : d'après le coup joué, ou d'après l'arsenal du camp dans la position
+// effet d'un pouvoir, en clair (bandeau et panneau)
+function powerEffect(m, before, after) {
+  const foes = st => st ? st.board.filter(q => q && q.c === other(m.color)).length : 0;
+  const n = before && after ? foes(before) - foes(after) : 0;
+  if (m.convert != null) return ' : une pièce change de camp';
+  if (m.upgrade) return ` : promotion en ${NAMES[m.upgrade]}`;
+  if (m.recharge) return ' : tous les pouvoirs sont rechargés';
+  return n > 1 ? ` : ${n} pièces détruites` : n === 1 ? ' : 1 pièce détruite' : '';
+}
 const pwOfMove = m => POWER_LIB[m.pid] || POWERS[m.piece];
 const pwOf = (st, c, t) => (st && st.powers ? pdef(st, c, t) : POWER_LIB[PREFS.load[t]]);
 function gameLoad(s) { // arsenal de chaque camp pour une nouvelle partie
@@ -3002,7 +3044,7 @@ function renderBoard(animFrom) {
   if (humanTurn() && st.powers) for (const m of allLegal(st)) if (m.power) pwr.add(m.from);
   if (G.arm && humanTurn()) {
     for (const m of allLegal(st)) if (m.power && m.piece === G.arm) can.add(m.from);
-    for (const m of G.targets) if (m.blast) m.blast.forEach(t => blastZone.add(t));
+    for (const m of G.targets) { if (m.blast) m.blast.forEach(t => blastZone.add(t)); if (m.kill && G.targets.length < 6) m.kill.forEach(t => blastZone.add(t)); }
   }
   // Brouillard : on ne voit que les cases qui touchent ses propres pièces
   let fogged = null;
@@ -3262,7 +3304,7 @@ function announcePower() {
   const who = G.settings.mode === 'ai' ? 'L\'ordinateur déclenche' : G.settings.mode === 'online' ? oppName() + ' déclenche' : `Les ${WHO(m.color)} déclenchent`;
   const el = document.createElement('div'); el.className = 'power-pill';
   el.innerHTML = pieceSVG(m.piece, m.color) + '<span></span>';
-  el.querySelector('span').textContent = `${who} ${pwOfMove(m).name}` + (m.blast ? ` · ${m.blast.length + 1} pièces détruites` : '');
+  el.querySelector('span').textContent = `${who} ${pwOfMove(m).name}` + powerEffect(m, G.states[n - 1], G.states[n]);
   wrap.querySelectorAll('.power-pill').forEach(x => x.remove());
   wrap.appendChild(el); setTimeout(() => el.remove(), 2800);
 }
@@ -3288,7 +3330,7 @@ function commit(m, animate = true) {
   }
   G.states.push(n); G.hist.push({ m, san: s, ev }); G.keys.push(posKey(n));
   G.sel = null; G.targets = []; G.hintMove = null; G.arm = null;
-  G.notice = m.chest ? `${actor(m.color)} trouvé le coffre au trésor : tous ses pouvoirs sont rechargés !` : m.power ? `${actor(m.color)} déclenché ${pwOfMove(m).name}${m.blast ? ` : ${m.blast.length + 1} pièce${m.blast.length ? 's' : ''} détruite${m.blast.length ? 's' : ''}` : ''}.` : '';
+  G.notice = m.chest ? `${actor(m.color)} trouvé le coffre au trésor : tous ses pouvoirs sont rechargés !` : m.power ? `${actor(m.color)} déclenché ${pwOfMove(m).name}${powerEffect(m, st, makeMove(st, m))}.` : '';
   for (const h of Hooks.turn) h(n);
   checkEnd();
   if (G.over) SND.end();
@@ -3297,8 +3339,8 @@ function commit(m, animate = true) {
   else if (m.castle) SND.castle();
   else if (m.captured) SND.capture();
   else SND.move();
-  renderAll(animate && !m.wall ? m : null);
-  if (m.power) flash(m.swap ? [m.from, m.to] : [m.to].concat(m.blast || [], m.push ? m.push.map(x => x[1]) : []));
+  renderAll(animate && !m.wall && !m.stay ? m : null);
+  if (m.power) flash(m.swap ? [m.from, m.to] : [m.to].concat(m.blast || [], m.kill || [], m.push ? m.push.map(x => x[1]) : [], m.self ? [m.from] : []));
   if (m.chest) { flash([m.to], 'chest'); SND.power({}); }
   if (ev) {
     setTimeout(() => { showBanner(ev.id); flash(ev.squares, ev.id); SND.event(); }, m.power ? 450 : 200);
