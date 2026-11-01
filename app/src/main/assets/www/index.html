@@ -619,6 +619,7 @@ body:not(.moves-open) #moves { display: none; }
     <section class="set-sec"><h5>Affichage</h5>
       <div class="set-row"><span>Ambiance<small>Décor, pièces et sons</small></span><div class="seg" data-pref="theme"><button data-v="pirate">Pirate</button><button data-v="classic">Classique</button></div></div>
       <div class="set-row" id="rowView"><span>Vue de l'échiquier<small>En relief ou à plat</small></span><div class="seg" data-pref="view"><button data-v="3d">3D</button><button data-v="2d">2D</button></div></div>
+      <div class="set-row"><span>Symboles en 3D<small>Médaillon au-dessus de chaque pièce pour la reconnaître</small></span><div class="seg" data-pref="icons"><button data-v="auto">Pirate</button><button data-v="on">Toujours</button><button data-v="off">Jamais</button></div></div>
       <div class="set-row"><span>Liste des coups<small>Notation de la partie à côté de l'échiquier</small></span><div class="seg" data-pref="moves"><button data-v="on">Affichée</button><button data-v="off">Masquée</button></div></div>
     </section>
     <section class="set-sec"><h5>Son</h5>
@@ -1412,7 +1413,41 @@ function createBoard3D(container, opts) {
   mat.wg = mat.w.clone(); mat.wg.emissive = new T.Color(0xe8b64c); mat.wg.emissiveIntensity = .55;
   mat.bg = mat.b.clone(); mat.bg.emissive = new T.Color(0xe8b64c); mat.bg.emissiveIntensity = .5;
 
+  /* Repère de lisibilité : la silhouette classique de la pièce (icône 2D), dans un médaillon flottant au-dessus d'elle */
+  let iconsOn = false;
+  const iconMats = {}, pieceTop = {};
+  function iconMat(t, c) {
+    const k = c + t;
+    if (iconMats[k]) return iconMats[k];
+    const N = 128, cv = document.createElement('canvas'); cv.width = cv.height = N;
+    const x = cv.getContext('2d'), tex = new T.CanvasTexture(cv);
+    const disc = () => {
+      x.clearRect(0, 0, N, N);
+      x.beginPath(); x.arc(N / 2, N / 2, N / 2 - 5, 0, 7);
+      x.fillStyle = c === 'w' ? 'rgba(252,247,234,.96)' : 'rgba(222,208,178,.96)'; x.fill();
+      x.lineWidth = 8; x.strokeStyle = c === 'w' ? '#d0a646' : '#15100c'; x.stroke();
+    };
+    disc();
+    if (opts.iconSVG) {
+      const img = new Image();
+      img.onload = () => { disc(); x.drawImage(img, N * .12, N * .1, N * .76, N * .76); tex.needsUpdate = true; wake(); };
+      img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(opts.iconSVG(t, c));
+    }
+    return (iconMats[k] = new T.SpriteMaterial({ map: tex, transparent: true, depthWrite: false }));
+  }
+  function addIcon(g, t, c) {
+    const key = theme + t;
+    if (pieceTop[key] == null) { const b = new T.Box3().setFromObject(g); pieceTop[key] = b.max.y; }
+    const sp = new T.Sprite(iconMat(t, c));
+    sp.scale.set(.56, .56, 1); sp.position.set(0, pieceTop[key] + .34, 0); sp.renderOrder = 5;
+    g.add(sp);
+  }
   function makePiece(t, c, glowOn) {
+    const g = makePieceMesh(t, c, glowOn);
+    if (iconsOn) addIcon(g, t, c);
+    return g;
+  }
+  function makePieceMesh(t, c, glowOn) {
     if (theme === 'pirate' && PW) return makePiratePiece(t, c, glowOn);
     const g = new T.Group(), m = mat[c + (glowOn ? 'g' : '')];
     for (const pt of G[t]) {
@@ -1509,11 +1544,23 @@ function createBoard3D(container, opts) {
   }
 
   /* ---------- Marqueurs de coups ---------- */
-  const dotGeo = new T.CircleGeometry(.15, 28), ringGeo = new T.RingGeometry(.37, .46, 40), diaGeo = new T.OctahedronGeometry(.14);
-  const dotMat = new T.MeshBasicMaterial({ color: 0x1c1028, transparent: true, opacity: .35, depthWrite: false });
-  const ringMat = new T.MeshBasicMaterial({ color: 0x1c1028, transparent: true, opacity: .4, depthWrite: false });
-  const goldRingMat = new T.MeshBasicMaterial({ color: 0xe8b64c, transparent: true, opacity: .95, depthWrite: false });
-  const diaMat = new T.MeshStandardMaterial({ color: 0xe8b64c, emissive: 0xe8b64c, emissiveIntensity: .7, roughness: .3 });
+  // marqueurs bien contrastés sur le bois clair comme foncé : pastille claire cerclée de sombre, anneau de prise rouge,
+  // et pour les coups spéciaux, une case dorée surmontée d'une colonne de lumière
+  const dotGeo = new T.CircleGeometry(.21, 32), dotEdgeGeo = new T.RingGeometry(.21, .27, 32);
+  const ringGeo = new T.RingGeometry(.36, .47, 44), diaGeo = new T.OctahedronGeometry(.17);
+  const sqGeo = new T.PlaneGeometry(.92, .92), sqEdgeGeo = new T.RingGeometry(.4, .47, 4, 1, Math.PI / 4);
+  const dotMat = new T.MeshBasicMaterial({ color: 0xfff6e0, transparent: true, opacity: .92, depthWrite: false });
+  const dotEdgeMat = new T.MeshBasicMaterial({ color: 0x1c1410, transparent: true, opacity: .75, depthWrite: false });
+  const ringMat = new T.MeshBasicMaterial({ color: 0xff4d3d, transparent: true, opacity: .95, depthWrite: false });
+  const goldRingMat = new T.MeshBasicMaterial({ color: 0xffc94d, transparent: true, opacity: 1, depthWrite: false });
+  const goldSqMat = new T.MeshBasicMaterial({ color: 0xffc94d, transparent: true, opacity: .42, depthWrite: false });
+  const diaMat = new T.MeshStandardMaterial({ color: 0xffc94d, emissive: 0xffb02e, emissiveIntensity: 1, roughness: .3 });
+  const beamGeo = new T.CylinderGeometry(.3, .38, 1.5, 24, 1, true); beamGeo.translate(0, .75, 0);
+  const beamMat = new T.MeshBasicMaterial({ transparent: true, depthWrite: false, side: T.DoubleSide, blending: T.AdditiveBlending,
+    map: canvasTex(64, (x, N) => { const g = x.createLinearGradient(0, 0, 0, N); g.addColorStop(0, 'rgba(255,190,70,0)'); g.addColorStop(1, 'rgba(255,190,70,.75)'); x.fillStyle = g; x.fillRect(0, 0, N, N); }) });
+  // les marqueurs passent devant les pièces et les médaillons : jamais cachés
+  for (const m of [dotMat, dotEdgeMat, ringMat, goldRingMat, goldSqMat]) m.depthTest = false;
+  const flat = (geo, mat, pos, y) => { const m = new T.Mesh(geo, mat); m.rotation.x = -Math.PI / 2; m.position.copy(pos).setY(y); m.renderOrder = mat === goldSqMat ? 8 : 10; return m; };
 
   const pieces = new T.Group(), hints = new T.Group(), fx = new T.Group();
   scene.add(pieces, hints, fx);
@@ -1570,13 +1617,16 @@ function createBoard3D(container, opts) {
         }
       }
       if (q.hint) {
-        let m;
-        if (q.hint === 'dot') { m = new T.Mesh(dotGeo, dotMat); m.rotation.x = -Math.PI / 2; m.position.copy(pos).setY(.01); }
-        else if (q.hint === 'cap') { m = new T.Mesh(ringGeo, ringMat); m.rotation.x = -Math.PI / 2; m.position.copy(pos).setY(.01); }
-        else if (q.hint === 'powcap') { m = new T.Mesh(ringGeo, goldRingMat); m.rotation.x = -Math.PI / 2; m.position.copy(pos).setY(.012); }
-        else { m = new T.Mesh(diaGeo, diaMat); m.position.copy(pos).setY(.35); spinners.push(m); }
-        m.userData.s = s;
-        hints.add(m);
+        const ms = [];
+        if (q.hint === 'dot') ms.push(flat(dotEdgeGeo, dotEdgeMat, pos, .011), flat(dotGeo, dotMat, pos, .012));
+        else if (q.hint === 'cap') ms.push(flat(ringGeo, ringMat, pos, .012));
+        else { // coup spécial : case dorée, liseré, colonne de lumière ; losange tournant si la case est vide
+          ms.push(flat(sqGeo, goldSqMat, pos, .011), flat(sqEdgeGeo, goldRingMat, pos, .013));
+          const beam = new T.Mesh(beamGeo, beamMat); beam.position.copy(pos).setY(.01); beam.raycast = () => {}; ms.push(beam);
+          if (q.hint === 'pow') { const d = new T.Mesh(diaGeo, diaMat); d.position.copy(pos).setY(.4); spinners.push(d); ms.push(d); }
+          else ms.push(flat(ringGeo, goldRingMat, pos, .014));
+        }
+        for (const m of ms) { m.userData.s = s; hints.add(m); }
       }
     }
     wake();
@@ -1725,7 +1775,7 @@ function createBoard3D(container, opts) {
         if (k >= 1) tweens.splice(i, 1);
       }
     }
-    for (const s of spinners) { s.rotation.y = now / 600; s.position.y = .35 + Math.sin(now / 300) * .04; }
+    for (const s of spinners) { s.rotation.y = now / 600; s.position.y = .4 + Math.sin(now / 300) * .06; }
     for (const p of pulsers) {
       const k = .5 + .5 * Math.sin(now / (p.armed ? 140 : 270) + p.ph), sc = p.armed ? 1.05 + k * .08 : .92 + k * .08;
       p.ring.scale.setScalar(sc); p.disc.scale.setScalar(sc);
@@ -1744,7 +1794,8 @@ function createBoard3D(container, opts) {
     return { x: r.left + (v.x + 1) / 2 * r.width, y: r.top + (1 - v.y) / 2 * r.height };
   }
   if (opts.theme) setTheme(opts.theme);
-  return { update, flash, setActive, resetView, screenOf, setTheme };
+  function setIcons(on) { if (iconsOn === !!on) return; iconsOn = !!on; if (lastModel) update(lastModel); }
+  return { update, flash, setActive, resetView, screenOf, setTheme, setIcons };
 }
 
 </script>
@@ -2737,7 +2788,7 @@ const PSND = (() => {
 })();
 
 /* Préférences de l'appareil (écran Paramètres), mémorisées localement */
-const PREFS = { theme: 'pirate', view: '3d', moves: null, sound: 'on', ambient: 'on', off: [], cdMul: 1, load: null };
+const PREFS = { theme: 'pirate', view: '3d', moves: null, sound: 'on', ambient: 'on', off: [], cdMul: 1, load: null, icons: 'auto' };
 try {
   Object.assign(PREFS, JSON.parse(localStorage.getItem('superchess.prefs') || '{}'));
   if (!localStorage.getItem('superchess.prefs')) { // anciennes clés séparées
@@ -3293,7 +3344,11 @@ function tapSquare(s) {
 /* ---------- Vue 3D ---------- */
 const view3dEl = document.getElementById('view3d');
 let view3d = null;
-try { view3d = typeof createBoard3D === 'function' ? createBoard3D(view3dEl, { onTap: tapSquare, onLongPress: showPieceCard, theme: THEME }) : null; } catch (e) { view3d = null; }
+try { view3d = typeof createBoard3D === 'function' ? createBoard3D(view3dEl, { onTap: tapSquare, onLongPress: showPieceCard, theme: THEME, iconSVG: (t, c) => {
+  const cs = getComputedStyle(document.body); // l'image autonome ne connaît pas les variables CSS
+  return pieceSVG(t, c).replace(/var\((--[\w-]+)\)/g, (m, v) => cs.getPropertyValue(v).trim() || '#888')
+    .replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" width="90" height="90" ');
+} }) : null; window.__sc3d = view3d; } catch (e) { view3d = null; }
 G.view = '2d';
 if (view3d) {
   let saved = null;
@@ -3474,9 +3529,11 @@ document.getElementById('rulesClose').onclick = () => hideModal('rulesModal');
 document.getElementById('rulesTuto').onclick = () => { hideModal('rulesModal'); showTuto(0); };
 document.getElementById('rulesModal').addEventListener('click', e => { if (e.target.id === 'rulesModal') hideModal('rulesModal'); });
 document.getElementById('btnFlip').onclick = () => { G.flipped = !G.flipped; if (view3d) view3d.resetView(); renderAll(); };
+function applyIcons() { if (view3d) view3d.setIcons(PREFS.icons === 'on' || (PREFS.icons !== 'off' && THEME === 'pirate')); }
 function applyTheme() {
   document.body.dataset.scTheme = THEME;
   if (view3d) view3d.setTheme(THEME);
+  applyIcons();
   PSND.ambient(ambientWanted());
 }
 document.getElementById('btnHint').onclick = async () => {
@@ -3665,7 +3722,7 @@ applyMoves();
 const setEl = document.getElementById('settings');
 let setFromHome = false;
 function renderSettings() {
-  const val = { theme: THEME, view: G.view, moves: PREFS.moves, sound: PREFS.sound, ambient: PREFS.ambient, cdMul: String(PREFS.cdMul) };
+  const val = { theme: THEME, view: G.view, icons: PREFS.icons, moves: PREFS.moves, sound: PREFS.sound, ambient: PREFS.ambient, cdMul: String(PREFS.cdMul) };
   setEl.querySelectorAll('.seg[data-pref]').forEach(seg => seg.querySelectorAll('button').forEach(b =>
     b.setAttribute('aria-pressed', String(b.dataset.v === val[seg.dataset.pref]))));
   document.getElementById('pwToggles').innerHTML = PTYPES.map(t => {
@@ -3690,6 +3747,7 @@ setEl.addEventListener('click', e => {
     if (k === 'theme') { THEME = PREFS.theme = v; applyTheme(); }
     else if (k === 'view') { PREFS.view = v; G.view = view3d ? v : '2d'; applyView(false); if (view3d && !setFromHome) view3d.setActive(false); }
     else if (k === 'moves') { PREFS.moves = v; applyMoves(); }
+    else if (k === 'icons') { PREFS.icons = v; applyIcons(); }
     else if (k === 'sound') { PREFS.sound = v; G.sound = v === 'on'; PSND.ambient(ambientWanted()); if (G.sound) SND.move(); }
     else if (k === 'ambient') { PREFS.ambient = v; PSND.ambient(ambientWanted()); }
     else if (k === 'cdMul') PREFS.cdMul = +v;
