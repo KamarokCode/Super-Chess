@@ -69,6 +69,10 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--gold);
 .thinking i { width: 5px; height: 5px; border-radius: 50%; background: var(--gold); animation: blink 1s infinite; }
 .thinking i:nth-child(2) { animation-delay: .15s; } .thinking i:nth-child(3) { animation-delay: .3s; }
 @keyframes blink { 0%,100% { opacity: .2 } 50% { opacity: 1 } }
+.evalbar { display: flex; align-items: center; gap: 6px; margin-top: 3px; }
+.evalbar i { position: relative; width: 92px; height: 7px; border-radius: 4px; background: #2a2f38; overflow: hidden; flex: none; box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); }
+.evalbar i::after { content: ""; position: absolute; inset: 0 auto 0 0; width: var(--p, 50%); border-radius: 4px; background: var(--c, var(--gold)); transition: width .5s ease, background .5s; }
+.evalbar span { font-size: 11px; font-weight: 700; color: var(--muted); white-space: nowrap; }
 .caps { display: flex; align-items: center; min-height: 18px; margin-top: 2px; flex-wrap: wrap; }
 .caps svg { width: 18px; height: 18px; margin-right: -6px; }
 .caps .grp { display: inline-flex; margin-right: 10px; }
@@ -199,7 +203,12 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--gold);
 .end-acc span { color: var(--muted); } .end-acc b { color: var(--gold); }
 .end-acc i { position: absolute; left: 20%; right: 20%; bottom: 0; height: 3px; border-radius: 3px; background: linear-gradient(90deg, var(--gold) var(--p), var(--line) var(--p)); }
 .review .btn { padding: 7px 9px; } .review .btn svg { width: 16px; height: 16px; }
-.rv-label { font: 700 12.5px var(--f-mono); padding: 0 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.rv-label { font: 700 12.5px var(--f-mono); padding: 0 8px; white-space: nowrap; overflow: hidden; min-width: 0; flex: 1; display: grid; line-height: 1.25; }
+.rv-label > span { overflow: hidden; text-overflow: ellipsis; }
+#reviewBar { width: min(460px, calc(100% - 16px)); }
+.rv-an { font: 700 11.5px var(--f-body); display: flex; align-items: center; gap: 5px; }
+@media (max-width: 700px), (max-height: 560px) { .review [data-rv="menu"] { font-size: 0; gap: 0; } .review [data-rv="first"], .review [data-rv="last"] { display: none; } }
+.rv-an i { font-style: normal; color: #10151c; border-radius: 6px; padding: 0 4px; font-size: 10.5px; }
 .mv[data-i] { cursor: pointer; } .mv[data-i]:hover { background: var(--panel-2); }
 .hint.pow::before { width: 30%; height: 30%; border-radius: 3px; transform: rotate(45deg); background: var(--gold); box-shadow: 0 0 12px rgba(232, 182, 76, .9); }
 .hint.pow.cap::before { width: 84%; height: 84%; border-radius: 50%; transform: none; background: none; border: 5px solid var(--gold); box-shadow: 0 0 14px rgba(232, 182, 76, .8), inset 0 0 14px rgba(232, 182, 76, .6); }
@@ -362,6 +371,13 @@ body[data-sc-theme="pirate"] .home-head h1 { font-weight: 400; letter-spacing: .
 .st-tile { padding: 10px; border-radius: 12px; background: var(--panel-2); text-align: center; }
 .st-tile b { display: block; font: 700 22px var(--f-mono); color: var(--gold); }
 .st-tile span { font-size: 12px; color: var(--muted); }
+.fav-list { display: grid; gap: 5px; }
+.fav-row { position: relative; display: grid; grid-template-columns: 26px 28px 1fr; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 10px; background: var(--panel-2); overflow: hidden; }
+.fav-row > i { position: absolute; left: 0; bottom: 0; height: 3px; width: var(--w); background: var(--gold); opacity: .8; border-radius: 0 3px 3px 0; }
+.fav-row.podium { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--gold) 45%, transparent); }
+.fav-row svg { width: 28px; height: 28px; } .fav-rank { text-align: center; font-size: 17px; }
+.fav-rank .rk { font-size: 13px; font-weight: 800; color: var(--muted); }
+.fav-nm b { display: block; font-size: 13.5px; } .fav-nm small { font-size: 11.5px; color: var(--muted); }
 .st-fav { display: flex; flex-wrap: wrap; gap: 6px; }
 .power-pill { position: absolute; left: 50%; top: 12px; transform: translateX(-50%); z-index: 28; display: flex; align-items: center; gap: 8px;
   padding: 5px 14px 5px 6px; border-radius: 999px; background: color-mix(in srgb, var(--panel) 94%, transparent); border: 1px solid var(--gold);
@@ -537,7 +553,7 @@ body:not(.moves-open) #moves { display: none; }
   <section class="board-col">
     <div class="player" id="pTop">
       <div class="avatar" id="avTop"></div>
-      <div class="pinfo"><div class="pname"><span id="nameTop"></span><span class="tag" id="tagTop"></span><span class="thinking" id="thinkTop"><i></i><i></i><i></i></span></div><div class="caps" id="capsTop"></div></div>
+      <div class="pinfo"><div class="pname"><span id="nameTop"></span><span class="tag" id="tagTop"></span><span class="thinking" id="thinkTop"><i></i><i></i><i></i></span></div><div class="caps" id="capsTop"></div><div class="evalbar" id="evalTop" hidden><i></i><span></span></div></div>
       <div class="clock" id="clockTop">5:00</div>
     </div>
     <div class="board-wrap" id="wrap">
@@ -550,7 +566,6 @@ body:not(.moves-open) #moves { display: none; }
         <button class="btn primary" data-rv="exit" title="Revenir à la partie">Partie</button>
         <button class="btn" data-rv="menu" title="Menu principal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7M5 10v10h14V10"/></svg>Menu</button>
       </div>
-      <div class="an-card" id="anCard" hidden></div>
       <div class="review over-bar" id="overBar" hidden>
         <button class="btn" data-ov="review"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 5v14M18 6l-8 6 8 6z"/></svg>Revoir</button>
         <button class="btn" data-ov="again">Rejouer</button>
@@ -561,7 +576,7 @@ body:not(.moves-open) #moves { display: none; }
     </div>
     <div class="player" id="pBot">
       <div class="avatar" id="avBot"></div>
-      <div class="pinfo"><div class="pname"><span id="nameBot"></span><span class="tag" id="tagBot"></span><span class="thinking" id="thinkBot"><i></i><i></i><i></i></span></div><div class="caps" id="capsBot"></div></div>
+      <div class="pinfo"><div class="pname"><span id="nameBot"></span><span class="tag" id="tagBot"></span><span class="thinking" id="thinkBot"><i></i><i></i><i></i></span></div><div class="caps" id="capsBot"></div><div class="evalbar" id="evalBot" hidden><i></i><span></span></div></div>
       <div class="clock" id="clockBot">5:00</div>
     </div>
     <div id="powerWrap">
@@ -619,7 +634,7 @@ body:not(.moves-open) #moves { display: none; }
     <section class="set-sec"><h5>Affichage</h5>
       <div class="set-row"><span>Ambiance<small>Décor, pièces et sons</small></span><div class="seg" data-pref="theme"><button data-v="pirate">Pirate</button><button data-v="classic">Classique</button></div></div>
       <div class="set-row" id="rowView"><span>Vue de l'échiquier<small>En relief ou à plat</small></span><div class="seg" data-pref="view"><button data-v="3d">3D</button><button data-v="2d">2D</button></div></div>
-      <div class="set-row"><span>Symboles en 3D<small>Médaillon au-dessus de chaque pièce pour la reconnaître</small></span><div class="seg" data-pref="icons"><button data-v="auto">Pirate</button><button data-v="on">Toujours</button><button data-v="off">Jamais</button></div></div>
+            <div class="set-row"><span>Barre d'évaluation<small>L'avantage du joueur dont c'est le tour</small></span><div class="seg" data-pref="evalbar"><button data-v="on">Affichée</button><button data-v="off">Masquée</button></div></div>
       <div class="set-row"><span>Liste des coups<small>Notation de la partie à côté de l'échiquier</small></span><div class="seg" data-pref="moves"><button data-v="on">Affichée</button><button data-v="off">Masquée</button></div></div>
     </section>
     <section class="set-sec"><h5>Son</h5>
@@ -1166,6 +1181,8 @@ function createPirateWorld(T, canvasTex) {
     P(new T.TorusGeometry(.288, .022, 6, 24), 'accent', 0, .36, 0, { rx: Math.PI / 2 }),
     P(new T.TorusGeometry(.262, .022, 6, 24), 'accent', 0, .53, 0, { rx: Math.PI / 2 }),
     P(new T.CylinderGeometry(.3, .29, .05, 24), 'body', 0, .63),
+    // créneaux : la silhouette de la tour classique, reconnaissable sous tous les angles
+    ...[0, 1, 2, 3, 4, 5].map(k => P(new T.BoxGeometry(.1, .12, .09), 'accent', Math.cos(k * Math.PI / 3) * .25, .71, Math.sin(k * Math.PI / 3) * .25, { ry: -k * Math.PI / 3 })),
     P(new T.CylinderGeometry(.018, .018, .45, 6), 'body', 0, .87),
     P(new T.PlaneGeometry(.24, .15), 'accent', .12, 1.0, 0, { side: true })
   ];
@@ -1196,6 +1213,9 @@ function createPirateWorld(T, canvasTex) {
     P(sph(.1), 'body', .05, .85),
     P(new T.ConeGeometry(.045, .11, 10), 'detail', .16, .83, 0, { rz: -Math.PI / 2 - .35 }),
     P(new T.ConeGeometry(.035, .12, 6), 'accent', .0, .97, 0, { rz: .5 }),
+    // mitre du fou (pointe et fente), posée sur la tête du perroquet
+    P(sph(.075, 14, 12), 'accent', .03, 1.02, 0, { sx: .8, sy: 1.6, sz: .8 }),
+    P(new T.BoxGeometry(.02, .1, .12), 'detail', .055, 1.05, 0, { rz: -.4 }),
     P(sph(.018, 6, 4), 'detail', .1, .88, .065), P(sph(.018, 6, 4), 'detail', .1, .88, -.065)
   ];
   pieces.q = [
@@ -1205,7 +1225,12 @@ function createPirateWorld(T, canvasTex) {
     P(new T.CylinderGeometry(.25, .25, .025, 28), 'detail', 0, .83, 0, { rz: .1 }),
     P(new T.CylinderGeometry(.1, .125, .12, 20), 'detail', 0, .9),
     P(sph(.06, 10, 8), 'accent', -.06, .99, .02, { sx: .8, sy: .8, sz: 4.2, rx: -.6, ry: .9 }),
-    P(new T.TorusGeometry(.06, .012, 6, 16), 'accent', 0, .64, 0, { rx: Math.PI / 2 })
+    P(new T.TorusGeometry(.06, .012, 6, 16), 'accent', 0, .64, 0, { rx: Math.PI / 2 }),
+    // couronne à pointes et perles : le signe de la dame
+    P(new T.CylinderGeometry(.13, .11, .07, 20, 1, true), 'accent', 0, 1.0),
+    ...[0, 1, 2, 3, 4, 5, 6, 7].map(k => P(new T.ConeGeometry(.032, .12, 6), 'accent', Math.cos(k * Math.PI / 4) * .125, 1.09, Math.sin(k * Math.PI / 4) * .125)),
+    ...[0, 1, 2, 3, 4, 5, 6, 7].map(k => P(sph(.022, 8, 6), 'accent', Math.cos(k * Math.PI / 4) * .125, 1.155, Math.sin(k * Math.PI / 4) * .125)),
+    P(sph(.045, 10, 8), 'accent', 0, 1.1)
   ];
   const tri = new T.Shape();
   for (let k = 0; k <= 3; k++) {
@@ -1224,7 +1249,11 @@ function createPirateWorld(T, canvasTex) {
     P(tricorn, 'detail', 0, .89),
     P(sph(.125, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2), 'detail', 0, .96),
     P(sph(.035, 10, 8), 'accent', .25, 1.01, 0),
-    P(new T.CylinderGeometry(.012, .012, .16, 6), 'accent', .25, 1.01, 0, { rx: Math.PI / 2, rz: .5 })
+    P(new T.CylinderGeometry(.012, .012, .16, 6), 'accent', .25, 1.01, 0, { rx: Math.PI / 2, rz: .5 }),
+    // croix du roi : le repère le plus haut de l'échiquier
+    P(new T.CylinderGeometry(.03, .03, .08, 10), 'accent', 0, 1.1),
+    P(new T.BoxGeometry(.07, .3, .07), 'accent', 0, 1.27),
+    P(new T.BoxGeometry(.07, .07, .22), 'accent', 0, 1.31)
   ];
   const mk = (c, r, m, extra) => new T.MeshStandardMaterial(Object.assign({ color: c, roughness: r, metalness: m }, extra || {}));
   const materials = {
@@ -1433,19 +1462,19 @@ function createBoard3D(container, opts) {
       img.onload = () => { disc(); x.drawImage(img, N * .12, N * .1, N * .76, N * .76); tex.needsUpdate = true; wake(); };
       img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(opts.iconSVG(t, c));
     }
-    return (iconMats[k] = new T.SpriteMaterial({ map: tex, transparent: true, depthWrite: false }));
+    return (iconMats[k] = new T.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }));
   }
-  function addIcon(g, t, c) {
-    const key = theme + t;
-    if (pieceTop[key] == null) { const b = new T.Box3().setFromObject(g); pieceTop[key] = b.max.y; }
-    const sp = new T.Sprite(iconMat(t, c));
-    sp.scale.set(.56, .56, 1); sp.position.set(0, pieceTop[key] + .34, 0); sp.renderOrder = 5;
-    g.add(sp);
+  // repère au sol : l'icône de la pièce peinte sur la case, juste devant elle (côté caméra) ; rien ne flotte au-dessus du plateau
+  const decalGeo = new T.PlaneGeometry(.3, .3);
+  function addDecal(s, t, c, pos, flipped) {
+    const m = new T.Mesh(decalGeo, iconMat(t, c));
+    m.rotation.x = -Math.PI / 2; if (flipped) m.rotation.z = Math.PI;
+    m.position.copy(pos).setY(.009); m.position.z += flipped ? -.33 : .33;
+    m.renderOrder = 2; m.userData.s = s;
+    pieces.add(m);
   }
   function makePiece(t, c, glowOn) {
-    const g = makePieceMesh(t, c, glowOn);
-    if (iconsOn) addIcon(g, t, c);
-    return g;
+    return makePieceMesh(t, c, glowOn);
   }
   function makePieceMesh(t, c, glowOn) {
     if (theme === 'pirate' && PW) return makePiratePiece(t, c, glowOn);
@@ -1558,9 +1587,8 @@ function createBoard3D(container, opts) {
   const beamGeo = new T.CylinderGeometry(.3, .38, 1.5, 24, 1, true); beamGeo.translate(0, .75, 0);
   const beamMat = new T.MeshBasicMaterial({ transparent: true, depthWrite: false, side: T.DoubleSide, blending: T.AdditiveBlending,
     map: canvasTex(64, (x, N) => { const g = x.createLinearGradient(0, 0, 0, N); g.addColorStop(0, 'rgba(255,190,70,0)'); g.addColorStop(1, 'rgba(255,190,70,.75)'); x.fillStyle = g; x.fillRect(0, 0, N, N); }) });
-  // les marqueurs passent devant les pièces et les médaillons : jamais cachés
-  for (const m of [dotMat, dotEdgeMat, ringMat, goldRingMat, goldSqMat]) m.depthTest = false;
-  const flat = (geo, mat, pos, y) => { const m = new T.Mesh(geo, mat); m.rotation.x = -Math.PI / 2; m.position.copy(pos).setY(y); m.renderOrder = mat === goldSqMat ? 8 : 10; return m; };
+  // (les marqueurs restent derrière les pièces qui se trouvent devant eux, comme sur un vrai échiquier)
+  const flat = (geo, mat, pos, y) => { const m = new T.Mesh(geo, mat); m.rotation.x = -Math.PI / 2; m.position.copy(pos).setY(y); return m; };
 
   const pieces = new T.Group(), hints = new T.Group(), fx = new T.Group();
   scene.add(pieces, hints, fx);
@@ -1610,6 +1638,7 @@ function createBoard3D(container, opts) {
         obj.userData.s = s;
         obj.traverse(o => { o.userData.s = s; });
         pieces.add(obj);
+        if (iconsOn && q.p.t !== 'x' && !q.fog) addDecal(s, q.p.t, q.p.c, pos, model.flipped);
         if (anim && anim.to === s && q.p.t !== 'x') {
           const from = sqPos(anim.from), jump = q.p.t === 'n' || anim.power;
           obj.position.copy(from);
@@ -2544,6 +2573,14 @@ function bestMove(st, level) {
   }
   return best;
 }
+/* Valeur d'une position pour le joueur au trait (centièmes de pion) */
+function evalPosition(st, depth, q) {
+  const moves = allLegal(st).sort((x, y) => orderScore(y) - orderScore(x));
+  if (!moves.length) return inCheck(st) ? -100000 : 0;
+  let a = -Infinity;
+  for (const m of moves) { const v = -negamax(makeMove(st, m), depth - 1, -Infinity, -a, 1, q); if (v > a) a = v; }
+  return a;
+}
 /* Analyse d'un coup joué : meilleur coup de la position et valeur du coup joué (point de vue du joueur au trait). */
 function analyzeMove(st, played, depth, q) {
   const moves = allLegal(st).sort((x, y) => orderScore(y) - orderScore(x));
@@ -2788,7 +2825,7 @@ const PSND = (() => {
 })();
 
 /* Préférences de l'appareil (écran Paramètres), mémorisées localement */
-const PREFS = { theme: 'pirate', view: '3d', moves: null, sound: 'on', ambient: 'on', off: [], cdMul: 1, load: null, icons: 'auto' };
+const PREFS = { theme: 'pirate', view: '3d', moves: null, sound: 'on', ambient: 'on', off: [], cdMul: 1, load: null, icons: 'auto', evalbar: 'on' };
 try {
   Object.assign(PREFS, JSON.parse(localStorage.getItem('superchess.prefs') || '{}'));
   if (!localStorage.getItem('superchess.prefs')) { // anciennes clés séparées
@@ -2816,7 +2853,7 @@ try {
 let anWorker = null;
 try {
   const src2 = document.getElementById('engine').textContent +
-    '\nonmessage = e => { const r = analyzeMove(e.data.st, e.data.m, e.data.depth, e.data.q); postMessage({ id: e.data.id, i: e.data.i, r }); };';
+    '\nonmessage = e => { if (e.data.kind === "eval") { postMessage({ id: e.data.id, v: evalPosition(e.data.st, 2, 3) }); return; } const r = analyzeMove(e.data.st, e.data.m, e.data.depth, e.data.q); postMessage({ id: e.data.id, i: e.data.i, r }); };';
   anWorker = new Worker(URL.createObjectURL(new Blob([src2], { type: 'text/javascript' })));
 } catch (e) { anWorker = null; }
 const CLS = { // classement d'un coup selon la perte de chances de gain
@@ -2868,6 +2905,38 @@ function renderEndAcc() {
   el.innerHTML = done
     ? `<span>Précision</span><b>Blancs ${w ?? '–'} %</b><b>Noirs ${b ?? '–'} %</b>`
     : `<span>Analyse des coups…</span><b>${AN.done}/${AN.n}</b><i style="--p:${AN.n ? AN.done / AN.n * 100 : 0}%"></i>`;
+}
+/* Barre d'évaluation : l'avantage du joueur au trait, affiché seulement pendant son tour */
+const EVB = { key: null, v: null };
+function evalWanted() {
+  if (PREFS.evalbar === 'off' || G.over || G.review != null || !G.hist) return null;
+  const st = cur(); if (!st) return null;
+  if (G.settings.mode !== 'local' && st.turn !== G.human) return null;
+  return st.turn;
+}
+function renderEvalBar() {
+  const side = evalWanted(), bot = G.flipped ? 'b' : 'w';
+  for (const [pos, c] of [['Bot', bot], ['Top', other(bot)]]) {
+    const el = document.getElementById('eval' + pos); if (!el) continue;
+    const on = side === c && EVB.v != null && EVB.key === G.gid + ':' + G.hist.length;
+    el.hidden = !on;
+    if (!on) continue;
+    const v = EVB.v, pct = winPct(v), x = v / 100;
+    el.querySelector('i').style.setProperty('--p', pct.toFixed(1) + '%');
+    el.querySelector('i').style.setProperty('--c', pct >= 55 ? '#5cc46b' : pct <= 45 ? '#e5534b' : 'var(--gold)');
+    el.querySelector('span').textContent = Math.abs(v) > 50000 ? (v > 0 ? 'Mat en vue !' : 'Danger de mat')
+      : Math.abs(x) < .3 ? 'Égalité' : (x > 0 ? 'Avantage +' : 'Retard ') + Math.abs(x).toFixed(1).replace('.', ',');
+  }
+  const key = side && G.gid + ':' + G.hist.length;
+  if (side && EVB.key !== key && EVB.pending !== key) {
+    EVB.pending = key;
+    const st = cur(), id = 'e' + Math.random();
+    const done = v => { if (EVB.pending !== key) return; EVB.pending = null; EVB.key = key; EVB.v = v; renderEvalBar(); };
+    if (!anWorker) { setTimeout(() => done(evalPosition(st, 2, 3)), 20); return; }
+    const h = e => { if (e.data.id === id) { anWorker.removeEventListener('message', h); done(e.data.v); } };
+    anWorker.addEventListener('message', h);
+    anWorker.postMessage({ kind: 'eval', id, st });
+  }
 }
 let aiReq = 0;
 function askAI(st, level) {
@@ -3079,9 +3148,15 @@ function renderStatus() {
     h20.textContent = G.review === 0 ? 'Position de départ' : `Après ${Math.ceil(G.review / 2)}.${G.review % 2 ? '' : '..'} ${G.hist[G.review - 1].san}`;
     const ev = G.review > 0 && G.hist[G.review - 1].ev;
     sub0.textContent = ev ? `${EVENTS[ev.id].name} : ${EVENTS[ev.id].desc}` : 'Utilisez ‹ › pour avancer ou reculer, « Partie » pour revenir au jeu.';
+    const r = anOf(G.review - 1);
+    if (r) {
+      const c = CLS[r.k], h = G.hist[G.review - 1];
+      sub0.textContent = `${c.label} · précision ${Math.round(r.acc)} % · éval. ${evTxt(h.m.color === 'w' ? r.playedV : -r.playedV)}`
+        + (r.isBest ? ' · c\'était le meilleur coup' : r.k === 'forced' ? '' : ` · meilleur : ${r.bestSan}${r.best && r.best.power ? ' (' + pwOfMove(r.best).name + ')' : ''}`);
+    }
     if (anOk() && AN.done === AN.n) {
       const w = accuracy('w'), b = accuracy('b');
-      sub0.textContent = `Précision · Blancs ${w ?? '–'} % · Noirs ${b ?? '–'} %` + (ev ? ` · ${EVENTS[ev.id].name}` : '');
+      sub0.textContent = `Précision de la partie · Blancs ${w ?? '–'} % · Noirs ${b ?? '–'} %` + (sub0.textContent && r ? ' — ' + sub0.textContent : '') + (ev ? ` · ${EVENTS[ev.id].name}` : '');
     }
     renderAnCard();
     return;
@@ -3202,7 +3277,7 @@ function announcePower() {
   wrap.querySelectorAll('.power-pill').forEach(x => x.remove());
   wrap.appendChild(el); setTimeout(() => el.remove(), 2800);
 }
-function renderAll(anim) { recordEnd(); announcePower(); renderBoard(anim); renderPlayers(); renderMoves(); renderStatus(); renderChips(); renderControls(); renderPowers(); snapshot(); }
+function renderAll(anim) { recordEnd(); announcePower(); setTimeout(renderEvalBar, 0); renderBoard(anim); renderPlayers(); renderMoves(); renderStatus(); renderChips(); renderControls(); renderPowers(); snapshot(); }
 function flash(squares, kind) {
   if (view3d && G.view === '3d') { view3d.flash(squares, kind); return; }
   for (const s of squares) {
@@ -3529,7 +3604,7 @@ document.getElementById('rulesClose').onclick = () => hideModal('rulesModal');
 document.getElementById('rulesTuto').onclick = () => { hideModal('rulesModal'); showTuto(0); };
 document.getElementById('rulesModal').addEventListener('click', e => { if (e.target.id === 'rulesModal') hideModal('rulesModal'); });
 document.getElementById('btnFlip').onclick = () => { G.flipped = !G.flipped; if (view3d) view3d.resetView(); renderAll(); };
-function applyIcons() { if (view3d) view3d.setIcons(PREFS.icons === 'on' || (PREFS.icons !== 'off' && THEME === 'pirate')); }
+function applyIcons() { if (view3d) view3d.setIcons(false); } // les pièces portent maintenant leurs propres repères (croix, couronne, créneaux, mitre)
 function applyTheme() {
   document.body.dataset.scTheme = THEME;
   if (view3d) view3d.setTheme(THEME);
@@ -3610,19 +3685,10 @@ function startReview(i) {
   renderBoard(); renderMoves(); renderStatus();
 }
 function exitReview() { G.review = null; renderAll(); maybeAI(); }
-/* Carte d'analyse au-dessus de la barre de relecture : classement du coup, meilleur coup, précision */
-function renderAnCard() {
-  const el = document.getElementById('anCard');
-  const i = G.review != null ? G.review - 1 : -1;
-  if (i < 0 || !anOk()) { el.hidden = true; return; }
-  el.hidden = false;
-  const r = AN.res[i], h = G.hist[i], who = WHO(h.m.color);
-  if (!r) { el.innerHTML = `<span class="an-wait">Analyse du coup en cours… (${AN.done}/${AN.n})</span>`; return; }
-  const c = CLS[r.k], ev = v => { if (Math.abs(v) > 50000) return v > 0 ? 'mat pour les Blancs' : 'mat pour les Noirs'; const x = Math.max(-99, Math.min(99, v / 100)); return (x > 0 ? '+' : '') + x.toFixed(1); };
-  const bestTxt = r.isBest ? 'C\'était le meilleur coup.' : r.k === 'forced' ? 'Aucun autre coup possible.' : `Meilleur : <b>${r.bestSan}</b>${r.best && r.best.power ? ` <small>(${pwOfMove(r.best).name})</small>` : ''}`;
-  el.innerHTML = `<span class="an-sym" style="background:${c.col}">${c.sym}</span><div><b style="color:${c.col}">${h.san} · ${c.label}</b>`
-    + `<small>${who} · précision ${Math.round(r.acc)} % · éval. ${ev(h.m.color === 'w' ? r.playedV : -r.playedV)}</small><p>${bestTxt}</p></div>`;
-}
+/* Évaluation du coup affiché, intégrée à la barre de relecture (rien ne recouvre l'échiquier) */
+const evTxt = v => { if (Math.abs(v) > 50000) return v > 0 ? 'mat pour les Blancs' : 'mat pour les Noirs'; const x = Math.max(-99, Math.min(99, v / 100)); return (x > 0 ? '+' : '') + x.toFixed(1); };
+function anOf(i) { return i >= 0 && anOk() ? AN.res[i] : null; }
+function renderAnCard() {} // conservée pour compatibilité : tout passe par renderReviewBar / renderStatus
 function renderReviewBar() {
   const on = G.review != null;
   reviewBar.hidden = !on;
@@ -3630,8 +3696,15 @@ function renderReviewBar() {
   renderAnCard();
   if (!on) return;
   const i = G.review, h = G.hist[i - 1];
-  document.getElementById('reviewLabel').textContent = i === 0 ? 'Position de départ'
-    : `${Math.ceil(i / 2)}.${i % 2 ? '' : '..'} ${h.san}${h.ev ? ' ✷' : ''}  ·  ${i}/${G.hist.length}`;
+  const lab = document.getElementById('reviewLabel');
+  if (i === 0) { lab.innerHTML = '<span class="rv-top">Position de départ</span>'; }
+  else {
+    const top = `${Math.ceil(i / 2)}.${i % 2 ? '' : '..'} ${h.san}${h.ev ? ' ✷' : ''} · ${i}/${G.hist.length}`, r = anOf(i - 1);
+    let bot = '';
+    if (r) { const c = CLS[r.k]; bot = `<span class="rv-an" style="color:${c.col}"><i style="background:${c.col}">${c.sym}</i>${c.label}${r.isBest || r.k === 'forced' ? '' : ' · mieux : ' + r.bestSan}</span>`; }
+    else if (anOk()) bot = `<span class="rv-an">Analyse… ${AN.done}/${AN.n}</span>`;
+    lab.innerHTML = `<span class="rv-top">${top}</span>${bot}`;
+  }
   reviewBar.querySelector('[data-rv="exit"]').textContent = G.over ? 'Terminer' : 'Partie';
 }
 reviewBar.addEventListener('click', e => {
@@ -3722,7 +3795,7 @@ applyMoves();
 const setEl = document.getElementById('settings');
 let setFromHome = false;
 function renderSettings() {
-  const val = { theme: THEME, view: G.view, icons: PREFS.icons, moves: PREFS.moves, sound: PREFS.sound, ambient: PREFS.ambient, cdMul: String(PREFS.cdMul) };
+  const val = { theme: THEME, view: G.view, icons: PREFS.icons, evalbar: PREFS.evalbar, moves: PREFS.moves, sound: PREFS.sound, ambient: PREFS.ambient, cdMul: String(PREFS.cdMul) };
   setEl.querySelectorAll('.seg[data-pref]').forEach(seg => seg.querySelectorAll('button').forEach(b =>
     b.setAttribute('aria-pressed', String(b.dataset.v === val[seg.dataset.pref]))));
   document.getElementById('pwToggles').innerHTML = PTYPES.map(t => {
@@ -3748,6 +3821,7 @@ setEl.addEventListener('click', e => {
     else if (k === 'view') { PREFS.view = v; G.view = view3d ? v : '2d'; applyView(false); if (view3d && !setFromHome) view3d.setActive(false); }
     else if (k === 'moves') { PREFS.moves = v; applyMoves(); }
     else if (k === 'icons') { PREFS.icons = v; applyIcons(); }
+    else if (k === 'evalbar') { PREFS.evalbar = v; EVB.key = null; renderEvalBar(); }
     else if (k === 'sound') { PREFS.sound = v; G.sound = v === 'on'; PSND.ambient(ambientWanted()); if (G.sound) SND.move(); }
     else if (k === 'ambient') { PREFS.ambient = v; PSND.ambient(ambientWanted()); }
     else if (k === 'cdMul') PREFS.cdMul = +v;
@@ -4365,14 +4439,22 @@ function openStats() {
   const tot = a => a[0] + a[1] + a[2], all = [1, 2, 3, 4].reduce((n, l) => n + tot(STATS.ai[l]), 0) + tot(STATS.online) + STATS.local;
   const wins = [1, 2, 3, 4].reduce((n, l) => n + STATS.ai[l][0], 0) + STATS.online[0];
   const row = (label, a) => `<div class="st-row"><span>${label}</span><b class="w">${a[0]}</b><b>${a[1]}</b><b class="l">${a[2]}</b></div>`;
-  const fav = Object.entries(STATS.powers).sort((a, b) => b[1] - a[1]);
+  // pouvoirs favoris : anciennes clés par type ramenées au pouvoir d'origine, puis classement
+  const favM = {};
+  for (const [k, n] of Object.entries(STATS.powers)) { const id = POWER_LIB[k] ? k : DEFAULT_LOAD[k]; if (id) favM[id] = (favM[id] || 0) + n; }
+  const fav = Object.entries(favM).sort((a, b) => b[1] - a[1] || POWER_LIB[a[0]].name.localeCompare(POWER_LIB[b[0]].name));
+  const favTot = fav.reduce((n, x) => n + x[1], 0), favMax = fav.length ? fav[0][1] : 1;
+  const medal = i => ['🥇', '🥈', '🥉'][i] || `<span class="rk">${i + 1}</span>`;
+  const favHtml = fav.slice(0, 8).map(([id, n], i) => { const P = POWER_LIB[id];
+    return `<div class="fav-row${i < 3 ? ' podium' : ''}"><span class="fav-rank">${medal(i)}</span>${pieceSVG(P.t, 'w')}<span class="fav-nm"><b>${P.name}</b><small>${NAMES[P.t]} · ${n} utilisation${n > 1 ? 's' : ''} · ${Math.round(n / favTot * 100)} %</small></span><i style="--w:${Math.max(6, n / favMax * 100)}%"></i></div>`; }).join('')
+    + (fav.length > 8 ? `<p class="net-empty">… et ${fav.length - 8} autre${fav.length - 8 > 1 ? 's' : ''}</p>` : '');
   document.getElementById('statsBody').innerHTML =
     `<div class="st-tiles"><div class="st-tile"><b>${all}</b><span>parties terminées</span></div><div class="st-tile"><b>${wins}</b><span>victoires</span></div><div class="st-tile"><b>${STATS.best}</b><span>meilleure série</span></div></div>` +
     `<div class="st-row head"><span>Adversaire</span><span>Vict.</span><span>Nulles</span><span>Déf.</span></div>` +
     [1, 2, 3, 4].map(l => row('Ordinateur · ' + LEVELS[l].name, STATS.ai[l])).join('') + row('En ligne', STATS.online) +
     `<p class="net-empty">À deux sur cet appareil : ${STATS.local} partie${STATS.local > 1 ? 's' : ''} · Événements vécus : ${STATS.events}</p>` +
     `<div><p class="net-empty" style="margin-bottom:6px">Succès · ${ACH.filter(a => STATS.ach[a.id]).length}/${ACH.length}</p><div class="ach-grid">${ACH.map(a => `<div class="ach${STATS.ach[a.id] ? ' on' : ''}" title="${a.desc}"><span class="ach-ico">${STATS.ach[a.id] ? a.ico : '🔒'}</span><b>${a.name}</b><small>${a.desc}</small></div>`).join('')}</div></div>` +
-    (fav.length ? `<div><p class="net-empty" style="margin-bottom:6px">Vos pouvoirs favoris</p><div class="st-fav">${fav.map(([k, n]) => { const P = POWER_LIB[k] || POWERS[k]; return P ? `<span>${pieceSVG(P.t, 'w')}${P.name} · ${n}</span>` : ''; }).join('')}</div></div>` : '');
+    (fav.length ? `<div><p class="net-empty" style="margin-bottom:6px">Vos pouvoirs favoris · ${favTot} pouvoir${favTot > 1 ? 's' : ''} joué${favTot > 1 ? 's' : ''}</p><div class="fav-list">${favHtml}</div></div>` : '');
   showModal('statsModal');
 }
 // succès déjà mérités avant leur apparition : débloqués sans annonce
