@@ -186,6 +186,18 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--gold);
 @media (prefers-reduced-motion: reduce) { .pwring { animation: none; } }
 .review { position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%); z-index: 25; display: flex; align-items: center; gap: 4px;
   padding: 5px; border-radius: 14px; background: color-mix(in srgb, var(--panel) 92%, transparent); border: 1px solid var(--gold); box-shadow: 0 12px 30px -10px rgba(0,0,0,.8); max-width: calc(100% - 16px); }
+.sq.best::after { content: ""; position: absolute; inset: 0; box-shadow: inset 0 0 0 4px rgba(92, 196, 107, .95); background: rgba(92, 196, 107, .22); pointer-events: none; }
+.an-card { position: absolute; left: 50%; bottom: 62px; transform: translateX(-50%); z-index: 26; width: min(380px, calc(100% - 16px)); display: flex; gap: 10px; align-items: flex-start;
+  padding: 9px 12px; border-radius: 14px; background: color-mix(in srgb, var(--panel) 95%, transparent); border: 1px solid var(--line); box-shadow: 0 12px 30px -10px rgba(0,0,0,.8); }
+.an-card .an-sym { flex: none; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: 14px; color: #10151c; }
+.an-card b { font-size: 14px; } .an-card small { display: block; font-size: 11.5px; color: var(--muted); margin-top: 1px; }
+.an-card p { margin: 3px 0 0; font-size: 12.5px; } .an-card p b { color: #5cc46b; font-size: 13px; } .an-card p small { display: inline; }
+.an-wait { font-size: 12.5px; color: var(--muted); }
+.moves .mv { white-space: nowrap; }
+.an-b { font-style: normal; font-weight: 800; font-size: 11px; margin-left: 2px; }
+.end-acc { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 14px; margin: -2px 0 12px; font-size: 13px; position: relative; padding-bottom: 6px; }
+.end-acc span { color: var(--muted); } .end-acc b { color: var(--gold); }
+.end-acc i { position: absolute; left: 20%; right: 20%; bottom: 0; height: 3px; border-radius: 3px; background: linear-gradient(90deg, var(--gold) var(--p), var(--line) var(--p)); }
 .review .btn { padding: 7px 9px; } .review .btn svg { width: 16px; height: 16px; }
 .rv-label { font: 700 12.5px var(--f-mono); padding: 0 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 .mv[data-i] { cursor: pointer; } .mv[data-i]:hover { background: var(--panel-2); }
@@ -538,6 +550,7 @@ body:not(.moves-open) #moves { display: none; }
         <button class="btn primary" data-rv="exit" title="Revenir à la partie">Partie</button>
         <button class="btn" data-rv="menu" title="Menu principal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7M5 10v10h14V10"/></svg>Menu</button>
       </div>
+      <div class="an-card" id="anCard" hidden></div>
       <div class="review over-bar" id="overBar" hidden>
         <button class="btn" data-ov="review"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 5v14M18 6l-8 6 8 6z"/></svg>Revoir</button>
         <button class="btn" data-ov="again">Rejouer</button>
@@ -706,7 +719,8 @@ body:not(.moves-open) #moves { display: none; }
     <div class="result-ico" id="endIco"></div>
     <h3 id="endTitle">Échec et mat</h3>
     <p id="endSub"></p>
-    <div class="actions" style="justify-content:center"><button class="btn" id="endMenu">Menu principal</button><button class="btn" id="endClose">Voir l'échiquier</button><button class="btn" id="endReview">Revoir la partie</button><button class="btn primary" id="endAgain">Revanche</button></div>
+    <div class="end-acc" id="endAcc" hidden></div>
+    <div class="actions" style="justify-content:center"><button class="btn" id="endMenu">Menu principal</button><button class="btn" id="endClose">Voir l'échiquier</button><button class="btn" id="endReview">Revoir et analyser</button><button class="btn primary" id="endAgain">Revanche</button></div>
   </div>
 </div>
 
@@ -1526,6 +1540,7 @@ function createBoard3D(container, opts) {
       let col = null, op = 0;
       if (q.fog) { col = theme === 'pirate' ? 0x0e1820 : 0x221b2e; op = .9; }
       else if (q.sel) { col = 0xe8b64c; op = .62; }
+      else if (q.best) { col = 0x5cc46b; op = .55; } // relecture : meilleur coup suggéré par l'analyse
       else if (q.last) { col = 0xe8b64c; op = .4; }
       else if (q.blast) { col = 0xe5534b; op = .38; }
       ov.visible = col !== null;
@@ -2478,6 +2493,20 @@ function bestMove(st, level) {
   }
   return best;
 }
+/* Analyse d'un coup joué : meilleur coup de la position et valeur du coup joué (point de vue du joueur au trait). */
+function analyzeMove(st, played, depth, q) {
+  const moves = allLegal(st).sort((x, y) => orderScore(y) - orderScore(x));
+  const same = x => x && x.from === played.from && x.to === played.to && (x.promo || null) === (played.promo || null) && !!x.power === !!played.power;
+  let best = null, bestV = -Infinity, a = -Infinity;
+  for (const m of moves) {
+    const v = -negamax(makeMove(st, m), depth - 1, -Infinity, -a, 1, q);
+    if (v > bestV) { bestV = v; best = m; }
+    if (v > a) a = v;
+  }
+  const pm = moves.find(same) || played;
+  const playedV = same(best) ? bestV : -negamax(makeMove(st, pm), depth - 1, -Infinity, Infinity, 1, q);
+  return { best, bestSan: best ? san(st, best) : '', bestV, playedV: Math.min(playedV, bestV), n: moves.length, isBest: same(best) };
+}
 /* ==================== FIN MOTEUR ==================== */
 
 </script>
@@ -2732,6 +2761,63 @@ try {
     '\nonmessage = e => { const m = bestMove(e.data.st, e.data.level); postMessage({ id: e.data.id, m }); };';
   worker = new Worker(URL.createObjectURL(new Blob([src], { type: 'text/javascript' })));
 } catch (e) { worker = null; }
+/* ---------- Analyse de fin de partie : un second Worker, coup par coup ---------- */
+let anWorker = null;
+try {
+  const src2 = document.getElementById('engine').textContent +
+    '\nonmessage = e => { const r = analyzeMove(e.data.st, e.data.m, e.data.depth, e.data.q); postMessage({ id: e.data.id, i: e.data.i, r }); };';
+  anWorker = new Worker(URL.createObjectURL(new Blob([src2], { type: 'text/javascript' })));
+} catch (e) { anWorker = null; }
+const CLS = { // classement d'un coup selon la perte de chances de gain
+  best: { label: 'Meilleur coup', sym: '★', col: '#5cc46b' }, excellent: { label: 'Excellent', sym: '!', col: '#7fd18a' },
+  good: { label: 'Bon coup', sym: '✓', col: '#9fbfa6' }, forced: { label: 'Coup forcé', sym: '□', col: '#9aa4b2' },
+  inacc: { label: 'Imprécision', sym: '?!', col: '#e8c14c' }, mistake: { label: 'Erreur', sym: '?', col: '#f0913a' },
+  blunder: { label: 'Gaffe', sym: '??', col: '#e5534b' }
+};
+const winPct = cp => 50 + 50 * (2 / (1 + Math.exp(-0.00368208 * Math.max(-3000, Math.min(3000, cp)))) - 1);
+function classify(r) {
+  // tolérance de 20 centièmes : à faible profondeur, de petits écarts ne sont que du bruit d'évaluation
+  const drop = Math.max(0, winPct(r.bestV) - winPct(Math.min(r.bestV, r.playedV + 20)));
+  const acc = Math.max(0, Math.min(100, 103.1668 * Math.exp(-0.04354 * drop) - 3.1669));
+  const k = r.n === 1 ? 'forced' : r.isBest ? 'best' : drop < 2 ? 'excellent' : drop < 5 ? 'good' : drop < 10 ? 'inacc' : drop < 20 ? 'mistake' : 'blunder';
+  return { k, acc, drop };
+}
+let AN = null; // { gid, res: [], done, n }
+function startAnalysis() {
+  const gid = G.settings.mode === 'online' && G.online ? 'o:' + G.online.id : G.gid;
+  if (AN && AN.gid === gid && AN.n === G.hist.length) return;
+  const n = G.hist.length, depth = n > 90 ? 2 : 3, id = Math.random();
+  AN = { gid, res: new Array(n).fill(null), done: 0, n, id };
+  const step = i => {
+    if (!AN || AN.id !== id || i >= n) return;
+    const st = G.states[i], m = G.hist[i].m;
+    const fin = r => { if (!AN || AN.id !== id) return; AN.res[i] = Object.assign(r, classify(r)); AN.done = i + 1; onAnalysis(i); step(i + 1); };
+    if (!anWorker) { setTimeout(() => fin(analyzeMove(st, m, 2, 2)), 10); return; }
+    const h = e => { if (e.data.id === id && e.data.i === i) { anWorker.removeEventListener('message', h); fin(e.data.r); } };
+    anWorker.addEventListener('message', h);
+    anWorker.postMessage({ id, i, st, m, depth, q: 3 });
+  };
+  step(0);
+}
+function accuracy(c) {
+  if (!AN) return null;
+  const a = AN.res.filter((r, i) => r && G.hist[i] && G.hist[i].m.color === c);
+  return a.length ? Math.round(a.reduce((x, r) => x + r.acc, 0) / a.length) : null;
+}
+function onAnalysis(i) {
+  renderMoves();
+  if (G.review != null && (G.review - 1 === i || AN.done === AN.n)) { renderBoard(); renderStatus(); }
+  renderEndAcc();
+}
+function renderEndAcc() {
+  const el = document.getElementById('endAcc'); if (!el) return;
+  if (!anOk() || !G.over) { el.hidden = true; return; }
+  el.hidden = false;
+  const done = AN.done === AN.n, w = accuracy('w'), b = accuracy('b');
+  el.innerHTML = done
+    ? `<span>Précision</span><b>Blancs ${w ?? '–'} %</b><b>Noirs ${b ?? '–'} %</b>`
+    : `<span>Analyse des coups…</span><b>${AN.done}/${AN.n}</b><i style="--p:${AN.n ? AN.done / AN.n * 100 : 0}%"></i>`;
+}
 let aiReq = 0;
 function askAI(st, level) {
   const id = ++aiReq;
@@ -2800,6 +2886,8 @@ function renderBoard(animFrom) {
   const checkSq = !G.over || G.over.type === 'mate' ? (inCheck(st) ? findKing(st, st.turn) : -1) : -1;
   const threats = new Set(checkSq >= 0 ? checkers(st) : []); // pièces qui donnent l'échec, soulignées en rouge
   const tgt = new Map(G.targets.map(m => [m.to, m]));
+  const anR = G.review > 0 && anOk() && AN.res[G.review - 1];
+  const bestSq = anR && !anR.isBest && anR.best ? [anR.best.from, anR.best.to] : [];
   // pièces capables d'utiliser le pouvoir armé + zones d'explosion de la Supernova
   const can = new Set(), blastZone = new Set(), pwr = new Set();
   if (humanTurn() && st.powers) for (const m of allLegal(st)) if (m.power) pwr.add(m.from);
@@ -2822,7 +2910,7 @@ function renderBoard(animFrom) {
     {
       const p0 = st.board[s], tm = tgt.get(s);
       model.squares[s] = {
-        p: fog ? null : p0, fog: !!fog, sel: G.sel === s, check: s === checkSq, threat: threats.has(s) && !fog,
+        p: fog ? null : p0, fog: !!fog, sel: G.sel === s, best: bestSq.includes(s), check: s === checkSq, threat: threats.has(s) && !fog,
         last: !!((lm && (lm.from === s || lm.to === s)) || (G.hintMove && (G.hintMove.from === s || G.hintMove.to === s))),
         can: can.has(s) && G.sel !== s, blast: blastZone.has(s),
         pwr: pwr.has(s) && !fog, armed: G.sel === s && !!G.arm,
@@ -2835,6 +2923,7 @@ function renderBoard(animFrom) {
     if (G.hintMove && (G.hintMove.from === s || G.hintMove.to === s)) cls += ' last';
     if (G.sel === s) cls += ' sel';
     if (s === checkSq) cls += ' check';
+    if (bestSq.includes(s)) cls += ' best';
     if (can.has(s) && G.sel !== s) cls += ' can';
     if (blastZone.has(s)) cls += ' blastzone';
     if (fog) cls += ' fog';
@@ -2910,6 +2999,9 @@ function renderPlayers() {
 
 /* ---------- Historique + statut ---------- */
 const movesEl = document.getElementById('moves');
+const anOk = () => AN && AN.n === G.hist.length && AN.gid === (G.settings.mode === 'online' && G.online ? 'o:' + G.online.id : G.gid);
+const anBadge = k => { const r = anOk() && AN.res[k]; if (!r || !['best', 'inacc', 'mistake', 'blunder'].includes(r.k)) return '';
+  const c = CLS[r.k]; return ` <i class="an-b" style="color:${c.col}" title="${c.label}">${c.sym}</i>`; };
 function renderMoves() {
   if (!G.hist.length) {
     movesEl.innerHTML = `<div class="empty">${G.settings.mode === 'ai' && G.human === 'b'
@@ -2921,7 +3013,7 @@ function renderMoves() {
   for (let i = 0; i < G.hist.length; i += 2) {
     const a = G.hist[i], b = G.hist[i + 1], last = G.hist.length - 1;
     const at = G.review != null ? G.review - 1 : last;
-    const cell = (h, k) => h ? `<span class="mv${k === at ? ' cur' : ''}${h.m.power ? ' pw' : ''}" data-i="${k + 1}" role="button" tabindex="0"${h.m.power ? ` title="${pwOfMove(h.m).name}"` : ''}>${h.san}</span>` : '<span></span>';
+    const cell = (h, k) => h ? `<span class="mv${k === at ? ' cur' : ''}${h.m.power ? ' pw' : ''}" data-i="${k + 1}" role="button" tabindex="0"${h.m.power ? ` title="${pwOfMove(h.m).name}"` : ''}>${h.san}${anBadge(k)}</span>` : '<span></span>';
     html += `<div class="mrow"><span class="n">${i / 2 + 1}.</span>${cell(a, i)}${cell(b, i + 1)}</div>`;
     for (const h of [a, b]) if (h && h.ev) html += `<div class="evrow">✷ ${EVENTS[h.ev.id].name}</div>`;
   }
@@ -2936,6 +3028,11 @@ function renderStatus() {
     h20.textContent = G.review === 0 ? 'Position de départ' : `Après ${Math.ceil(G.review / 2)}.${G.review % 2 ? '' : '..'} ${G.hist[G.review - 1].san}`;
     const ev = G.review > 0 && G.hist[G.review - 1].ev;
     sub0.textContent = ev ? `${EVENTS[ev.id].name} : ${EVENTS[ev.id].desc}` : 'Utilisez ‹ › pour avancer ou reculer, « Partie » pour revenir au jeu.';
+    if (anOk() && AN.done === AN.n) {
+      const w = accuracy('w'), b = accuracy('b');
+      sub0.textContent = `Précision · Blancs ${w ?? '–'} % · Noirs ${b ?? '–'} %` + (ev ? ` · ${EVENTS[ev.id].name}` : '');
+    }
+    renderAnCard();
     return;
   }
   const st = cur(), h2 = document.getElementById('statusText'), eb = document.getElementById('statusEyebrow'), sub = document.getElementById('statusSub');
@@ -3423,6 +3520,8 @@ document.getElementById('newGo').onclick = () => { hideModal('newModal'); newFro
 
 function showEnd() {
   if (!G.over) return;
+  if (G.hist.length) startAnalysis();
+  setTimeout(renderEndAcc, 0);
   const o = G.over;
   let title = o.title, sub = o.sub;
   const vsSomeone = G.settings.mode === 'ai' || G.settings.mode === 'online';
@@ -3447,16 +3546,31 @@ overBar.addEventListener('click', e => {
   else document.getElementById('endAgain').click();
 });
 function startReview(i) {
+  if (G.over && G.hist.length) startAnalysis();
   G.review = Math.max(0, Math.min(G.states.length - 1, i));
   if (G.review === G.states.length - 1 && !G.over) G.review = null; // la position actuelle, c'est la partie elle-même
   G.sel = null; G.targets = []; G.arm = null;
   renderBoard(); renderMoves(); renderStatus();
 }
 function exitReview() { G.review = null; renderAll(); maybeAI(); }
+/* Carte d'analyse au-dessus de la barre de relecture : classement du coup, meilleur coup, précision */
+function renderAnCard() {
+  const el = document.getElementById('anCard');
+  const i = G.review != null ? G.review - 1 : -1;
+  if (i < 0 || !anOk()) { el.hidden = true; return; }
+  el.hidden = false;
+  const r = AN.res[i], h = G.hist[i], who = WHO(h.m.color);
+  if (!r) { el.innerHTML = `<span class="an-wait">Analyse du coup en cours… (${AN.done}/${AN.n})</span>`; return; }
+  const c = CLS[r.k], ev = v => { if (Math.abs(v) > 50000) return v > 0 ? 'mat pour les Blancs' : 'mat pour les Noirs'; const x = Math.max(-99, Math.min(99, v / 100)); return (x > 0 ? '+' : '') + x.toFixed(1); };
+  const bestTxt = r.isBest ? 'C\'était le meilleur coup.' : r.k === 'forced' ? 'Aucun autre coup possible.' : `Meilleur : <b>${r.bestSan}</b>${r.best && r.best.power ? ` <small>(${pwOfMove(r.best).name})</small>` : ''}`;
+  el.innerHTML = `<span class="an-sym" style="background:${c.col}">${c.sym}</span><div><b style="color:${c.col}">${h.san} · ${c.label}</b>`
+    + `<small>${who} · précision ${Math.round(r.acc)} % · éval. ${ev(h.m.color === 'w' ? r.playedV : -r.playedV)}</small><p>${bestTxt}</p></div>`;
+}
 function renderReviewBar() {
   const on = G.review != null;
   reviewBar.hidden = !on;
   overBar.hidden = on || !G.over;
+  renderAnCard();
   if (!on) return;
   const i = G.review, h = G.hist[i - 1];
   document.getElementById('reviewLabel').textContent = i === 0 ? 'Position de départ'
