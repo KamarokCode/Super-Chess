@@ -195,6 +195,9 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--gold);
 .wall .ttl { position: absolute; right: 3px; top: 3px; min-width: 16px; height: 16px; border-radius: 8px; padding: 0 4px; box-sizing: border-box;
   background: rgba(16, 12, 22, .78); color: #fff; font: 700 10px/16px var(--f-mono); text-align: center; }
 .sq.fog .coord { opacity: .25; }
+.wall.chest svg { filter: drop-shadow(0 0 6px rgba(232, 182, 76, .8)); animation: chestGlow 1.8s ease-in-out infinite alternate; }
+@keyframes chestGlow { from { filter: drop-shadow(0 0 3px rgba(232, 182, 76, .5)); } to { filter: drop-shadow(0 0 9px rgba(232, 182, 76, 1)); } }
+@media (prefers-reduced-motion: reduce) { .wall.chest svg { animation: none; } }
 .fogveil { position: absolute; inset: 0; z-index: 4; pointer-events: none;
   background: radial-gradient(circle at 30% 40%, rgba(120, 110, 140, .55), transparent 60%), rgba(34, 28, 46, .9); }
 .evbanner { position: absolute; left: 6%; right: 6%; top: 50%; z-index: 40; transform: translateY(-50%);
@@ -275,6 +278,31 @@ body[data-sc-theme="pirate"] .sq.d { background-image: repeating-linear-gradient
 @media (max-width: 420px) { #btnNet .lbl { display: none; } #btnNet { padding: 9px 10px; } body[data-sc-theme="pirate"] .logo { font-size: 23px; } .top { gap: 8px; } }
 @media (max-width: 520px) { .btn.theme span { display: none; } .btn.theme { padding: 9px 10px; } }
 
+/* ---------- Écran d'accueil ---------- */
+.home { position: fixed; inset: 0; z-index: 45; display: grid; place-items: center; overflow-y: auto;
+  padding: max(20px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(20px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+  background: radial-gradient(900px 500px at 50% 0%, rgba(232, 182, 76, .14), transparent 60%), rgba(12, 9, 18, .78); backdrop-filter: blur(3px); }
+body[data-sc-theme="pirate"] .home { background: linear-gradient(180deg, rgba(10, 22, 32, .25) 0%, rgba(7, 17, 26, .82) 55%, rgba(7, 17, 26, .94) 100%); backdrop-filter: none; }
+.home-card { width: min(440px, 100%); display: grid; gap: 22px; }
+.home-head { text-align: center; display: grid; justify-items: center; gap: 4px; }
+.home-crown { width: 58px; height: 58px; filter: drop-shadow(0 6px 18px rgba(232, 182, 76, .45)); }
+.home-head h1 { margin: 0; font-family: var(--f-display); font-size: clamp(34px, 8vw, 52px); letter-spacing: -.02em; line-height: 1; text-shadow: 0 4px 24px rgba(0,0,0,.6); }
+body[data-sc-theme="pirate"] .home-head h1 { font-weight: 400; letter-spacing: .01em; }
+.home-head h1 b { color: var(--gold); }
+.home-tag { margin: 6px 0 0; color: var(--muted); font-size: 15px; }
+.home-actions { display: grid; gap: 10px; }
+.hbtn { display: flex; align-items: center; gap: 14px; text-align: left; padding: 14px 16px; border-radius: 14px; border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--panel) 88%, transparent); color: var(--fg); font: 700 16px var(--f-body); transition: border-color .15s, transform .1s, background .15s; }
+.hbtn svg { width: 26px; height: 26px; flex: none; color: var(--gold); }
+.hbtn small { display: block; font-weight: 500; font-size: 13px; color: var(--muted); margin-top: 2px; }
+.hbtn:hover { border-color: var(--gold); }
+.hbtn:active { transform: scale(.985); }
+.hbtn.resume { background: var(--gold); color: var(--gold-ink); border-color: var(--gold); }
+.hbtn.resume svg, .hbtn.resume small { color: var(--gold-ink); }
+.home-foot { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; color: var(--muted); }
+.home-foot .linkbtn { font-size: 14px; }
+.linkbtn { border: 0; background: none; color: var(--gold); font: 700 13px var(--f-body); padding: 2px; cursor: pointer; }
+
 /* Écran de compte (application) */
 .modal.auth { width: min(400px, 100%); gap: 12px; }
 .auth-logo { display: flex; align-items: center; gap: 10px; font-family: var(--f-display); font-weight: 800; font-size: 18px; }
@@ -309,6 +337,52 @@ body[data-sc-theme="pirate"] .sq.d { background-image: repeating-linear-gradient
   .logo span.full { display: none; }
   .clock { font-size: 17px; min-width: 76px; padding: 5px 9px; }
 }
+/* ---------- Téléphone à l'horizontale (l'application Android est verrouillée ainsi) ----------
+   Colonne gauche : menu, joueurs, statut, commandes · centre : échiquier, pouvoirs dessous · droite : coups en petit. */
+@media (orientation: landscape) and (max-height: 560px) {
+  body { height: 100dvh; box-sizing: border-box; overflow: hidden; padding-block: 6px;
+    display: grid; column-gap: 10px; row-gap: 5px;
+    grid-template-columns: minmax(150px, 184px) minmax(0, 1fr) minmax(112px, 146px);
+    grid-template-rows: auto auto minmax(0, 1fr) auto auto auto;
+    grid-template-areas: "head board moves" "ptop board moves" "status board moves" "ctrl board moves" "pbot board moves" "pbot powers powers"; }
+  main.game, .board-col, .side { display: contents; }
+  .top { grid-area: head; margin: 0; flex-direction: column; align-items: stretch; gap: 5px; }
+  .logo { font-size: 15px; gap: 6px; } .logo svg { width: 22px; height: 22px; }
+  body[data-sc-theme="pirate"] .logo { font-size: 20px; }
+  .top-actions { gap: 5px; } .top-actions .btn { flex: 1; justify-content: center; padding: 6px; }
+  .top-actions .lbl, .btn.theme span, #btnNewTop { display: none; }
+  #pTop { grid-area: ptop; } #pBot { grid-area: pbot; align-self: end; }
+  .board-col > * { width: auto; min-width: 0; max-width: none; }
+  .player { min-height: 0; gap: 7px; }
+  .avatar { width: 28px; height: 28px; border-radius: 6px; } .avatar svg { width: 22px; height: 22px; }
+  .pname { font-size: 12px; } .pname .tag { font-size: 9px; }
+  .caps svg { width: 13px; height: 13px; margin-right: -5px; } .caps .adv { font-size: 10px; }
+  .clock { font-size: 13px; min-width: 52px; padding: 3px 6px; }
+  #wrap { grid-area: board; align-self: center; justify-self: center; height: 100%; width: auto; max-width: 100%; aspect-ratio: 1; min-height: 0; }
+  #wrap.is3d { width: 100%; aspect-ratio: auto; }
+  #powerWrap { grid-area: powers; }
+  #powerWrap .pw-head { display: none; }
+  .powerbar { margin-top: 0 !important; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; }
+  .pw-card { grid-template-columns: 15px minmax(0, 1fr); grid-template-rows: auto auto; justify-items: start; text-align: left; column-gap: 3px; row-gap: 0; padding: 4px 4px; border-radius: 8px; }
+  .pw-card svg { grid-row: 1 / 3; width: 15px; height: 15px; align-self: center; }
+  .pw-card .nm { font-size: 9px; letter-spacing: -.02em; padding: 0; } .pw-card .st { font-size: 8.5px; }
+  .status { grid-area: status; padding: 8px 10px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); overflow-y: auto; min-height: 0; }
+  .status .eyebrow { font-size: 9px; } .status h2 { font-size: 14px; } .opening { font-size: 11px; min-height: 0; line-height: 1.35; }
+  .chips { margin-top: 6px; gap: 4px; } .chip { font-size: 10px; padding: 2px 7px; }
+  #moves { grid-area: moves; max-height: none; min-height: 0; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); font-size: 11px; padding: 4px 0; }
+  .mrow { grid-template-columns: 20px 1fr 1fr; padding: 0 4px; }
+  .mrow .n { font-size: 10px; } .mv { padding: 2px 3px; } .evrow { margin: 2px 4px; padding: 2px 5px; font-size: 10px; }
+  .moves .empty { font-size: 11px; padding: 8px; }
+  .controls { grid-area: ctrl; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 0; border: 0; gap: 4px; }
+  .controls .btn { padding: 5px 2px; font-size: 9px; gap: 2px; } .controls .btn svg { width: 16px; height: 16px; }
+  .side .newgame { display: none; }
+  .modal { max-height: calc(100dvh - 24px); }
+  .home-card { width: min(760px, 100%); grid-template-columns: 1fr 1.2fr; align-items: center; gap: 24px; }
+  .home-head h1 { font-size: 40px; } .home-crown { width: 44px; height: 44px; }
+  .hbtn { padding: 10px 14px; font-size: 14px; } .hbtn small { font-size: 12px; }
+  .home-foot { grid-column: 1 / -1; }
+  .evbanner { padding: 10px 14px; } .evbanner h3 { font-size: 20px; } .evbanner p { font-size: 12px; }
+}
 @media (prefers-reduced-motion: reduce) { .pc.anim { transition: none; } .thinking i { animation: none; opacity: 1; } }
 </style>
 
@@ -318,6 +392,7 @@ body[data-sc-theme="pirate"] .sq.d { background-image: repeating-linear-gradient
     <span>Super <b>Chess</b></span>
   </div>
   <div class="top-actions">
+    <button class="btn" id="btnMenu" title="Menu principal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span class="lbl">Menu</span></button>
     <button class="btn" id="btnNet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 010 6.8M18 14.8c1.9.8 3.1 2.6 3.5 5.2"/></svg><span class="lbl">En ligne</span><span class="badge" id="netBadge" hidden>0</span></button>
     <button class="btn theme" id="btnTheme" title="Changer d'ambiance" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2.2"/><path d="M12 7.2V21M8 11h8M4.5 14.5c.5 3.6 3.6 6.5 7.5 6.5s7-2.9 7.5-6.5M4.5 14.5l-1.8 1.6M4.5 14.5l1.9 1.4M19.5 14.5l1.8 1.6M19.5 14.5l-1.9 1.4"/></svg><span id="themeLabel">Pirate</span></button>
     <button class="btn primary" id="btnNewTop">Nouvelle partie</button>
@@ -365,6 +440,23 @@ body[data-sc-theme="pirate"] .sq.d { background-image: repeating-linear-gradient
     <button class="btn primary newgame" id="btnNew">Nouvelle partie</button>
   </aside>
 </main>
+
+<div class="home" id="home" hidden>
+  <div class="home-card" role="dialog" aria-modal="true" aria-labelledby="homeTitle">
+    <div class="home-head">
+      <svg class="home-crown" viewBox="0 0 45 45" aria-hidden="true"><path d="M10 31l-2-17 5.5 8L16 10l4 10 2.5-12 2.5 12 4-10 2.5 12 5.5-8-2 17z" fill="#e8b64c" stroke="#2a1d05" stroke-width="1.5" stroke-linejoin="round"/><rect x="9" y="33" width="27" height="5" rx="1.5" fill="#e8b64c" stroke="#2a1d05" stroke-width="1.5"/></svg>
+      <h1 id="homeTitle">Super <b>Chess</b></h1>
+      <p class="home-tag" id="homeTag">Les échecs où chaque pièce a un pouvoir.</p>
+    </div>
+    <div class="home-actions">
+      <button class="hbtn resume" data-home="resume" hidden><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="currentColor"/></svg><span>Reprendre la partie<small id="homeResume"></small></span></button>
+      <button class="hbtn" data-home="ai"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="8" width="14" height="11" rx="2"/><path d="M12 4v4M9 13h.01M15 13h.01M9.5 16h5"/></svg><span>Contre l'ordinateur<small>Quatre niveaux, de Débutant à Grand maître</small></span></button>
+      <button class="hbtn" data-home="local"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="3"/><circle cx="16" cy="8" r="3"/><path d="M2.5 19c.7-3 2.8-4.5 5.5-4.5s4.8 1.5 5.5 4.5M10.5 19c.7-3 2.8-4.5 5.5-4.5s4.8 1.5 5.5 4.5"/></svg><span>À deux sur cet appareil<small>Chacun son tour, sur le même écran</small></span></button>
+      <button class="hbtn" data-home="online"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg><span>En ligne avec mes amis<small id="homeOnline">Défiez vos amis sur leur propre appareil</small></span></button>
+    </div>
+    <div class="home-foot"><button class="linkbtn" data-home="rules">Pouvoirs et événements</button><span aria-hidden="true">·</span><button class="linkbtn" data-home="theme">Ambiance : <span id="homeTheme">Pirate</span></button></div>
+  </div>
+</div>
 
 <div class="modal-bg" id="newModal" hidden>
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="newTitle">
@@ -423,7 +515,7 @@ body[data-sc-theme="pirate"] .sq.d { background-image: repeating-linear-gradient
     <div class="result-ico" id="endIco"></div>
     <h3 id="endTitle">Échec et mat</h3>
     <p id="endSub"></p>
-    <div class="actions" style="justify-content:center"><button class="btn" id="endClose">Voir l'échiquier</button><button class="btn primary" id="endAgain">Revanche</button></div>
+    <div class="actions" style="justify-content:center"><button class="btn" id="endMenu">Menu principal</button><button class="btn" id="endClose">Voir l'échiquier</button><button class="btn primary" id="endAgain">Revanche</button></div>
   </div>
 </div>
 
@@ -1106,8 +1198,18 @@ function createBoard3D(container, opts) {
     }) });
     const sp = new T.Sprite(labelCache[n]); sp.scale.set(.28, .28, 1); return sp;
   }
+  const chestBody = new T.BoxGeometry(.62, .34, .44), chestLid = new T.CylinderGeometry(.22, .22, .62, 16, 1, false, 0, Math.PI), chestBand = new T.BoxGeometry(.06, .4, .47);
+  const chestWood = new T.MeshStandardMaterial({ color: 0x7a4a24, roughness: .7 }), chestGold = new T.MeshStandardMaterial({ color: 0xd8a63e, roughness: .3, metalness: .9, emissive: 0x6b4a10, emissiveIntensity: .4 });
   function makeWall(p) {
     const g = new T.Group();
+    if (p.kind === 'chest') { // coffre au trésor : caisse cerclée d'or, couvercle bombé
+      const box = new T.Mesh(chestBody, chestWood); box.position.y = .17; box.castShadow = true; g.add(box);
+      const lid = new T.Mesh(chestLid, chestWood); lid.rotation.set(0, 0, Math.PI / 2); lid.rotation.order = 'ZXY'; lid.position.y = .34; lid.castShadow = true; g.add(lid);
+      for (const x of [-.2, .2]) { const band = new T.Mesh(chestBand, chestGold); band.position.set(x, .2, 0); g.add(band); }
+      const lock = new T.Mesh(new T.BoxGeometry(.1, .12, .04), chestGold); lock.position.set(0, .32, .23); g.add(lock);
+      const l = label(Math.ceil(p.ttl / 2)); l.position.set(.32, .7, .32); g.add(l);
+      return g;
+    }
     if (p.kind === 'ice') {
       const m = new T.Mesh(iceGeo, iceMat); m.position.y = .275; m.castShadow = true; g.add(m);
     } else {
@@ -1203,8 +1305,8 @@ function createBoard3D(container, opts) {
         tweens.push({ fx: m, from, to: to.clone().setY(.2), t0: performance.now() + i * 160, dur: 560, kind: 'fall',
           done: () => { fx.remove(m); burst(to, 0xff8a3c); burst(to, 0xffe2a0, 60); } });
       });
-    } else if (kind === 'ice' || kind === 'fog' || kind === 'storm' || kind === 'silence') {
-      squares.forEach((s, i) => burst(sqPos(s), kind === 'ice' ? 0x9fd6ff : 0xb9a0ff, i * 60));
+    } else if (kind === 'ice' || kind === 'fog' || kind === 'storm' || kind === 'silence' || kind === 'gust' || kind === 'swell' || kind === 'doldrums') {
+      squares.forEach((s, i) => burst(sqPos(s), kind === 'ice' || kind === 'swell' ? 0x9fd6ff : kind === 'gust' ? 0xe8f4ff : 0xb9a0ff, i * 60));
     } else {
       squares.forEach((s, i) => burst(sqPos(s), 0xe8b64c, i * 40));
     }
@@ -1382,7 +1484,7 @@ const PTYPES = ['p', 'n', 'b', 'r', 'q', 'k'];
 function initialState(powers, events) {
   const st = fromFEN(START_FEN);
   if (powers) { st.powers = true; st.cd = { w: Object.assign({}, CD_START), b: Object.assign({}, CD_START) }; }
-  if (powers && events) { st.events = true; st.ev = { truce: 0, fog: 0 }; }
+  if (powers && events) { st.events = true; st.ev = { truce: 0, fog: 0, calm: 0 }; }
   return st;
 }
 
@@ -1459,8 +1561,11 @@ function pseudo(st, s) {
   const p = st.board[s];
   if (!p) return [];
   const r = s >> 3, f = s & 7, out = [], opp = other(p.c), b = st.board;
+  const isChest = t => b[t] && b[t].kind === 'chest';
+  const free = t => !b[t] || isChest(t); // le coffre se ramasse en s'arrêtant dessus
   const add = (to, extra) => {
-    out.push(Object.assign({ from: s, to, piece: p.t, color: p.c, captured: b[to] ? b[to].t : null }, extra));
+    const chest = isChest(to);
+    out.push(Object.assign({ from: s, to, piece: p.t, color: p.c, captured: b[to] && !chest ? b[to].t : null }, chest ? { chest: true } : null, extra));
   };
   if (p.t === 'p') {
     const dir = p.c === 'w' ? -1 : 1, start = p.c === 'w' ? 6 : 1, last = p.c === 'w' ? 0 : 7;
@@ -1468,9 +1573,9 @@ function pseudo(st, s) {
       if ((to >> 3) === last) for (const q of 'qrbn') add(to, Object.assign({ promo: q }, extra));
       else add(to, extra);
     };
-    if (inB(r + dir, f) && !b[idx(r + dir, f)]) {
+    if (inB(r + dir, f) && free(idx(r + dir, f))) {
       push(idx(r + dir, f));
-      if (r === start && !b[idx(r + 2 * dir, f)]) add(idx(r + 2 * dir, f), { double: true });
+      if (r === start && !b[idx(r + dir, f)] && free(idx(r + 2 * dir, f))) add(idx(r + 2 * dir, f), { double: true });
     }
     for (const df of [-1, 1]) {
       const nr = r + dir, nf = f + df;
@@ -1484,7 +1589,7 @@ function pseudo(st, s) {
       const nr = r + dr, nf = f + df;
       if (!inB(nr, nf)) continue;
       const t = idx(nr, nf);
-      if (!b[t] || b[t].c === opp) add(t);
+      if (free(t) || b[t].c === opp) add(t);
     }
     if (p.t === 'k') {
       const home = p.c === 'w' ? 60 : 4;
@@ -1501,15 +1606,18 @@ function pseudo(st, s) {
       while (inB(nr, nf)) {
         const t = idx(nr, nf);
         if (!b[t]) add(t);
-        else { if (b[t].c === opp) add(t); break; }
+        else { if (b[t].c === opp || isChest(t)) add(t); break; }
         nr += dr; nf += df;
       }
     }
   }
   if (st.powers && st.cd && st.cd[p.c][p.t] === 0) powerMoves(st, s, p, out);
   for (const h of Hooks.moves) h(st, s, out, add);
-  if (st.ev && st.ev.truce > 0) return out.filter(m => !m.captured); // Trêve
-  return out;
+  let res = out;
+  if (st.ev && st.ev.truce > 0) res = res.filter(m => !m.captured); // Trêve
+  if (st.ev && st.ev.calm > 0) // Calme plat : aucun déplacement de plus de deux cases
+    res = res.filter(m => Math.max(Math.abs((m.to >> 3) - (m.from >> 3)), Math.abs((m.to & 7) - (m.from & 7))) <= 2);
+  return res;
 }
 
 function attacked(st, s, by) {
@@ -1546,7 +1654,7 @@ function attacked(st, s, by) {
 const ROOK_HOME = { 0: 'bQ', 7: 'bK', 56: 'wQ', 63: 'wK' };
 
 function makeMove(st, m) {
-  const b = st.board.slice(), p = b[m.from];
+  const b = st.board.slice(), p = b[m.from], chest = !!(b[m.to] && b[m.to].kind === 'chest');
   const n = {
     board: b, turn: other(st.turn), castle: Object.assign({}, st.castle), ep: null,
     half: st.half + 1, full: st.full + (st.turn === 'b' ? 1 : 0)
@@ -1561,6 +1669,7 @@ function makeMove(st, m) {
     const cd = { w: Object.assign({}, st.cd.w), b: Object.assign({}, st.cd.b) }, mine = cd[p.c];
     for (const k in mine) if (mine[k] > 0) mine[k]--;
     if (m.power) mine[m.piece] = POWERS[m.piece].cd;
+    if (chest) for (const k in mine) mine[k] = 0; // le trésor recharge tous les pouvoirs du camp
     n.cd = cd; n.powers = st.powers;
   }
   // obstacles temporaires (cratères, glace) et effets d'événements qui s'écoulent
@@ -1568,7 +1677,7 @@ function makeMove(st, m) {
     const q = b[s];
     if (q && q.t === 'x') b[s] = q.ttl <= 1 ? null : Object.assign({}, q, { ttl: q.ttl - 1 });
   }
-  if (st.ev) n.ev = { truce: Math.max(0, (st.ev.truce || 0) - 1), fog: Math.max(0, (st.ev.fog || 0) - 1) };
+  if (st.ev) n.ev = { truce: Math.max(0, (st.ev.truce || 0) - 1), fog: Math.max(0, (st.ev.fog || 0) - 1), calm: Math.max(0, (st.ev.calm || 0) - 1) };
   n.events = st.events;
   if (m.ep) b[m.to + (p.c === 'w' ? 8 : -8)] = null;
   if (m.castle === 'K') { b[m.from + 1] = b[m.from + 3]; b[m.from + 3] = null; }
@@ -1665,7 +1774,14 @@ const EVENTS = {
   quake:     { name: 'Séisme',            w: 2, desc: 'Trois pièces au hasard (jamais un roi) glissent sur une case voisine.' },
   fog:       { name: 'Brouillard',        w: 2, desc: 'Pendant 2 tours, vous ne voyez que vos pièces et les cases qui les touchent.' },
   truce:     { name: 'Trêve',             w: 1, desc: 'Aucune capture, pouvoirs compris, pendant un coup de chaque camp.' },
-  revive:    { name: 'Résurrection',      w: 1, desc: 'Chaque camp récupère sa meilleure pièce perdue, posée sur sa première rangée.' }
+  revive:    { name: 'Résurrection',      w: 1, desc: 'Chaque camp récupère sa meilleure pièce perdue, posée sur sa première rangée.' },
+  // La vie à bord
+  gust:      { name: 'Rafale de vent',    w: 3, desc: 'Une rafale balaie le pont : les pièces des quatre rangées centrales (sauf les rois) glissent d\'une case dans le sens du vent.' },
+  swell:     { name: 'Lame de fond',      w: 2, desc: 'Une vague déferle sur une colonne : chaque pièce qui s\'y trouve (sauf un roi) recule d\'une case vers son camp.' },
+  doldrums:  { name: 'Calme plat',        w: 2, desc: 'Plus un souffle : pendant 2 tours, aucune pièce ne peut se déplacer de plus de deux cases.' },
+  mutiny:    { name: 'Mutinerie',         w: 1, desc: 'Un pion de chaque camp se mutine et passe dans le camp adverse.' },
+  overboard: { name: 'Un homme à la mer', w: 2, desc: 'Un pion de chaque camp, tiré au sort, passe par-dessus bord.' },
+  chest:     { name: 'Coffre au trésor',  w: 2, desc: 'Un coffre est repêché au centre. La première pièce qui s\'y arrête recharge tous les pouvoirs de son camp. Il coule au bout de 6 tours.' }
 };
 const EVENT_TOTAL_W = Object.values(EVENTS).reduce((a, e) => a + e.w, 0);
 const isEventTurn = st => st.events && st.turn === 'w' && st.full >= EVENT_FIRST && (st.full - EVENT_FIRST) % EVENT_EVERY === 0;
@@ -1683,7 +1799,7 @@ function cloneSt(st) {
   return Object.assign({}, st, {
     board: st.board.slice(), castle: Object.assign({}, st.castle),
     cd: st.cd ? { w: Object.assign({}, st.cd.w), b: Object.assign({}, st.cd.b) } : st.cd,
-    ev: Object.assign({ truce: 0, fog: 0 }, st.ev || {})
+    ev: Object.assign({ truce: 0, fog: 0, calm: 0 }, st.ev || {})
   });
 }
 function fixCastle(n) {
@@ -1757,6 +1873,50 @@ const EVENT_FN = {
   },
   fog(st) { const n = cloneSt(st); n.ev.fog = 4; return { st: n, squares: [] }; },
   truce(st) { const n = cloneSt(st); n.ev.truce = 2; return { st: n, squares: [] }; },
+  gust(st) {
+    const n = cloneSt(st), b = n.board, dir = Math.random() < .5 ? 1 : -1, moved = [];
+    // on part du bord sous le vent pour que les pièces glissent en file
+    for (let r = 2; r <= 5; r++) for (let k = 0; k < 8; k++) {
+      const f = dir > 0 ? 7 - k : k, s = r * 8 + f, p = b[s], t = s + dir;
+      if (!p || p.t === 'k' || p.t === 'x' || f + dir < 0 || f + dir > 7 || b[t]) continue;
+      b[t] = p; b[s] = null; moved.push(t);
+    }
+    return moved.length ? { st: n, squares: moved } : null;
+  },
+  swell(st) {
+    const n = cloneSt(st), b = n.board, f = rnd(8), moved = [];
+    for (let pass = 0; pass < 2; pass++) for (let k = 0; k < 8; k++) {
+      const order = pass ? 7 - k : k, s = order * 8 + f, p = b[s];
+      if (!p || p.t === 'k' || p.t === 'x') continue;
+      const nr = (s >> 3) + (p.c === 'w' ? 1 : -1);
+      if (nr < 0 || nr > 7 || b[nr * 8 + f]) continue;
+      if (p.t === 'p' && (nr === 7 || nr === 0)) continue; // un pion ne recule pas sur sa première rangée
+      if ((pass === 0) !== (p.c === 'b')) continue; // noirs d'abord (vers le haut), blancs ensuite (vers le bas)
+      b[nr * 8 + f] = p; b[s] = null; moved.push(nr * 8 + f);
+    }
+    return moved.length ? { st: n, squares: moved } : null;
+  },
+  doldrums(st) { const n = cloneSt(st); n.ev.calm = 4; return { st: n, squares: [] }; },
+  mutiny(st) {
+    const n = cloneSt(st), b = n.board;
+    const pick = c => { const c2 = []; b.forEach((p, s) => { if (p && p.t === 'p' && p.c === c) { const r = s >> 3; if (c === 'w' ? r < 6 : r > 1) c2.push(s); } }); return c2.length ? pickOne(c2) : -1; };
+    const w = pick('w'), k = pick('b'); // un pion devenu adverse ne doit pas se retrouver aux portes de la promotion
+    if (w < 0 || k < 0) return null;
+    b[w] = { t: 'p', c: 'b' }; b[k] = { t: 'p', c: 'w' };
+    return { st: n, squares: [w, k] };
+  },
+  overboard(st) {
+    const n = cloneSt(st), b = n.board, sq = [];
+    for (const c of 'wb') { const ps = []; b.forEach((p, s) => { if (p && p.t === 'p' && p.c === c) ps.push(s); }); if (ps.length) { const s = pickOne(ps); b[s] = null; sq.push(s); } }
+    return sq.length ? { st: n, squares: sq } : null;
+  },
+  chest(st) {
+    const n = cloneSt(st), c = [];
+    for (let s = 16; s < 48; s++) if (!n.board[s]) c.push(s);
+    if (!c.length) return null;
+    const s = pickOne(c); n.board[s] = { t: 'x', c: 'n', kind: 'chest', ttl: 12 };
+    return { st: n, squares: [s] };
+  },
   revive(st) {
     const n = cloneSt(st), sq = [], START = { q: 1, r: 2, b: 2, n: 2, p: 8 };
     for (const [c, r] of [['w', 7], ['b', 0]]) {
@@ -1824,7 +1984,7 @@ function evaluate(st) {
   }
   return st.turn === 'w' ? sc : -sc;
 }
-const orderScore = m => (m.captured ? VAL[m.captured] * 10 - VAL[m.piece] / 10 + 1000 : 0) + (m.promo ? VAL[m.promo] : 0) +
+const orderScore = m => (m.chest ? 400 : 0) + (m.captured ? VAL[m.captured] * 10 - VAL[m.piece] / 10 + 1000 : 0) + (m.promo ? VAL[m.promo] : 0) +
   (m.blast ? (m.blastV - VAL.q) * 10 : 0);
 function quiesce(st, a, b, d) {
   const stand = evaluate(st);
@@ -1890,10 +2050,17 @@ function pieceSVG(t, c) {
 }
 const NAMES = { p: 'pion', n: 'cavalier', b: 'fou', r: 'tour', q: 'dame', k: 'roi' };
 function wallSVG(kind) {
+  if (kind === 'chest') return `<svg viewBox="0 0 45 45" aria-hidden="true"><rect x="8" y="20" width="29" height="17" rx="2" fill="#7a4a24" stroke="#2a1608" stroke-width="1.5"/><path d="M8 21c0-7 6-11 14.5-11S37 14 37 21z" fill="#8f5a2c" stroke="#2a1608" stroke-width="1.5"/><path d="M8 21h29" stroke="#2a1608" stroke-width="1.5"/><path d="M13 11.5v25.5M32 11.5v25.5" stroke="#d8a63e" stroke-width="2.5"/><rect x="19.5" y="18" width="6" height="7" rx="1" fill="#e8c35a" stroke="#2a1608" stroke-width="1"/><circle cx="22.5" cy="21.5" r="1" fill="#2a1608"/><path d="M15 17l2-3M28 15l2 2" stroke="#ffe9a6" stroke-width="1.5" stroke-linecap="round"/></svg>`;
   if (kind === 'ice') return `<svg viewBox="0 0 45 45" aria-hidden="true"><rect x="3" y="3" width="39" height="39" rx="5" fill="#bfe4ff" fill-opacity=".85" stroke="#eef9ff" stroke-width="1.5"/><path d="M9 14l10-6M9 22l18-12M27 37l9-6M19 37l17-11" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".8"/><path d="M3 30l39-6" stroke="#8cc7f0" stroke-width="1"/></svg>`;
   return `<svg viewBox="0 0 45 45" aria-hidden="true"><circle cx="22.5" cy="22.5" r="19" fill="#4a3324"/><circle cx="22.5" cy="22.5" r="19" fill="none" stroke="#e8763c" stroke-width="2" stroke-dasharray="4 3" opacity=".8"/><circle cx="22.5" cy="23.5" r="12.5" fill="#1d130d"/><circle cx="22.5" cy="24.5" r="6" fill="#e8763c" opacity=".55"/><circle cx="9" cy="12" r="2.2" fill="#6b4a33"/><circle cx="36" cy="33" r="2.6" fill="#6b4a33"/><circle cx="35" cy="11" r="1.6" fill="#6b4a33"/></svg>`;
 }
 const EV_ICONS = {
+  gust: '<path d="M3 8h11a3 3 0 1 0-3-3M3 12h16a3 3 0 1 1-3 3M3 16h8"/>',
+  swell: '<path d="M2 15c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2M2 19c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2M7 11c0-4 3-7 7-7 2 0 3.5 1 4 2-2-.5-4 .5-4 3"/>',
+  doldrums: '<path d="M4 20h16M12 3v14M12 4c3 3 4 7 4 10M12 4C9 7 8 11 8 14"/><circle cx="12" cy="3" r=".5"/>',
+  mutiny: '<path d="M4 7h12l-3-3M20 17H8l3 3"/><circle cx="7" cy="17" r="1.5"/><circle cx="17" cy="7" r="1.5"/>',
+  overboard: '<circle cx="12" cy="7" r="2.5"/><path d="M12 9.5v4M8 12l4 1.5 4-1.5M2 18c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2"/>',
+  chest: '<rect x="4" y="11" width="16" height="9" rx="1"/><path d="M4 12c0-4 3.5-6 8-6s8 2 8 6M10 11v3h4v-3M7 6.5v13.5M17 6.5v13.5"/>',
   meteor: '<circle cx="15" cy="15" r="5"/><path d="M11 11L3 3M15 9L9 3M9 15L3 9"/>',
   ice: '<path d="M12 2v20M3.5 7l17 10M20.5 7l-17 10M9 3.5l3 2 3-2M9 20.5l3-2 3 2"/>',
   storm: '<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',
@@ -2199,12 +2366,12 @@ function renderBoard(animFrom) {
     if (d >= 56) html += `<span class="coord fl">${FILES[f]}</span>`;
     const p = st.board[s];
     if (p && !fog) html += p.t === 'x'
-      ? `<div class="wall">${wallSVG(p.kind)}<span class="ttl" title="Tours restants">${Math.ceil(p.ttl / 2)}</span></div>`
+      ? `<div class="wall ${p.kind}">${wallSVG(p.kind)}<span class="ttl" title="Tours restants">${Math.ceil(p.ttl / 2)}</span></div>`
       : `<div class="pc" data-s="${s}">${pieceSVG(p.t, p.c)}</div>`;
     if (fog) html += '<div class="fogveil"></div>';
     if (tgt.has(s)) { const tm = tgt.get(s); html += `<div class="hint${(p || tm.ep) && !fog ? ' cap' : ''}${tm.power ? ' pow' : ''}"></div>`; }
     el.innerHTML = html;
-    el.setAttribute('aria-label', sqName(s) + (fog ? ' (brouillard)' : p ? ' ' + (p.t === 'x' ? (p.kind === 'ice' ? 'glace' : 'cratère') : NAMES[p.t] + (p.c === 'w' ? ' blanc' : ' noir')) : ''));
+    el.setAttribute('aria-label', sqName(s) + (fog ? ' (brouillard)' : p ? ' ' + (p.t === 'x' ? (p.kind === 'ice' ? 'glace' : p.kind === 'chest' ? 'coffre au trésor' : 'cratère') : NAMES[p.t] + (p.c === 'w' ? ' blanc' : ' noir')) : ''));
   }
   if (animFrom && lm) {
     const pcEl = sqEls[disp(lm.to)].querySelector('.pc');
@@ -2311,10 +2478,12 @@ function renderChips() {
     out.push(n === 1 ? '<span class="chip soon">✷ Événement au prochain tour</span>' : `<span class="chip next">✷ Événement dans ${n} tours</span>`);
   }
   if (st.ev && st.ev.truce > 0) out.push('<span class="chip fx-on">Trêve : aucune capture</span>');
+  if (st.ev && st.ev.calm > 0) out.push(`<span class="chip fx-on">Calme plat · ${Math.ceil(st.ev.calm / 2)} tour${st.ev.calm > 2 ? 's' : ''}</span>`);
+  if (st.board.some(p => p && p.kind === 'chest')) out.push('<span class="chip next">Coffre au trésor sur le pont</span>');
   if (st.ev && st.ev.fog > 0) out.push(`<span class="chip fx-on">Brouillard · ${Math.ceil(st.ev.fog / 2)} tour${st.ev.fog > 2 ? 's' : ''}</span>`);
   const ice = st.board.filter(p => p && p.kind === 'ice').length, cr = st.board.filter(p => p && p.kind === 'crater').length;
   if (ice) out.push(`<span class="chip fx-on">Glace ×${ice}</span>`);
-  if (cr) out.push(`<span class="chip fx-on">Cratères ×${cr}</span>`);
+  if (cr) out.push(`<span class="chip fx-on">${THEME === 'pirate' ? 'Brèches' : 'Cratères'} ×${cr}</span>`);
   document.getElementById('chips').innerHTML = out.join('');
 }
 let bannerTimer = null;
@@ -2389,7 +2558,7 @@ function commit(m, animate = true) {
   }
   G.states.push(n); G.hist.push({ m, san: s, ev }); G.keys.push(posKey(n));
   G.sel = null; G.targets = []; G.hintMove = null; G.arm = null;
-  G.notice = m.power ? `${actor(m.color)} déclenché ${POWERS[m.piece].name}${m.blast ? ` : ${m.blast.length + 1} pièce${m.blast.length ? 's' : ''} détruite${m.blast.length ? 's' : ''}` : ''}.` : '';
+  G.notice = m.chest ? `${actor(m.color)} trouvé le coffre au trésor : tous ses pouvoirs sont rechargés !` : m.power ? `${actor(m.color)} déclenché ${POWERS[m.piece].name}${m.blast ? ` : ${m.blast.length + 1} pièce${m.blast.length ? 's' : ''} détruite${m.blast.length ? 's' : ''}` : ''}.` : '';
   for (const h of Hooks.turn) h(n);
   checkEnd();
   if (G.over) SND.end();
@@ -2400,6 +2569,7 @@ function commit(m, animate = true) {
   else SND.move();
   renderAll(animate ? m : null);
   if (m.power) flash(m.swap ? [m.from, m.to] : [m.to].concat(m.blast || []));
+  if (m.chest) { flash([m.to], 'chest'); SND.power({}); }
   if (ev) {
     setTimeout(() => { showBanner(ev.id); flash(ev.squares, ev.id); SND.event(); }, m.power ? 450 : 200);
     G.notice = EVENTS[ev.id].name + ' : ' + EVENTS[ev.id].desc;
@@ -2577,6 +2747,7 @@ boardEl.addEventListener('pointercancel', e => endDrag(e, true));
 document.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
   const open = ['newModal', 'rulesModal', 'netModal'].find(id => !document.getElementById(id).hidden);
+  if (!open && !homeEl.hidden) { if (G.hist.length && !G.over) hideHome(); return; }
   if (open) hideModal(open);
   else { G.arm = null; clearSel(); renderPowers(); renderStatus(); }
 });
@@ -2655,8 +2826,9 @@ document.getElementById('btnHint').onclick = async () => {
 function showModal(id) { document.getElementById(id).hidden = false; }
 function hideModal(id) { document.getElementById(id).hidden = true; }
 const draft = {};
-function openNew() {
+function openNew(mode) {
   Object.assign(draft, { variant: 'super' }, G.settings);
+  if (mode === 'ai' || mode === 'local') draft.mode = mode;
   if (draft.mode === 'online') draft.mode = 'ai'; // une nouvelle partie se joue ici ; les parties en ligne passent par « En ligne »
   syncSeg(); showModal('newModal');
   document.querySelector('#newModal .seg button[aria-pressed="true"]').focus();
@@ -2673,11 +2845,11 @@ document.querySelectorAll('#newModal .seg').forEach(seg => seg.addEventListener(
   const k = seg.dataset.key; draft[k] = (k === 'level' || k === 'time') ? +b.dataset.v : b.dataset.v;
   syncSeg();
 }));
-document.getElementById('btnNew').onclick = openNew;
-document.getElementById('btnNewTop').onclick = openNew;
-document.getElementById('newCancel').onclick = () => hideModal('newModal');
+document.getElementById('btnNew').onclick = () => { newFromHome = false; openNew(); };
+document.getElementById('btnNewTop').onclick = () => { newFromHome = false; openNew(); };
+document.getElementById('newCancel').onclick = () => { hideModal('newModal'); if (newFromHome) showHome(); };
 document.getElementById('newModal').addEventListener('click', e => { if (e.target.id === 'newModal') hideModal('newModal'); });
-document.getElementById('newGo').onclick = () => { hideModal('newModal'); newGame(Object.assign({}, draft)); };
+document.getElementById('newGo').onclick = () => { hideModal('newModal'); newFromHome = false; newGame(Object.assign({}, draft)); };
 
 function showEnd() {
   if (!G.over) return;
@@ -2693,6 +2865,35 @@ function showEnd() {
   showModal('endModal');
 }
 document.getElementById('endClose').onclick = () => hideModal('endModal');
+document.getElementById('endMenu').onclick = () => { hideModal('endModal'); showHome(); };
+
+/* ---------- Menu principal ---------- */
+const homeEl = document.getElementById('home');
+let newFromHome = false;
+function showHome() {
+  const inGame = G.hist.length > 0 && !G.over;
+  const r = homeEl.querySelector('[data-home="resume"]');
+  r.hidden = !inGame;
+  if (inGame) document.getElementById('homeResume').textContent =
+    (G.settings.mode === 'ai' ? 'Contre l\'ordinateur' : G.settings.mode === 'online' ? 'En ligne contre ' + oppName() : 'À deux') + ' · coup ' + cur().full;
+  document.getElementById('homeTheme').textContent = THEME === 'pirate' ? 'Pirate' : 'Classique';
+  document.getElementById('homeTag').textContent = THEME === 'pirate' ? 'Les échecs à l\'abordage : chaque pièce a son pouvoir.' : 'Les échecs où chaque pièce a un pouvoir.';
+  const on = document.getElementById('homeOnline');
+  on.textContent = NET.state === 'ready' ? `Connecté : ${NET.myName || NET.names[NET.me] || 'vous'}` : 'Défiez vos amis sur leur propre appareil';
+  homeEl.hidden = false;
+  (r.hidden ? homeEl.querySelector('[data-home="ai"]') : r).focus();
+}
+function hideHome() { homeEl.hidden = true; }
+homeEl.addEventListener('click', e => {
+  const b = e.target.closest('[data-home]'); if (!b) return;
+  const a = b.dataset.home;
+  if (a === 'resume') hideHome();
+  else if (a === 'ai' || a === 'local') { hideHome(); newFromHome = true; openNew(a); }
+  else if (a === 'online') { hideHome(); openNet(); }
+  else if (a === 'rules') { openRules(); }
+  else if (a === 'theme') { THEME = THEME === 'pirate' ? 'classic' : 'pirate'; try { localStorage.setItem('superchess.theme', THEME); } catch (err) {} applyTheme(); showHome(); }
+});
+document.getElementById('btnMenu').onclick = showHome;
 document.getElementById('endAgain').onclick = () => {
   if (G.settings.mode === 'online' && G.online) {
     hideModal('endModal');
@@ -2746,9 +2947,8 @@ function netFail(e) {
 /* ---------- Démarrage ---------- */
 function netInit() {
   const cfg = window.SUPERCHESS_FIREBASE;
-  if (typeof firebase === 'undefined' || !cfg || !cfg.apiKey || /REMPLACER/.test(cfg.apiKey)) {
-    NET.state = 'unavailable'; renderNet(); return;
-  }
+  if (!cfg || !cfg.apiKey || /REMPLACER/.test(cfg.apiKey)) { NET.state = 'noconfig'; renderNet(); return; }
+  if (typeof firebase === 'undefined') { NET.state = 'unavailable'; renderNet(); return; } // SDK non chargé : pas d'internet au lancement
   NET.fb = firebase.apps.length ? firebase.app() : firebase.initializeApp(cfg);
   NET.auth = firebase.auth(); NET.db = firebase.firestore();
   try { NET.auth.languageCode = 'fr'; } catch (e) {}
@@ -3021,7 +3221,8 @@ function syncOnline(g, live) {
   G.notice = '';
   if (grew && last) {
     const m = last.m;
-    if (m.power) G.notice = `${actor(m.color)} déclenché ${POWERS[m.piece].name}.`;
+    if (m.chest) G.notice = `${actor(m.color)} trouvé le coffre au trésor : tous ses pouvoirs sont rechargés !`;
+    else if (m.power) G.notice = `${actor(m.color)} déclenché ${POWERS[m.piece].name}.`;
     if (G.over) SND.end(); else if (m.power) SND.power(m); else if (last.san.endsWith('+')) SND.check();
     else if (m.castle) SND.castle(); else if (m.captured) SND.capture(); else SND.move();
     try { navigator.vibrate && navigator.vibrate(40); } catch (e) {}
@@ -3069,6 +3270,7 @@ function renderNet() {
     meEl.textContent = '';
     body.innerHTML = NET.state === 'loading' ? '<p class="net-empty">Connexion…</p>'
       : NET.state === 'unavailable' ? '<p class="net-note">Le jeu en ligne a besoin d\'internet. Vérifiez votre connexion puis relancez l\'application. Les parties contre l\'ordinateur et à deux restent disponibles.</p>'
+      : NET.state === 'noconfig' ? '<p class="net-note"><b>Les comptes en ligne ne sont pas encore activés dans cette version.</b> Le serveur de comptes (Firebase) doit être relié à l\'application ; une prochaine mise à jour l\'activera. En attendant, les parties contre l\'ordinateur et à deux fonctionnent normalement.</p>'
       : '<p class="net-note">Connectez-vous pour ajouter des amis et les défier sur leur propre téléphone.</p><button class="btn primary" data-act="login">Se connecter ou créer un compte</button>';
     return;
   }
@@ -3173,7 +3375,7 @@ function start(data) {
   if (data && data.G && data.G.states && data.G.states.length) {
     Object.assign(G, data.G, { sel: null, targets: [], hintMove: null, thinking: false, arm: null });
     renderAll(); maybeAI();
-  } else newGame({});
+  } else { newGame({}); showHome(); }
 }
 applyTheme();
 applyView(true);
