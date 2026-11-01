@@ -135,10 +135,11 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--gold);
 .mv { padding: 5px 8px; border-radius: 6px; font-weight: 500; }
 .mv.cur { background: var(--panel-2); color: var(--gold); font-weight: 700; box-shadow: inset 0 -2px 0 var(--gold); }
 .moves .empty { color: var(--muted); font-family: var(--f-body); font-size: 14px; padding: 20px 18px; line-height: 1.5; }
-.controls { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; padding: 12px; border-top: 1px solid var(--line); }
+.controls { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 6px; padding: 12px; border-top: 1px solid var(--line); }
 .controls .btn { justify-content: center; padding: 10px 6px; flex-direction: column; gap: 4px; font-size: 11px; font-weight: 600; color: var(--muted); }
 .controls .btn svg { width: 20px; height: 20px; color: var(--fg); }
 .controls .btn.on svg { color: var(--gold); }
+.controls .btn.danger, .controls .btn.danger svg { color: #ff6b5e; border-color: #e5534b; }
 .side .newgame { margin: 0 12px 12px; justify-content: center; }
 
 /* Fenêtres */
@@ -461,7 +462,7 @@ body:not(.moves-open) #moves { display: none; }
   #moves .mv.cur { box-shadow: none; }
   #moves .evrow { display: inline; margin: 0 2px; padding: 0 4px; border: 0; font-size: 10px; }
   .moves .empty { font-size: 11px; padding: 2px; line-height: 1.45; }
-  .controls { grid-area: ctrl; grid-template-columns: repeat(5, minmax(0, 1fr)); padding: 0; border: 0; gap: 3px; }
+  .controls { grid-area: ctrl; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); padding: 0; border: 0; gap: 3px; }
   .controls .btn { padding: 6px 1px; font-size: 0; gap: 0; } .controls .btn svg { width: 17px; height: 17px; }
   .side .newgame { display: none; }
   .modal { max-height: calc(100dvh - 24px); }
@@ -538,6 +539,7 @@ body:not(.moves-open) #moves { display: none; }
     <div class="controls">
       <button class="btn" id="btnRules" title="Les pouvoirs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.6 6.6L21 9.5l-5 4.4L17.5 21 12 17.3 6.5 21 8 13.9 3 9.5l6.4-.9z"/></svg>Pouvoirs</button>
       <button class="btn" id="btnUndo" title="Annuler le dernier coup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 010 12h-3"/></svg><span id="undoLabel">Annuler</span></button>
+      <button class="btn" id="btnResign" title="Abandonner la partie"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg><span id="resignLabel">Abandon</span></button>
       <button class="btn" id="btnFlip" title="Retourner l'échiquier"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16M7 20l-3-3M7 20l3-3M17 20V4M17 4l-3 3M17 4l3 3"/></svg>Retourner</button>
       <button class="btn" id="btnHint" title="Suggérer un coup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 00-4 10.5c.8.8 1 1.5 1 2.5h6c0-1 .2-1.7 1-2.5A6 6 0 0012 3z"/></svg>Indice</button>
       <button class="btn" id="btnSettings" title="Paramètres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg>Réglages</button>
@@ -610,7 +612,7 @@ body:not(.moves-open) #moves { display: none; }
     <h3 id="rulesTitle">Pouvoirs et événements</h3>
     <div class="rules" id="rulesList"></div>
     <div class="rules" id="eventsList"></div>
-    <p class="golden"><b>Comment jouer un pouvoir :</b> les pièces dont le pouvoir est prêt ont un cercle doré au sol. Touchez une fois la pièce pour ses coups normaux, une deuxième fois pour son coup spécial (cases marquées d'un losange doré), une troisième fois pour revenir aux coups normaux. Un pouvoir remplace votre coup, puis se recharge pendant le nombre de tours indiqué. <b>Échec par pouvoir :</b> une Catapulte, un Spectre, un Double bond ou une Percée prêts peuvent mettre le roi en échec, et même le mater : il faut parer la menace. Le roi n'est jamais capturé, la Supernova l'épargne et aucun événement ne le touche. <b>Événements :</b> en variante Super, un événement tiré au sort frappe l'échiquier au début des tours 5, 9, 13, 17… Le même ne tombe jamais deux fois de suite, et aucun ne peut donner mat.</p>
+    <p class="golden"><b>Comment jouer un pouvoir :</b> les pièces dont le pouvoir est prêt ont un cercle doré au sol. Touchez une fois la pièce pour ses coups normaux, une deuxième fois pour son coup spécial (cases marquées d'un losange doré), une troisième fois pour revenir aux coups normaux. Un pouvoir remplace votre coup, puis se recharge pendant le nombre de tours indiqué. <b>Règle d'or :</b> un pouvoir ne touche jamais un roi. Seuls les coups normaux donnent échec ; la Supernova épargne le roi et aucun événement ne le touche. <b>Événements :</b> en variante Super, un événement tiré au sort frappe l'échiquier au début des tours 5, 9, 13, 17… Le même ne tombe jamais deux fois de suite, et aucun ne peut donner mat.</p>
     <div class="actions"><button class="btn" id="rulesTuto">Revoir les premiers pas</button><button class="btn primary" id="rulesClose">Compris</button></div>
   </div>
 </div>
@@ -1915,57 +1917,9 @@ function attacked(st, s, by) {
       nr += dr; nf += df;
     }
   }
-  // un roi peut aussi être mis en échec par un pouvoir prêt de l'adversaire
-  if (b[s] && b[s].t === 'k' && powerThreat(st, s, by)) return true;
   return false;
 }
 
-/* Menaces de pouvoirs sur une case (utilisé pour le roi) : Percée, Catapulte, Spectre, Double bond.
-   La Supernova épargne toujours le roi, la Permutation ne capture rien. Un pouvoir désactivé
-   ou en recharge ne menace rien ; par Calme plat, seules les menaces à deux cases comptent. */
-function powerThreat(st, s, by) {
-  if (!st.powers || !st.cd || !st.cd[by]) return false;
-  const ready = t => st.cd[by][t] === 0 && !(st.rules && st.rules.off.includes(t));
-  const b = st.board, r = s >> 3, f = s & 7, calm = st.ev && st.ev.calm > 0;
-  const near = (rr, ff) => !calm || Math.max(Math.abs(rr - r), Math.abs(ff - f)) <= 2;
-  const own = (rr, ff, t) => { const q = b[idx(rr, ff)]; return q && q.c === by && q.t === t; };
-  if (ready('p')) { // Percée : un pion ennemi juste devant (de son point de vue)
-    const pr = by === 'w' ? r + 1 : r - 1;
-    if (inB(pr, f) && own(pr, f, 'p')) return true;
-  }
-  if (ready('r')) { // Catapulte : exactement une pièce entre la tour et le roi
-    for (const [dr, df] of ORTH) {
-      let nr = r + dr, nf = f + df, screen = false;
-      while (inB(nr, nf)) {
-        if (b[idx(nr, nf)]) {
-          if (!screen) screen = true;
-          else { if (own(nr, nf, 'r') && near(nr, nf)) return true; break; }
-        }
-        nr += dr; nf += df;
-      }
-    }
-  }
-  if (ready('b')) { // Spectre : un fou ennemi sur la diagonale, au-delà d'au moins une pièce
-    for (const [dr, df] of DIAG) {
-      let nr = r + dr, nf = f + df, passed = false;
-      while (inB(nr, nf)) {
-        if (b[idx(nr, nf)]) { if (passed && own(nr, nf, 'b') && near(nr, nf)) return true; passed = true; }
-        nr += dr; nf += df;
-      }
-    }
-  }
-  if (ready('n')) { // Double bond : deux sauts de cavalier par une case d'escale libre
-    for (const [a1, b1] of KN) {
-      const r1 = r + a1, f1 = f + b1;
-      if (!inB(r1, f1) || b[idx(r1, f1)]) continue;
-      for (const [a2, b2] of KN) {
-        const r2 = r1 + a2, f2 = f1 + b2;
-        if (inB(r2, f2) && (r2 !== r || f2 !== f) && own(r2, f2, 'n') && near(r2, f2)) return true;
-      }
-    }
-  }
-  return false;
-}
 
 const ROOK_HOME = { 0: 'bQ', 7: 'bK', 56: 'wQ', 63: 'wK' };
 
@@ -2007,7 +1961,8 @@ function makeMove(st, m) {
   return n;
 }
 
-/* Pièces adverses qui mettent en échec le roi du camp au trait (y compris par un pouvoir prêt).
+/* Pièces adverses qui mettent en échec le roi du camp au trait (coups normaux uniquement :
+   règle d'or, un pouvoir ne touche jamais un roi).
    Chaque pièce est testée seule : les autres pièces ennemies deviennent de simples obstacles neutres. */
 function checkers(st) {
   const k = findKing(st, st.turn); if (k < 0) return [];
@@ -2898,10 +2853,13 @@ powerbarEl.addEventListener('click', e => {
 });
 function renderControls() {
   const online = G.settings.mode === 'online';
-  document.getElementById('undoLabel').textContent = online ? (resignArmed ? 'Sûr ?' : 'Abandon') : 'Annuler';
-  document.getElementById('btnUndo').title = online ? 'Abandonner la partie' : 'Annuler le dernier coup';
-  document.getElementById('btnUndo').disabled = online ? !!G.over
-    : !G.hist.length || (G.settings.mode === 'ai' && !G.hist.some(h => h.m.color === G.human));
+  // en ligne, pas de retour en arrière : le bouton Annuler disparaît
+  document.getElementById('btnUndo').hidden = online;
+  document.getElementById('btnUndo').disabled = online || !G.hist.length || (G.settings.mode === 'ai' && !G.hist.some(h => h.m.color === G.human));
+  const rs = document.getElementById('btnResign');
+  rs.disabled = !!G.over || (!online && !G.hist.length);
+  rs.classList.toggle('danger', resignArmed);
+  document.getElementById('resignLabel').textContent = resignArmed ? 'Sûr ?' : 'Abandon';
   document.getElementById('btnHint').disabled = online || !humanTurn();
 }
 function renderAll(anim) { recordEnd(); renderBoard(anim); renderPlayers(); renderMoves(); renderStatus(); renderChips(); renderControls(); renderPowers(); snapshot(); }
@@ -3142,13 +3100,20 @@ setInterval(() => {
 
 /* ---------- Boutons ---------- */
 let resignArmed = false, resignTimer = null;
+/* Abandon : premier appui « Sûr ? », second appui dans les 3 secondes pour confirmer */
+document.getElementById('btnResign').onclick = () => {
+  if (G.over || !G.hist.length && G.settings.mode !== 'online') return;
+  if (!resignArmed) { resignArmed = true; renderControls(); clearTimeout(resignTimer); resignTimer = setTimeout(() => { resignArmed = false; renderControls(); }, 3000); return; }
+  resignArmed = false; clearTimeout(resignTimer);
+  if (G.settings.mode === 'online') { resignOnline(); return; }
+  const loser = G.settings.mode === 'ai' ? G.human : cur().turn, w = other(loser);
+  G.review = null; G.sel = null; G.targets = []; G.arm = null;
+  G.over = { type: 'resign', winner: w, title: `Abandon · ${WHO(w)} gagnent`,
+    sub: G.settings.mode === 'ai' ? 'Vous avez abandonné la partie.' : `Les ${WHO(loser)} ont abandonné la partie.` };
+  aiReq++; G.thinking = false; SND.end(); renderAll(); setTimeout(showEnd, 300);
+};
 document.getElementById('btnUndo').onclick = () => {
-  if (G.settings.mode === 'online') {
-    if (G.over) return;
-    if (!resignArmed) { resignArmed = true; renderControls(); clearTimeout(resignTimer); resignTimer = setTimeout(() => { resignArmed = false; renderControls(); }, 3000); return; }
-    resignArmed = false; clearTimeout(resignTimer); resignOnline();
-    return;
-  }
+  if (G.settings.mode === 'online') return;
   if (!G.hist.length) return;
   G.review = null;
   aiReq++; G.thinking = false; G.over = null;
@@ -3913,7 +3878,7 @@ const TUTO = [
   { ico: () => pieceSVG('p', 'w'), title: 'Jouer un coup', text: 'Touchez une de vos pièces : les cases où elle peut aller s\'affichent. Touchez ensuite la case d\'arrivée. En 2D, vous pouvez aussi la faire glisser.' },
   { ico: () => '<div class="pwring armed"></div>' + pieceSVG('n', 'w'), title: 'Les pouvoirs', text: 'Un cercle doré au sol signale une pièce dont le pouvoir est prêt. Touchez-la deux fois pour son coup spécial, une troisième fois pour revenir aux coups normaux.' },
   { ico: () => `<span style="color:var(--gold)">${evIcon('gust')}</span>`, title: 'Les événements', text: 'Tous les 4 tours, un événement secoue la partie : rafale de vent, météores, coffre au trésor… Le compteur du panneau vous prévient à l\'avance.' },
-  { ico: () => pieceSVG('k', 'w'), title: 'Échec par pouvoir', text: 'Une Catapulte, un Spectre, un Double bond ou une Percée prêts menacent aussi le roi : surveillez les cercles dorés de l\'adversaire !' },
+  { ico: () => pieceSVG('k', 'w'), title: 'Le roi est protégé', text: 'Un pouvoir ne touche jamais un roi : seuls les coups normaux donnent échec. Les pièces qui mettent votre roi en échec sont soulignées en rouge.' },
   { ico: () => '<svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>', title: 'Menu et panneau', text: 'Le panneau de droite se replie pour agrandir l\'échiquier. Le menu donne accès aux parties, aux paramètres (son, 3D, règles des pouvoirs) et à vos statistiques. Touchez un coup de la liste pour revoir la partie.' }
 ];
 let tutoI = 0;
