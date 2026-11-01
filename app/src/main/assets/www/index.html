@@ -352,6 +352,25 @@ body[data-sc-theme="pirate"] .home-head h1 { font-weight: 400; letter-spacing: .
 .st-tile b { display: block; font: 700 22px var(--f-mono); color: var(--gold); }
 .st-tile span { font-size: 12px; color: var(--muted); }
 .st-fav { display: flex; flex-wrap: wrap; gap: 6px; }
+.power-pill { position: absolute; left: 50%; top: 12px; transform: translateX(-50%); z-index: 28; display: flex; align-items: center; gap: 8px;
+  padding: 5px 14px 5px 6px; border-radius: 999px; background: color-mix(in srgb, var(--panel) 94%, transparent); border: 1px solid var(--gold);
+  font-size: 13px; font-weight: 700; white-space: nowrap; pointer-events: none; animation: pillIn 2.8s ease both; box-shadow: 0 10px 24px -10px rgba(0,0,0,.8); }
+.power-pill svg { width: 28px; height: 28px; }
+@keyframes pillIn { 0% { opacity: 0; transform: translate(-50%, -8px); } 8%, 85% { opacity: 1; transform: translate(-50%, 0); } 100% { opacity: 0; } }
+.ach-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px; }
+.ach { display: grid; grid-template-columns: 30px 1fr; column-gap: 8px; align-items: center; padding: 7px 9px; border-radius: 10px; background: var(--panel-2); opacity: .5; }
+.ach.on { opacity: 1; box-shadow: inset 0 0 0 1px var(--gold); }
+.ach-ico { grid-row: span 2; font-size: 20px; text-align: center; }
+.ach b { font-size: 12.5px; } .ach small { font-size: 11px; color: var(--muted); line-height: 1.3; }
+/* fiche d'une pièce (appui long) */
+.piece-card { position: absolute; left: 50%; top: 10px; transform: translateX(-50%); z-index: 30; width: min(320px, calc(100% - 20px));
+  display: grid; grid-template-columns: 46px 1fr; gap: 4px 10px; align-items: center; padding: 10px 12px; border-radius: 14px;
+  background: color-mix(in srgb, var(--panel) 95%, transparent); border: 1px solid var(--gold); box-shadow: 0 14px 30px -10px rgba(0,0,0,.8); pointer-events: none;
+  animation: cardIn .15s ease-out; }
+@keyframes cardIn { from { opacity: 0; transform: translate(-50%, -6px); } }
+.piece-card .pc-ico { grid-row: span 3; width: 46px; height: 46px; } .piece-card .pc-ico svg { width: 100%; height: 100%; }
+.piece-card b { font-size: 14px; } .piece-card p { margin: 0; font-size: 12px; color: var(--muted); line-height: 1.35; }
+.piece-card .pc-st { font-size: 12px; font-weight: 700; } .pc-st.ready { color: var(--gold); } .pc-st.wait { color: var(--fg); } .pc-st.off { color: var(--muted); }
 .st-fav span { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px 3px 3px; border-radius: 999px; background: var(--panel-2); font-size: 12px; font-weight: 700; }
 .st-fav svg { width: 22px; height: 22px; }
 .hbtn.small { padding: 11px 12px; font-size: 14px; gap: 10px; } .hbtn.small svg { width: 22px; height: 22px; } .hbtn.small small { font-size: 12px; }
@@ -657,7 +676,7 @@ body:not(.moves-open) #moves { display: none; }
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="statsTitle">
     <h3 id="statsTitle">Statistiques</h3>
     <div id="statsBody" class="stats-grid"></div>
-    <div class="actions"><button class="btn" id="statsReset">Remettre à zéro</button><button class="btn primary" id="statsClose">Fermer</button></div>
+    <div class="actions"><button class="btn primary" id="statsClose">Fermer</button></div>
   </div>
 </div>
 
@@ -1589,11 +1608,17 @@ function createBoard3D(container, opts) {
     const f = Math.floor(b.point.x + 4), rr = Math.floor(b.point.z + 4);
     return f >= 0 && f < 8 && rr >= 0 && rr < 8 ? rr * 8 + f : null;
   }
-  let pd = null;
+  let pd = null, lpT = 0;
   el.addEventListener('pointerdown', e => {
     if (e.button !== 0 && e.pointerType === 'mouse') return;
     pd = { x: e.clientX, y: e.clientY, az: userAz, pol, moved: false };
     el.setPointerCapture(e.pointerId);
+    // appui long : fiche de la pièce (le relâchement ne compte alors pas comme un toucher)
+    clearTimeout(lpT);
+    if (opts.onLongPress) {
+      const at = { clientX: e.clientX, clientY: e.clientY }, mine = pd;
+      lpT = setTimeout(() => { if (pd === mine && !pd.moved && touches.size < 2) { pd.moved = true; opts.onLongPress(pick(at)); } }, 520);
+    }
   });
   el.addEventListener('pointermove', e => {
     if (!pd) return;
@@ -1607,6 +1632,7 @@ function createBoard3D(container, opts) {
     }
   });
   el.addEventListener('pointerup', e => {
+    clearTimeout(lpT);
     if (pd && !pd.moved) opts.onTap(pick(e));
     pd = null;
   });
@@ -2862,7 +2888,23 @@ function renderControls() {
   document.getElementById('resignLabel').textContent = resignArmed ? 'Sûr ?' : 'Abandon';
   document.getElementById('btnHint').disabled = online || !humanTurn();
 }
-function renderAll(anim) { recordEnd(); renderBoard(anim); renderPlayers(); renderMoves(); renderStatus(); renderChips(); renderControls(); renderPowers(); snapshot(); }
+/* Annonce sur l'échiquier quand l'adversaire déclenche un pouvoir (visible même panneau replié) */
+let annLen = 0;
+function announcePower() {
+  const n = G.hist.length;
+  if (G.review != null) return;
+  if (n !== annLen + 1) { annLen = n; return; } // partie reprise, annulation… : rien à annoncer
+  annLen = n;
+  const m = G.hist[n - 1].m;
+  if (!m.power || (G.settings.mode !== 'local' && m.color === G.human)) return;
+  const who = G.settings.mode === 'ai' ? 'L\'ordinateur déclenche' : G.settings.mode === 'online' ? oppName() + ' déclenche' : `Les ${WHO(m.color)} déclenchent`;
+  const el = document.createElement('div'); el.className = 'power-pill';
+  el.innerHTML = pieceSVG(m.piece, m.color) + '<span></span>';
+  el.querySelector('span').textContent = `${who} ${POWERS[m.piece].name}` + (m.blast ? ` · ${m.blast.length + 1} pièces détruites` : '');
+  wrap.querySelectorAll('.power-pill').forEach(x => x.remove());
+  wrap.appendChild(el); setTimeout(() => el.remove(), 2800);
+}
+function renderAll(anim) { recordEnd(); announcePower(); renderBoard(anim); renderPlayers(); renderMoves(); renderStatus(); renderChips(); renderControls(); renderPowers(); snapshot(); }
 function flash(squares, kind) {
   if (view3d && G.view === '3d') { view3d.flash(squares, kind); return; }
   for (const s of squares) {
@@ -3004,7 +3046,7 @@ function tapSquare(s) {
 /* ---------- Vue 3D ---------- */
 const view3dEl = document.getElementById('view3d');
 let view3d = null;
-try { view3d = typeof createBoard3D === 'function' ? createBoard3D(view3dEl, { onTap: tapSquare, theme: THEME }) : null; } catch (e) { view3d = null; }
+try { view3d = typeof createBoard3D === 'function' ? createBoard3D(view3dEl, { onTap: tapSquare, onLongPress: showPieceCard, theme: THEME }) : null; } catch (e) { view3d = null; }
 G.view = '2d';
 if (view3d) {
   let saved = null;
@@ -3025,6 +3067,48 @@ function applyView(first) {
 
 
 let drag = null, ghost = null, hoverEl = null;
+/* ---------- Fiche d'une pièce : appui long sur n'importe quelle pièce (2D et 3D) ---------- */
+let lpTimer = 0, lpEat = false, cardEl = null, cardTimer = 0;
+function hideCard() { if (cardEl) { cardEl.remove(); cardEl = null; } clearTimeout(cardTimer); }
+function showPieceCard(s) {
+  hideCard();
+  if (s == null) return;
+  const st = viewSt(), p = st.board[s];
+  if (!p || (st.ev && st.ev.fog > 0 && !G.over && p.c !== powerSide())) return;
+  let ico, title, text, stat = '', cls = '';
+  if (p.t === 'x') {
+    const K = { ice: ['Bloc de glace', 'Infranchissable : aucune pièce ne peut s\'y poser ni le traverser.'],
+      crater: ['Cratère', 'Infranchissable : aucune pièce ne peut s\'y poser ni le traverser.'],
+      chest: ['Coffre au trésor', 'Une pièce qui s\'y pose recharge tous les pouvoirs de son camp. On ne peut pas passer à travers.'] }[p.kind] || ['Obstacle', ''];
+    ico = wallSVG(p.kind); [title, text] = K; stat = `Disparaît dans ${Math.ceil(p.ttl / 2)} tour${Math.ceil(p.ttl / 2) > 1 ? 's' : ''}`; cls = 'wait';
+  } else {
+    const P = POWERS[p.t];
+    ico = pieceSVG(p.t, p.c);
+    title = `${NAMES[p.t][0].toUpperCase() + NAMES[p.t].slice(1)} ${p.c === 'w' ? 'blanc' : 'noir'}${'qr'.includes(p.t) ? 'e' : ''} · ${P.name}`;
+    text = P.desc;
+    if (!st.powers) { stat = 'Pouvoirs désactivés dans cette variante'; cls = 'off'; }
+    else if (st.rules && st.rules.off.includes(p.t)) { stat = 'Pouvoir désactivé dans les règles'; cls = 'off'; }
+    else if (st.cd[p.c][p.t] === 0) { stat = '● Pouvoir prêt'; cls = 'ready'; }
+    else { const n = st.cd[p.c][p.t]; stat = `Recharge : prêt dans ${n} tour${n > 1 ? 's' : ''}`; cls = 'wait'; }
+  }
+  cardEl = document.createElement('div'); cardEl.className = 'piece-card'; cardEl.setAttribute('role', 'status');
+  cardEl.innerHTML = `<div class="pc-ico">${ico}</div><b></b><p></p><span class="pc-st ${cls}"></span>`;
+  cardEl.querySelector('b').textContent = title; cardEl.querySelector('p').textContent = text; cardEl.querySelector('.pc-st').textContent = stat;
+  wrap.appendChild(cardEl);
+  try { navigator.vibrate && navigator.vibrate(12); } catch (e) {}
+  cardTimer = setTimeout(hideCard, 4500);
+}
+document.addEventListener('pointerdown', e => { if (cardEl && !e.target.closest('.piece-card')) hideCard(); }, true);
+boardEl.addEventListener('pointerdown', e => {
+  lpEat = false; clearTimeout(lpTimer);
+  const s0 = sqAt(e), x0 = e.clientX, y0 = e.clientY;
+  if (s0 == null || !viewSt().board[s0]) return;
+  lpTimer = setTimeout(() => { lpEat = true; showPieceCard(s0); }, 520);
+  const stop = ev => { if (ev.type !== 'pointermove' || Math.hypot(ev.clientX - x0, ev.clientY - y0) > 5) { clearTimeout(lpTimer); off(); } };
+  const off = () => ['pointermove', 'pointerup', 'pointercancel'].forEach(t => boardEl.removeEventListener(t, stop));
+  ['pointermove', 'pointerup', 'pointercancel'].forEach(t => boardEl.addEventListener(t, stop));
+});
+boardEl.addEventListener('contextmenu', e => e.preventDefault());
 boardEl.addEventListener('pointerdown', e => {
   if (e.button !== 0 && e.pointerType === 'mouse') return;
   const s = sqAt(e);
@@ -3058,6 +3142,7 @@ boardEl.addEventListener('pointermove', e => {
   }
 });
 function endDrag(e, cancel) {
+  if (lpEat) { lpEat = false; if (drag) { drag = null; if (ghost) { ghost.remove(); ghost = null; } renderBoard(); } return; }
   if (!drag) return;
   const d = drag; drag = null;
   if (ghost) { ghost.remove(); ghost = null; }
@@ -3829,7 +3914,7 @@ netInit();
 
 /* ---------- Conservation de la partie lors des mises à jour ---------- */
 /* ---------- Statistiques (sur cet appareil) ---------- */
-const STATS0 = () => ({ ai: { 1: [0, 0, 0], 2: [0, 0, 0], 3: [0, 0, 0], 4: [0, 0, 0] }, online: [0, 0, 0], local: 0, streak: 0, best: 0, powers: {}, events: 0, seen: [] });
+const STATS0 = () => ({ ai: { 1: [0, 0, 0], 2: [0, 0, 0], 3: [0, 0, 0], 4: [0, 0, 0] }, online: [0, 0, 0], local: 0, streak: 0, best: 0, powers: {}, events: 0, seen: [], ach: {} });
 let STATS = STATS0();
 try { STATS = Object.assign(STATS0(), JSON.parse(localStorage.getItem('superchess.stats') || '{}')); } catch (e) {}
 const saveStats = () => { try { localStorage.setItem('superchess.stats', JSON.stringify(STATS)); } catch (e) {} };
@@ -3850,7 +3935,74 @@ function recordEnd() { // appelée à chaque rendu : n'enregistre qu'une fois ch
     if (h.m.power && (G.settings.mode === 'local' || h.m.color === G.human)) STATS.powers[h.m.piece] = (STATS.powers[h.m.piece] || 0) + 1;
     if (h.ev) STATS.events++;
   }
+  checkAchievements(res);
   saveStats();
+}
+
+/* ---------- Succès : débloqués en fin de partie, conservés sur l'appareil ---------- */
+const ACH = [
+  { id: 'first', ico: '🏆', name: 'Premier abordage', desc: 'Gagner une partie contre l\'ordinateur ou en ligne.' },
+  { id: 'mate20', ico: '⚡', name: 'Coup de grâce', desc: 'Mater en moins de 20 coups.' },
+  { id: 'l3', ico: '🧭', name: 'Corsaire aguerri', desc: 'Battre l\'ordinateur au niveau 3 ou plus.' },
+  { id: 'l4', ico: '👑', name: 'Terreur des mers', desc: 'Battre l\'ordinateur au niveau maximal.' },
+  { id: 'online', ico: '🌍', name: 'Duelliste', desc: 'Gagner une partie en ligne.' },
+  { id: 'nova3', ico: '💥', name: 'Bordée complète', desc: 'Détruire au moins 3 pièces avec une seule Supernova.' },
+  { id: 'all6', ico: '✨', name: 'Maître des pouvoirs', desc: 'Utiliser les six pouvoirs dans une même partie.' },
+  { id: 'pure', ico: '🗡️', name: 'À l\'ancienne', desc: 'Gagner une partie à pouvoirs sans en utiliser un seul.' },
+  { id: 'promo', ico: '🎖️', name: 'Promotion éclair', desc: 'Promouvoir un pion grâce à la Percée.' },
+  { id: 'chest', ico: '💰', name: 'Chasseur de trésor', desc: 'Ouvrir un coffre au trésor.' },
+  { id: 'comeback', ico: '🔥', name: 'Remontada', desc: 'Gagner après avoir été mené de 5 points de matériel ou plus.' },
+  { id: 'streak3', ico: '🌊', name: 'Vent en poupe', desc: 'Enchaîner 3 victoires.' },
+  { id: 'ev10', ico: '🌪️', name: 'Vieux loup de mer', desc: 'Vivre 10 événements.' },
+  { id: 'g25', ico: '⚓', name: 'Équipage fidèle', desc: 'Terminer 25 parties.' }
+];
+let achQueue = [];
+function unlock(id, silent) {
+  if (STATS.ach[id]) return;
+  STATS.ach[id] = Date.now();
+  const a = ACH.find(x => x.id === id); if (!a || silent) return;
+  achQueue.push(a);
+  if (achQueue.length === 1) showAch();
+}
+function showAch() {
+  const a = achQueue[0]; if (!a) return;
+  if (typeof toast === 'function') toast(`${a.ico} Succès débloqué : ${a.name}`);
+  try { navigator.vibrate && navigator.vibrate([20, 30, 20]); } catch (e) {}
+  setTimeout(() => { achQueue.shift(); showAch(); }, 3700);
+}
+function checkAchievements(res) {
+  const mode = G.settings.mode, mine = c => mode === 'local' || c === G.human;
+  const won = res === 0 && mode !== 'local';
+  const used = new Set();
+  let behind = 0;
+  G.hist.forEach((h, i) => {
+    const m = h.m, before = G.states[i];
+    if (mine(m.color)) {
+      if (m.power) used.add(m.piece);
+      if (m.power && m.piece === 'q' && m.blast && 1 + m.blast.length >= 3) unlock('nova3');
+      if (m.power && m.piece === 'p' && m.promo) unlock('promo');
+      if (m.chest) unlock('chest');
+    }
+    const after = G.states[i + 1];
+    if (after && mode !== 'local') {
+      const val = c => after.board.reduce((n, p) => n + (p && p.c === c && VAL[p.t] && p.t !== 'k' ? VAL[p.t] : 0), 0);
+      behind = Math.max(behind, val(other(G.human)) - val(G.human));
+    }
+  });
+  if (used.size === 6) unlock('all6');
+  if (won) {
+    unlock('first');
+    if (G.over.type === 'mate' && G.hist.length <= 40) unlock('mate20');
+    if (mode === 'ai' && G.settings.level >= 3) unlock('l3');
+    if (mode === 'ai' && G.settings.level >= 4) unlock('l4');
+    if (mode === 'online') unlock('online');
+    if (G.settings.variant !== 'classic' && !G.hist.some(h => h.m.power && h.m.color === G.human)) unlock('pure');
+    if (behind >= 500) unlock('comeback');
+  }
+  if (STATS.best >= 3) unlock('streak3');
+  if (STATS.events >= 10) unlock('ev10');
+  const tot = a => a[0] + a[1] + a[2];
+  if ([1, 2, 3, 4].reduce((n, l) => n + tot(STATS.ai[l]), 0) + tot(STATS.online) + STATS.local >= 25) unlock('g25');
 }
 function openStats() {
   const tot = a => a[0] + a[1] + a[2], all = [1, 2, 3, 4].reduce((n, l) => n + tot(STATS.ai[l]), 0) + tot(STATS.online) + STATS.local;
@@ -3862,16 +4014,24 @@ function openStats() {
     `<div class="st-row head"><span>Adversaire</span><span>Vict.</span><span>Nulles</span><span>Déf.</span></div>` +
     [1, 2, 3, 4].map(l => row('Ordinateur · ' + LEVELS[l].name, STATS.ai[l])).join('') + row('En ligne', STATS.online) +
     `<p class="net-empty">À deux sur cet appareil : ${STATS.local} partie${STATS.local > 1 ? 's' : ''} · Événements vécus : ${STATS.events}</p>` +
+    `<div><p class="net-empty" style="margin-bottom:6px">Succès · ${ACH.filter(a => STATS.ach[a.id]).length}/${ACH.length}</p><div class="ach-grid">${ACH.map(a => `<div class="ach${STATS.ach[a.id] ? ' on' : ''}" title="${a.desc}"><span class="ach-ico">${STATS.ach[a.id] ? a.ico : '🔒'}</span><b>${a.name}</b><small>${a.desc}</small></div>`).join('')}</div></div>` +
     (fav.length ? `<div><p class="net-empty" style="margin-bottom:6px">Vos pouvoirs favoris</p><div class="st-fav">${fav.map(([t, n]) => `<span>${pieceSVG(t, 'w')}${POWERS[t].name} · ${n}</span>`).join('')}</div></div>` : '');
-  document.getElementById('statsReset').textContent = 'Remettre à zéro';
   showModal('statsModal');
 }
+// succès déjà mérités avant leur apparition : débloqués sans annonce
+(() => {
+  const tot = a => a[0] + a[1] + a[2], ai = l => STATS.ai[l][0];
+  if ([1, 2, 3, 4].some(ai) || STATS.online[0]) unlock('first', true);
+  if (ai(3) || ai(4)) unlock('l3', true);
+  if (ai(4)) unlock('l4', true);
+  if (STATS.online[0]) unlock('online', true);
+  if (STATS.best >= 3) unlock('streak3', true);
+  if (STATS.events >= 10) unlock('ev10', true);
+  if ([1, 2, 3, 4].reduce((n, l) => n + tot(STATS.ai[l]), 0) + tot(STATS.online) + STATS.local >= 25) unlock('g25', true);
+  saveStats();
+})();
 document.getElementById('statsClose').onclick = () => hideModal('statsModal');
 document.getElementById('statsModal').addEventListener('click', e => { if (e.target.id === 'statsModal') hideModal('statsModal'); });
-document.getElementById('statsReset').onclick = e => { // confirmation en deux temps, dans la page
-  if (e.currentTarget.textContent !== 'Confirmer la remise à zéro') { e.currentTarget.textContent = 'Confirmer la remise à zéro'; return; }
-  STATS = STATS0(); saveStats(); openStats();
-};
 
 /* ---------- Premiers pas (au premier lancement, puis depuis les Règles) ---------- */
 const TUTO = [
